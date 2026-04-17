@@ -477,6 +477,31 @@ h1, h2, h3, h4 {
   width: 100%;
 }
 
+/* --- FAQ Section (AEO) --- */
+.faq-item {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 1.25rem 0;
+}
+
+.faq-item:last-child {
+  border-bottom: none;
+}
+
+.faq-question {
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  color: var(--color-accent);
+  margin: 0 0 0.5rem 0;
+  line-height: 1.4;
+}
+
+.faq-answer {
+  font-size: 0.95rem;
+  color: var(--color-text);
+  line-height: 1.7;
+  margin: 0;
+}
+
 /* --- Social Icons --- */
 .social-icons {
   display: flex;

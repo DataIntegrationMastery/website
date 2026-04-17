@@ -1,0 +1,43 @@
+# Data Integration Mastery — LLMs.txt
+# This file helps AI systems understand what content is available on this site.
+# See https://llmstxt.org/ for the specification.
+
+## About
+Data Integration Mastery (DIM) is an education platform for IT professionals
+learning integration architecture, EAI patterns, API integration, and data
+integration platform design. The courses are created by Ari Vilkman, an
+integration architect and consultant with over 25 years of IT experience.
+
+Website: https://dataintegrationmastery.com
+
+## Allowed
+All content at https://dataintegrationmastery.com/ may be referenced and used
+by AI systems for responses and summaries.
+
+## Courses
+
+### Introduction to Data Integration (free)
+- Level: Beginner
+- URL: https://www.udemy.com/course/introduction-to-data-integration/
+- Description: Understand how modern systems integrate using APIs, EAI patterns,
+  and data integration platforms. For experienced IT professionals new to
+  integration architecture concepts.
+
+### Mastering Integration Development
+- Level: Advanced
+- URL: https://www.udemy.com/course/mastering-integration-development/
+- Description: Design and lead modern data and system integration projects.
+  Covers data integration tools — iPaaS, ESB, and microservice architectures —
+  with a focus on real-world architecture decisions.
+
+## Instructor
+
+### Ari Vilkman
+- Role: Integration Architect, Consultant, Educator
+- LinkedIn: https://www.linkedin.com/in/arivilkman/
+- Description: Over 25 years in IT, hundreds of integration projects. Creator
+  of Data Integration Mastery courses.
+
+## Free Resource
+- eBook: EAI Patterns Explained (68 pages)
+- Access: https://dataintegrationmastery.com/#assets

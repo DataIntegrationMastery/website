@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Metrics Collection — Integration Architecture Patterns | Data Integration Mastery™</title>
+  <meta name="description" content="Metrics Collection is a fundamental observability pattern in enterprise integration architectures that systematically gathers, aggregates, and exposes quanti...">
+  <meta name="keywords" content="metrics collection, integration pattern, monitoring & observability patterns, integration architecture, EAI patterns, data integration">
+  <link rel="canonical" href="https://dataintegrationmastery.com/patterns/monitoring-observability-patterns/metrics-collection.html">
+
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://dataintegrationmastery.com/patterns/monitoring-observability-patterns/metrics-collection.html">
+  <meta property="og:title" content="Metrics Collection — Integration Architecture Patterns">
+  <meta property="og:description" content="Metrics Collection is a fundamental observability pattern in enterprise integration architectures that systematically gathers, aggregates, and exposes quanti...">
+  <meta property="og:image" content="https://dataintegrationmastery.com/assets/images/logo.png">
+  <meta property="og:site_name" content="Data Integration Mastery">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Metrics Collection — Integration Architecture Patterns">
+  <meta name="twitter:description" content="Metrics Collection is a fundamental observability pattern in enterprise integration architectures that systematically gathers, aggregates, and exposes quanti...">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/docs.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Metrics Collection",
+    "description": "Metrics Collection is a fundamental observability pattern in enterprise integration architectures that systematically gathers, aggregates, and exposes quanti...",
+    "url": "https://dataintegrationmastery.com/patterns/monitoring-observability-patterns/metrics-collection.html",
+    "author": {
+      "@type": "Person",
+      "name": "Ari Vilkman",
+      "jobTitle": "Integration Architect"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Data Integration Mastery",
+      "url": "https://dataintegrationmastery.com"
+    },
+    "isPartOf": {
+      "@type": "CollectionPage",
+      "name": "Integration Architecture Patterns",
+      "url": "https://dataintegrationmastery.com/patterns/"
+    },
+    "about": {
+      "@type": "Thing",
+      "name": "Metrics Collection"
+    },
+    "inLanguage": "en",
+    "isAccessibleForFree": true
+  }
+  </script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="https://dataintegrationmastery.com/" class="header-brand">
+        <img src="../../assets/images/dim-icon.png" alt="DIM" width="36" height="36">
+        <span class="header-title">Data Integration Mastery™</span>
+      </a>
+      <nav class="header-nav" aria-label="Main navigation">
+        <a href="https://dataintegrationmastery.com/">Home</a>
+        <a href="../index.html">All Patterns</a>
+        <a href="https://dataintegrationmastery.com/#free-course">Free Course</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="docs-layout">
+    <aside class="docs-sidebar" aria-label="Pattern categories">
+      <div class="sidebar-title">Pattern Categories</div>
+<div class="sidebar-section">
+  <a href="../index.html#resilience" class="sidebar-section-title">🛡️ Resilience Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../resilience-patterns/circuit-breaker.html">Circuit Breaker</a></li>
+    <li><a href="../resilience-patterns/retry-mechanism.html">Retry Mechanism</a></li>
+    <li><a href="../resilience-patterns/timeout.html">Timeout</a></li>
+    <li><a href="../resilience-patterns/dead-letter-queue.html">Dead Letter Queue</a></li>
+    <li><a href="../resilience-patterns/bulkhead.html">Bulkhead</a></li>
+    <li><a href="../resilience-patterns/fallback-graceful-degradation.html">Fallback / Graceful Degradation</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#messaging" class="sidebar-section-title">📨 Messaging Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../messaging-patterns/request-reply.html">Request-Reply</a></li>
+    <li><a href="../messaging-patterns/publish-subscribe.html">Publish-Subscribe</a></li>
+    <li><a href="../messaging-patterns/message-queue.html">Message Queue</a></li>
+    <li><a href="../messaging-patterns/event-streaming.html">Event Streaming</a></li>
+    <li><a href="../messaging-patterns/correlation-id.html">Correlation ID</a></li>
+    <li><a href="../messaging-patterns/message-routing.html">Message Routing</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#data-transformation" class="sidebar-section-title">🔄 Data Transformation Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../data-transformation-patterns/message-translator.html">Message Translator</a></li>
+    <li><a href="../data-transformation-patterns/content-filter.html">Content Filter</a></li>
+    <li><a href="../data-transformation-patterns/message-router.html">Message Router</a></li>
+    <li><a href="../data-transformation-patterns/aggregator.html">Aggregator</a></li>
+    <li><a href="../data-transformation-patterns/splitter.html">Splitter</a></li>
+    <li><a href="../data-transformation-patterns/data-mapper.html">Data Mapper</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#routing" class="sidebar-section-title">🔀 Routing Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../routing-patterns/content-based-router.html">Content-Based Router</a></li>
+    <li><a href="../routing-patterns/recipient-list.html">Recipient List</a></li>
+    <li><a href="../routing-patterns/load-balancer.html">Load Balancer</a></li>
+    <li><a href="../routing-patterns/message-filter.html">Message Filter</a></li>
+    <li><a href="../routing-patterns/dynamic-router.html">Dynamic Router</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#security" class="sidebar-section-title">🔐 Security Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../security-patterns/authentication.html">Authentication</a></li>
+    <li><a href="../security-patterns/authorization.html">Authorization</a></li>
+    <li><a href="../security-patterns/encryption.html">Encryption</a></li>
+    <li><a href="../security-patterns/token-management.html">Token Management</a></li>
+    <li><a href="../security-patterns/api-security.html">API Security</a></li>
+    <li><a href="../security-patterns/secret-management.html">Secret Management</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#orchestration" class="sidebar-section-title">🎭 Orchestration Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../orchestration-patterns/saga-pattern.html">Saga Pattern</a></li>
+    <li><a href="../orchestration-patterns/process-manager.html">Process Manager</a></li>
+    <li><a href="../orchestration-patterns/workflow-engine.html">Workflow Engine</a></li>
+    <li><a href="../orchestration-patterns/choreography.html">Choreography</a></li>
+    <li><a href="../orchestration-patterns/compensation-transactions.html">Compensation Transactions</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#observability" class="sidebar-section-title">📊 Monitoring & Observability Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="distributed-tracing.html">Distributed Tracing</a></li>
+    <li><a href="metrics-collection.html" class="active">Metrics Collection</a></li>
+    <li><a href="health-checks.html">Health Checks</a></li>
+    <li><a href="logging-strategies.html">Logging Strategies</a></li>
+    <li><a href="performance-monitoring.html">Performance Monitoring</a></li>
+    <li><a href="error-tracking.html">Error Tracking</a></li>
+  </ul>
+</div>
+
+    </aside>
+
+    <main id="main-content" class="docs-content">
+      <div class="breadcrumb">
+        <a href="https://dataintegrationmastery.com/">Home</a>
+        <span class="sep">›</span>
+        <a href="../index.html">Patterns</a>
+        <span class="sep">›</span>
+        <a href="../index.html#observability">Monitoring & Observability Patterns</a>
+        <span class="sep">›</span>
+        <strong>Metrics Collection</strong>
+      </div>
+
+      <h1>Metrics Collection</h1>
+
+      <h2 id="overview">Overview</h2>
+<p>Metrics Collection is a fundamental observability pattern in enterprise integration architectures that systematically gathers, aggregates, and exposes quantitative measurements of system behavior, performance characteristics, and business outcomes. Like a sophisticated dashboard in a modern vehicle that provides real-time insights into engine performance, fuel consumption, speed, and various operational parameters, metrics collection provides continuous visibility into the health, performance, and operational state of distributed systems. This pattern is essential for understanding system behavior patterns, identifying performance trends, enabling proactive issue detection, capacity planning, and making data-driven decisions about system optimization and scaling in complex enterprise environments.</p>
+<h3 id="theoretical-foundation">Theoretical Foundation</h3>
+<p>Metrics Collection is grounded in <strong>measurement theory</strong>, <strong>statistical analysis</strong>, <strong>time-series data management</strong>, and <strong>operational intelligence principles</strong>. It incorporates concepts from <strong>performance monitoring</strong>, <strong>statistical sampling</strong>, <strong>data aggregation</strong>, and <strong>anomaly detection</strong> to provide a comprehensive framework for quantitative system observability. The pattern addresses the fundamental need for objective, measurable insights into system behavior that enable data-driven operational decisions, performance optimization, and proactive issue detection in complex distributed environments.</p>
+<h3 id="core-principles">Core Principles</h3>
+<h4 id="1-systematic-measurement-and-collection">1. <strong>Systematic Measurement and Collection</strong></h4>
+<p>Comprehensive gathering of quantitative system data:
+- <strong>Metric definition</strong> - clearly defined measurements with consistent semantics and units
+- <strong>Data collection</strong> - systematic gathering of metric data from all system components
+- <strong>Temporal consistency</strong> - regular, predictable metric collection intervals and timestamps
+- <strong>Multi-dimensional data</strong> - metrics with rich metadata and dimensional attributes for analysis</p>
+<h4 id="2-aggregation-and-statistical-analysis">2. <strong>Aggregation and Statistical Analysis</strong></h4>
+<p>Processing raw metric data for meaningful insights:
+- <strong>Data aggregation</strong> - combining metric data across time periods, systems, and dimensions
+- <strong>Statistical computation</strong> - calculating averages, percentiles, rates, and other statistical measures
+- <strong>Trend analysis</strong> - identifying patterns, trends, and anomalies in metric data over time
+- <strong>Comparative analysis</strong> - comparing metrics across different system components and time periods</p>
+<h4 id="3-real-time-processing-and-storage">3. <strong>Real-Time Processing and Storage</strong></h4>
+<p>Efficient handling of high-volume metric data:
+- <strong>Stream processing</strong> - real-time processing of metric data as it's collected
+- <strong>Time-series storage</strong> - specialized storage optimized for time-stamped metric data
+- <strong>Data retention</strong> - intelligent data lifecycle management with appropriate retention policies
+- <strong>Query optimization</strong> - efficient querying and retrieval of metric data for analysis</p>
+<h4 id="4-alerting-and-anomaly-detection">4. <strong>Alerting and Anomaly Detection</strong></h4>
+<p>Proactive identification of operational issues and anomalies:
+- <strong>Threshold monitoring</strong> - detecting when metrics exceed predefined operational thresholds
+- <strong>Anomaly detection</strong> - identifying unusual patterns and behaviors in metric data
+- <strong>Predictive alerting</strong> - forecasting potential issues based on metric trends
+- <strong>Alert correlation</strong> - connecting related metric anomalies for comprehensive issue detection</p>
+<h3 id="why-metrics-collection-is-essential-in-integration-architecture">Why Metrics Collection is Essential in Integration Architecture</h3>
+<h4 id="1-operational-visibility-and-control">1. <strong>Operational Visibility and Control</strong></h4>
+<p>In complex integration environments, metrics collection provides:
+- <strong>System health monitoring</strong> - continuous assessment of system operational state
+- <strong>Performance tracking</strong> - quantitative measurement of system performance characteristics
+- <strong>Resource utilization monitoring</strong> - tracking computational, memory, and network resource usage
+- <strong>Business process metrics</strong> - measurement of business-relevant operational outcomes</p>
+<h4 id="2-capacity-planning-and-scaling">2. <strong>Capacity Planning and Scaling</strong></h4>
+<p>Supporting infrastructure and capacity management:
+- <strong>Resource trend analysis</strong> - understanding resource consumption patterns over time
+- <strong>Capacity forecasting</strong> - predicting future resource needs based on historical trends
+- <strong>Scaling decisions</strong> - data-driven decisions about horizontal and vertical scaling
+- <strong>Cost optimization</strong> - optimizing infrastructure costs through usage-based insights</p>
+<h4 id="3-performance-optimization">3. <strong>Performance Optimization</strong></h4>
+<p>Enabling systematic performance improvement:
+- <strong>Bottleneck identification</strong> - pinpointing performance constraints and limitations
+- <strong>Optimization measurement</strong> - quantifying the impact of performance improvements
+- <strong>Baseline establishment</strong> - establishing performance baselines for comparison
+- <strong>Regression detection</strong> - identifying performance regressions through continuous monitoring</p>
+<h4 id="4-service-level-management">4. <strong>Service Level Management</strong></h4>
+<p>Supporting service level agreement (SLA) management and compliance:
+- <strong>SLA monitoring</strong> - tracking compliance with service level agreements
+- <strong>Quality metrics</strong> - measuring service quality attributes like availability and reliability
+- <strong>Customer impact assessment</strong> - understanding how system performance affects customers
+- <strong>Compliance reporting</strong> - generating reports for regulatory and business compliance</p>
+<h3 id="benefits-in-integration-contexts">Benefits in Integration Contexts</h3>
+<h4 id="1-technical-advantages">1. <strong>Technical Advantages</strong></h4>
+<ul>
+<li><strong>Data-driven decisions</strong> - objective, quantitative basis for operational and architectural decisions</li>
+<li><strong>Proactive management</strong> - early detection of issues before they impact users</li>
+<li><strong>Performance insights</strong> - detailed understanding of system performance characteristics</li>
+<li><strong>Automation enablement</strong> - enabling automated scaling, alerting, and optimization</li>
+</ul>
+<h4 id="2-business-value">2. <strong>Business Value</strong></h4>
+<ul>
+<li><strong>Operational efficiency</strong> - improved operational efficiency through better visibility</li>
+<li><strong>Cost management</strong> - optimized infrastructure costs through usage insights</li>
+<li><strong>Risk mitigation</strong> - reduced operational risk through proactive monitoring</li>
+<li><strong>Business intelligence</strong> - insights into business process performance and outcomes</li>
+</ul>
+<h4 id="3-integration-enablement">3. <strong>Integration Enablement</strong></h4>
+<ul>
+<li><strong>Integration monitoring</strong> - comprehensive monitoring of integration flows and processes</li>
+<li><strong>Message throughput tracking</strong> - monitoring message processing rates and volumes</li>
+<li><strong>Error rate monitoring</strong> - tracking integration error rates and failure patterns</li>
+<li><strong>Latency measurement</strong> - measuring processing delays and response times</li>
+</ul>
+<h4 id="4-operational-excellence">4. <strong>Operational Excellence</strong></h4>
+<ul>
+<li><strong>Continuous improvement</strong> - data-driven continuous improvement of system operations</li>
+<li><strong>Root cause analysis</strong> - supporting incident investigation through historical metric data</li>
+<li><strong>Trend identification</strong> - identifying long-term trends for strategic planning</li>
+<li><strong>Benchmarking</strong> - establishing benchmarks for performance comparison</li>
+</ul>
+<h3 id="integration-architecture-applications">Integration Architecture Applications</h3>
+<h4 id="1-microservices-metrics-collection">1. <strong>Microservices Metrics Collection</strong></h4>
+<p>Comprehensive metrics for microservices architecture:</p>
+<pre><code class="language-java">// Metrics Configuration
+@Configuration
+@EnableConfigurationProperties(MetricsProperties.class)
+public class MetricsConfiguration {
+
+    @Bean
+    public MeterRegistry meterRegistry() {
+        return new PrometheusMeterRegistry(PrometheusConfig.DEFAULT);
+    }
+
+    @Bean
+    public TimedAspect timedAspect(MeterRegistry registry) {
+        return new TimedAspect(registry);
+    }
+
+    @Bean
+    public CountedAspect countedAspect(MeterRegistry registry) {
+        return new CountedAspect(registry);
+    }
+
+    @Bean
+    public MetricsCollector metricsCollector(MeterRegistry registry) {
+        return new MetricsCollector(registry);
+    }
+}
+
+// Custom Metrics Collector
+@Component
+public class MetricsCollector {
+
+    private final MeterRegistry meterRegistry;
+    private final Counter requestCounter;
+    private final Timer requestTimer;
+    private final Gauge activeConnectionsGauge;
+    private final DistributionSummary messageSizeSummary;
+
+    public MetricsCollector(MeterRegistry meterRegistry) {
+        this.meterRegistry = meterRegistry;
+
+        this.requestCounter = Counter.builder(&quot;http.requests.total&quot;)
+            .description(&quot;Total number of HTTP requests&quot;)
+            .register(meterRegistry);
+
+        this.requestTimer = Timer.builder(&quot;http.request.duration&quot;)
+            .description(&quot;HTTP request processing time&quot;)
+            .register(meterRegistry);
+
+        this.messageSizeSummary = DistributionSummary.builder(&quot;message.size&quot;)
+            .description(&quot;Message size distribution&quot;)
+            .baseUnit(&quot;bytes&quot;)
+            .register(meterRegistry);
+
+        // Register JVM and system metrics
+        new JvmMetrics().bindTo(meterRegistry);
+        new ProcessorMetrics().bindTo(meterRegistry);
+        new UptimeMetrics().bindTo(meterRegistry);
+        new DiskSpaceMetrics(new File(&quot;/&quot;)).bindTo(meterRegistry);
+    }
+
+    public void recordHttpRequest(String method, String endpoint, int statusCode, long duration) {
+        requestCounter.increment(
+            Tags.of(
+                Tag.of(&quot;method&quot;, method),
+                Tag.of(&quot;endpoint&quot;, endpoint),
+                Tag.of(&quot;status&quot;, String.valueOf(statusCode))
+            )
+        );
+
+        requestTimer.record(duration, TimeUnit.MILLISECONDS,
+            Tags.of(
+                Tag.of(&quot;method&quot;, method),
+                Tag.of(&quot;endpoint&quot;, endpoint)
+            )
+        );
+    }
+
+    public void recordMessageProcessing(String messageType, int messageSize, long processingTime, boolean success) {
+        Counter.builder(&quot;messages.processed.total&quot;)
+            .description(&quot;Total number of processed messages&quot;)
+            .tags(
+                Tag.of(&quot;type&quot;, messageType),
+                Tag.of(&quot;status&quot;, success ? &quot;success&quot; : &quot;error&quot;)
+            )
+            .register(meterRegistry)
+            .increment();
+
+        Timer.builder(&quot;message.processing.duration&quot;)
+            .description(&quot;Message processing time&quot;)
+            .tags(Tag.of(&quot;type&quot;, messageType))
+            .register(meterRegistry)
+            .record(processingTime, TimeUnit.MILLISECONDS);
+
+        messageSizeSummary.record(messageSize,
+            Tags.of(Tag.of(&quot;type&quot;, messageType)));
+    }
+
+    public void recordBusinessMetric(String metricName, double value, Tags tags) {
+        Gauge.builder(&quot;business.&quot; + metricName)
+            .description(&quot;Business metric: &quot; + metricName)
+            .tags(tags)
+            .register(meterRegistry, this, obj -&gt; value);
+    }
+
+    public void recordCustomCounter(String counterName, String description, Tags tags) {
+        Counter.builder(counterName)
+            .description(description)
+            .tags(tags)
+            .register(meterRegistry)
+            .increment();
+    }
+}
+
+// Order Service with Metrics
+@RestController
+@RequestMapping(&quot;/orders&quot;)
+public class OrderController {
+
+    @Autowired
+    private OrderService orderService;
+
+    @Autowired
+    private MetricsCollector metricsCollector;
+
+    @PostMapping
+    @Timed(name = &quot;order.creation.time&quot;, description = &quot;Order creation processing time&quot;)
+    @Counted(name = &quot;order.creation.count&quot;, description = &quot;Order creation count&quot;)
+    public ResponseEntity&lt;OrderResponse&gt; createOrder(@RequestBody CreateOrderRequest request) {
+        long startTime = System.currentTimeMillis();
+
+        try {
+            // Record request metrics
+            metricsCollector.recordCustomCounter(&quot;order.requests.total&quot;, 
+                &quot;Total order requests&quot;, 
+                Tags.of(Tag.of(&quot;operation&quot;, &quot;create&quot;)));
+
+            OrderResult result = orderService.processOrder(request);
+
+            long duration = System.currentTimeMillis() - startTime;
+
+            if (result.isSuccess()) {
+                metricsCollector.recordHttpRequest(&quot;POST&quot;, &quot;/orders&quot;, 200, duration);
+                metricsCollector.recordBusinessMetric(&quot;order.value&quot;, 
+                    result.getOrder().getTotalAmount().doubleValue(),
+                    Tags.of(Tag.of(&quot;customer_tier&quot;, result.getOrder().getCustomerTier())));
+
+                return ResponseEntity.ok(OrderResponse.from(result));
+            } else {
+                metricsCollector.recordHttpRequest(&quot;POST&quot;, &quot;/orders&quot;, 400, duration);
+                return ResponseEntity.badRequest().body(OrderResponse.error(result.getErrorMessage()));
+            }
+
+        } catch (Exception e) {
+            long duration = System.currentTimeMillis() - startTime;
+            metricsCollector.recordHttpRequest(&quot;POST&quot;, &quot;/orders&quot;, 500, duration);
+
+            metricsCollector.recordCustomCounter(&quot;order.errors.total&quot;,
+                &quot;Total order processing errors&quot;,
+                Tags.of(Tag.of(&quot;error_type&quot;, e.getClass().getSimpleName())));
+
+            throw e;
+        }
+    }
+
+    @GetMapping(&quot;/{orderId}&quot;)
+    @Timed(name = &quot;order.retrieval.time&quot;, description = &quot;Order retrieval time&quot;)
+    public ResponseEntity&lt;OrderResponse&gt; getOrder(@PathVariable String orderId) {
+        long startTime = System.currentTimeMillis();
+
+        try {
+            Optional&lt;Order&gt; order = orderService.getOrder(orderId);
+            long duration = System.currentTimeMillis() - startTime;
+
+            if (order.isPresent()) {
+                metricsCollector.recordHttpRequest(&quot;GET&quot;, &quot;/orders/{id}&quot;, 200, duration);
+                return ResponseEntity.ok(OrderResponse.from(order.get()));
+            } else {
+                metricsCollector.recordHttpRequest(&quot;GET&quot;, &quot;/orders/{id}&quot;, 404, duration);
+                return ResponseEntity.notFound().build();
+            }
+
+        } catch (Exception e) {
+            long duration = System.currentTimeMillis() - startTime;
+            metricsCollector.recordHttpRequest(&quot;GET&quot;, &quot;/orders/{id}&quot;, 500, duration);
+            throw e;
+        }
+    }
+}
+
+// Message Processing Metrics
+@Service
+public class MessageProcessingService {
+
+    @Autowired
+    private MetricsCollector metricsCollector;
+
+    @EventListener
+    public void handleOrderEvent(OrderEvent event) {
+        long startTime = System.currentTimeMillis();
+        String messageType = event.getEventType();
+        int messageSize = calculateMessageSize(event);
+
+        try {
+            processOrderEvent(event);
+
+            long duration = System.currentTimeMillis() - startTime;
+            metricsCollector.recordMessageProcessing(messageType, messageSize, duration, true);
+
+            // Record business metrics
+            if (&quot;ORDER_PLACED&quot;.equals(messageType)) {
+                metricsCollector.recordBusinessMetric(&quot;orders.placed.rate&quot;, 1.0,
+                    Tags.of(Tag.of(&quot;customer_segment&quot;, event.getCustomerSegment())));
+            }
+
+        } catch (Exception e) {
+            long duration = System.currentTimeMillis() - startTime;
+            metricsCollector.recordMessageProcessing(messageType, messageSize, duration, false);
+
+            metricsCollector.recordCustomCounter(&quot;message.processing.errors&quot;,
+                &quot;Message processing errors&quot;,
+                Tags.of(
+                    Tag.of(&quot;message_type&quot;, messageType),
+                    Tag.of(&quot;error_type&quot;, e.getClass().getSimpleName())
+                ));
+
+            log.error(&quot;Error processing message of type: {}&quot;, messageType, e);
+        }
+    }
+
+    private void processOrderEvent(OrderEvent event) {
+        // Process the event
+        switch (event.getEventType()) {
+            case &quot;ORDER_PLACED&quot;:
+                handleOrderPlaced(event);
+                break;
+            case &quot;ORDER_UPDATED&quot;:
+                handleOrderUpdated(event);
+                break;
+            case &quot;ORDER_CANCELLED&quot;:
+                handleOrderCancelled(event);
+                break;
+            default:
+                throw new IllegalArgumentException(&quot;Unknown event type: &quot; + event.getEventType());
+        }
+    }
+
+    private int calculateMessageSize(OrderEvent event) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            return mapper.writeValueAsString(event).getBytes().length;
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+}
+</code></pre>
+<h4 id="2-apache-camel-integration-metrics">2. <strong>Apache Camel Integration Metrics</strong></h4>
+<p>Comprehensive metrics collection for Camel routes:</p>
+<pre><code class="language-java">@Component
+public class CamelMetricsRoute extends RouteBuilder {
+
+    @Autowired
+    private MetricsCollector metricsCollector;
+
+    @Override
+    public void configure() throws Exception {
+
+        // Enable Camel metrics
+        getContext().addRoutePolicyFactory(new MicrometerRoutePolicyFactory());
+        getContext().setMessageHistoryFactory(new MicrometerMessageHistoryFactory());
+
+        // Order processing route with metrics
+        from(&quot;kafka:order-events?groupId=order-processor&quot;)
+            .routeId(&quot;order-processing-route&quot;)
+            .process(exchange -&gt; {
+                // Record route entry metrics
+                exchange.setProperty(&quot;route.start.time&quot;, System.currentTimeMillis());
+                exchange.setProperty(&quot;route.id&quot;, &quot;order-processing-route&quot;);
+
+                metricsCollector.recordCustomCounter(&quot;camel.route.entries&quot;,
+                    &quot;Route entry count&quot;,
+                    Tags.of(Tag.of(&quot;route&quot;, &quot;order-processing-route&quot;)));
+            })
+            .unmarshal().json(JsonLibrary.Jackson, OrderEvent.class)
+            .process(exchange -&gt; {
+                OrderEvent event = exchange.getIn().getBody(OrderEvent.class);
+
+                // Record message metrics
+                int messageSize = exchange.getIn().getBody(String.class).getBytes().length;
+                metricsCollector.recordMessageProcessing(&quot;order_event&quot;, messageSize, 0, true);
+
+                // Record business metrics
+                if (&quot;ORDER_PLACED&quot;.equals(event.getEventType())) {
+                    metricsCollector.recordBusinessMetric(&quot;daily.orders&quot;, 1.0,
+                        Tags.of(Tag.of(&quot;date&quot;, LocalDate.now().toString())));
+                }
+            })
+            .choice()
+                .when(simple(&quot;${body.eventType} == 'ORDER_PLACED'&quot;))
+                    .to(&quot;direct:processNewOrder&quot;)
+                .when(simple(&quot;${body.eventType} == 'ORDER_UPDATED'&quot;))
+                    .to(&quot;direct:processOrderUpdate&quot;)
+                .when(simple(&quot;${body.eventType} == 'ORDER_CANCELLED'&quot;))
+                    .to(&quot;direct:processOrderCancellation&quot;)
+                .otherwise()
+                    .process(exchange -&gt; {
+                        metricsCollector.recordCustomCounter(&quot;camel.unknown.events&quot;,
+                            &quot;Unknown event types&quot;,
+                            Tags.of(Tag.of(&quot;route&quot;, &quot;order-processing-route&quot;)));
+                    })
+                    .log(&quot;Unknown event type: ${body.eventType}&quot;)
+            .end()
+            .process(exchange -&gt; {
+                // Record route completion metrics
+                long startTime = exchange.getProperty(&quot;route.start.time&quot;, Long.class);
+                long duration = System.currentTimeMillis() - startTime;
+                String routeId = exchange.getProperty(&quot;route.id&quot;, String.class);
+
+                Timer.builder(&quot;camel.route.duration&quot;)
+                    .description(&quot;Route processing duration&quot;)
+                    .tags(Tag.of(&quot;route&quot;, routeId))
+                    .register(meterRegistry)
+                    .record(duration, TimeUnit.MILLISECONDS);
+            });
+
+        from(&quot;direct:processNewOrder&quot;)
+            .routeId(&quot;process-new-order&quot;)
+            .process(exchange -&gt; {
+                exchange.setProperty(&quot;processing.start.time&quot;, System.currentTimeMillis());
+
+                metricsCollector.recordCustomCounter(&quot;order.processing.started&quot;,
+                    &quot;Order processing started&quot;,
+                    Tags.of(Tag.of(&quot;type&quot;, &quot;new_order&quot;)));
+            })
+            .to(&quot;direct:validateCustomer&quot;)
+            .to(&quot;direct:checkInventory&quot;)
+            .to(&quot;direct:calculatePricing&quot;)
+            .multicast().parallelProcessing()
+                .to(&quot;direct:updateInventory&quot;)
+                .to(&quot;direct:sendNotifications&quot;)
+            .end()
+            .process(exchange -&gt; {
+                long startTime = exchange.getProperty(&quot;processing.start.time&quot;, Long.class);
+                long duration = System.currentTimeMillis() - startTime;
+
+                metricsCollector.recordCustomCounter(&quot;order.processing.completed&quot;,
+                    &quot;Order processing completed&quot;,
+                    Tags.of(Tag.of(&quot;type&quot;, &quot;new_order&quot;)));
+
+                Timer.builder(&quot;order.processing.duration&quot;)
+                    .description(&quot;New order processing duration&quot;)
+                    .register(meterRegistry)
+                    .record(duration, TimeUnit.MILLISECONDS);
+            });
+
+        from(&quot;direct:validateCustomer&quot;)
+            .routeId(&quot;validate-customer&quot;)
+            .process(exchange -&gt; {
+                exchange.setProperty(&quot;validation.start.time&quot;, System.currentTimeMillis());
+
+                metricsCollector.recordCustomCounter(&quot;customer.validations.started&quot;,
+                    &quot;Customer validations started&quot;,
+                    Tags.empty());
+            })
+            .to(&quot;http://customer-service/validate?httpMethod=POST&amp;connectTimeout=5000&amp;socketTimeout=10000&quot;)
+            .process(exchange -&gt; {
+                long startTime = exchange.getProperty(&quot;validation.start.time&quot;, Long.class);
+                long duration = System.currentTimeMillis() - startTime;
+
+                int statusCode = exchange.getIn().getHeader(Exchange.HTTP_RESPONSE_CODE, Integer.class);
+                boolean success = statusCode &gt;= 200 &amp;&amp; statusCode &lt; 300;
+
+                metricsCollector.recordCustomCounter(&quot;customer.validations.completed&quot;,
+                    &quot;Customer validations completed&quot;,
+                    Tags.of(Tag.of(&quot;status&quot;, success ? &quot;success&quot; : &quot;failure&quot;)));
+
+                Timer.builder(&quot;customer.validation.duration&quot;)
+                    .description(&quot;Customer validation duration&quot;)
+                    .tags(Tag.of(&quot;status&quot;, success ? &quot;success&quot; : &quot;failure&quot;))
+                    .register(meterRegistry)
+                    .record(duration, TimeUnit.MILLISECONDS);
+
+                if (!success) {
+                    metricsCollector.recordCustomCounter(&quot;customer.validation.errors&quot;,
+                        &quot;Customer validation errors&quot;,
+                        Tags.of(Tag.of(&quot;http_status&quot;, String.valueOf(statusCode))));
+                }
+            });
+
+        from(&quot;direct:checkInventory&quot;)
+            .routeId(&quot;check-inventory&quot;)
+            .process(exchange -&gt; {
+                exchange.setProperty(&quot;inventory.start.time&quot;, System.currentTimeMillis());
+
+                OrderEvent event = exchange.getIn().getBody(OrderEvent.class);
+                int itemCount = event.getItems().size();
+
+                metricsCollector.recordCustomCounter(&quot;inventory.checks.started&quot;,
+                    &quot;Inventory checks started&quot;,
+                    Tags.of(Tag.of(&quot;item_count&quot;, String.valueOf(itemCount))));
+
+                DistributionSummary.builder(&quot;inventory.check.items&quot;)
+                    .description(&quot;Number of items in inventory check&quot;)
+                    .register(meterRegistry)
+                    .record(itemCount);
+            })
+            .to(&quot;http://inventory-service/check?httpMethod=POST&amp;connectTimeout=5000&amp;socketTimeout=15000&quot;)
+            .process(exchange -&gt; {
+                long startTime = exchange.getProperty(&quot;inventory.start.time&quot;, Long.class);
+                long duration = System.currentTimeMillis() - startTime;
+
+                int statusCode = exchange.getIn().getHeader(Exchange.HTTP_RESPONSE_CODE, Integer.class);
+                boolean success = statusCode &gt;= 200 &amp;&amp; statusCode &lt; 300;
+
+                metricsCollector.recordCustomCounter(&quot;inventory.checks.completed&quot;,
+                    &quot;Inventory checks completed&quot;,
+                    Tags.of(Tag.of(&quot;status&quot;, success ? &quot;success&quot; : &quot;failure&quot;)));
+
+                Timer.builder(&quot;inventory.check.duration&quot;)
+                    .description(&quot;Inventory check duration&quot;)
+                    .tags(Tag.of(&quot;status&quot;, success ? &quot;success&quot; : &quot;failure&quot;))
+                    .register(meterRegistry)
+                    .record(duration, TimeUnit.MILLISECONDS);
+            });
+
+        // Error handling with metrics
+        onException(Exception.class)
+            .handled(true)
+            .process(exchange -&gt; {
+                Exception exception = exchange.getException();
+                String routeId = exchange.getFromRouteId();
+
+                metricsCollector.recordCustomCounter(&quot;camel.route.errors&quot;,
+                    &quot;Route processing errors&quot;,
+                    Tags.of(
+                        Tag.of(&quot;route&quot;, routeId),
+                        Tag.of(&quot;exception&quot;, exception.getClass().getSimpleName())
+                    ));
+
+                log.error(&quot;Error in route {}: {}&quot;, routeId, exception.getMessage());
+            });
+
+        // Metrics publishing route
+        from(&quot;timer:metrics-publisher?period=60000&quot;)
+            .routeId(&quot;metrics-publisher&quot;)
+            .process(exchange -&gt; {
+                // Collect custom business metrics
+                BusinessMetrics metrics = new BusinessMetrics();
+                metrics.setTimestamp(Instant.now());
+                metrics.setDailyOrderCount(getDailyOrderCount());
+                metrics.setAverageOrderValue(getAverageOrderValue());
+                metrics.setCustomerSatisfactionScore(getCustomerSatisfactionScore());
+                metrics.setInventoryTurnover(getInventoryTurnover());
+
+                exchange.getIn().setBody(metrics);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to(&quot;kafka:business-metrics&quot;)
+            .log(&quot;Business metrics published: Daily orders ${body.dailyOrderCount}&quot;);
+
+        // System health metrics
+        from(&quot;timer:system-health?period=30000&quot;)
+            .routeId(&quot;system-health-metrics&quot;)
+            .process(exchange -&gt; {
+                SystemHealthMetrics health = new SystemHealthMetrics();
+                health.setTimestamp(Instant.now());
+                health.setCpuUsage(getCpuUsage());
+                health.setMemoryUsage(getMemoryUsage());
+                health.setDiskUsage(getDiskUsage());
+                health.setActiveConnections(getActiveConnections());
+                health.setThreadPoolUtilization(getThreadPoolUtilization());
+
+                // Record as metrics
+                metricsCollector.recordBusinessMetric(&quot;system.cpu.usage&quot;, health.getCpuUsage(), Tags.empty());
+                metricsCollector.recordBusinessMetric(&quot;system.memory.usage&quot;, health.getMemoryUsage(), Tags.empty());
+                metricsCollector.recordBusinessMetric(&quot;system.disk.usage&quot;, health.getDiskUsage(), Tags.empty());
+
+                exchange.getIn().setBody(health);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to(&quot;kafka:system-health-metrics&quot;)
+            .log(&quot;System health metrics published&quot;);
+    }
+
+    private int getDailyOrderCount() {
+        // Implementation to get daily order count
+        return 0;
+    }
+
+    private double getAverageOrderValue() {
+        // Implementation to calculate average order value
+        return 0.0;
+    }
+
+    private double getCustomerSatisfactionScore() {
+        // Implementation to get customer satisfaction score
+        return 0.0;
+    }
+
+    private double getInventoryTurnover() {
+        // Implementation to calculate inventory turnover
+        return 0.0;
+    }
+
+    private double getCpuUsage() {
+        return ManagementFactory.getOperatingSystemMXBean().getProcessCpuLoad() * 100;
+    }
+
+    private double getMemoryUsage() {
+        MemoryMXBean memoryBean = ManagementFactory.getMemoryMXBean();
+        long used = memoryBean.getHeapMemoryUsage().getUsed();
+        long max = memoryBean.getHeapMemoryUsage().getMax();
+        return ((double) used / max) * 100;
+    }
+
+    private double getDiskUsage() {
+        File disk = new File(&quot;/&quot;);
+        long total = disk.getTotalSpace();
+        long free = disk.getFreeSpace();
+        return ((double) (total - free) / total) * 100;
+    }
+}
+</code></pre>
+<h4 id="3-custom-business-metrics-and-dashboards">3. <strong>Custom Business Metrics and Dashboards</strong></h4>
+<p>Advanced metrics for business intelligence:</p>
+<pre><code class="language-java">// Business Metrics Service
+@Service
+public class BusinessMetricsService {
+
+    @Autowired
+    private MetricsCollector metricsCollector;
+
+    @Autowired
+    private OrderRepository orderRepository;
+
+    @Autowired
+    private CustomerRepository customerRepository;
+
+    @Scheduled(fixedRate = 300000) // Every 5 minutes
+    public void collectBusinessMetrics() {
+        try {
+            // Revenue metrics
+            BigDecimal hourlyRevenue = calculateHourlyRevenue();
+            metricsCollector.recordBusinessMetric(&quot;revenue.hourly&quot;, 
+                hourlyRevenue.doubleValue(),
+                Tags.of(Tag.of(&quot;currency&quot;, &quot;USD&quot;)));
+
+            // Customer metrics
+            int activeCustomers = getActiveCustomerCount();
+            metricsCollector.recordBusinessMetric(&quot;customers.active&quot;, 
+                activeCustomers,
+                Tags.of(Tag.of(&quot;period&quot;, &quot;current_hour&quot;)));
+
+            // Order metrics
+            int completedOrders = getCompletedOrdersCount();
+            metricsCollector.recordBusinessMetric(&quot;orders.completed.hourly&quot;, 
+                completedOrders,
+                Tags.empty());
+
+            double averageOrderProcessingTime = getAverageOrderProcessingTime();
+            metricsCollector.recordBusinessMetric(&quot;orders.processing.time.average&quot;,
+                averageOrderProcessingTime,
+                Tags.of(Tag.of(&quot;unit&quot;, &quot;seconds&quot;)));
+
+            // Inventory metrics
+            int lowStockItems = getLowStockItemsCount();
+            metricsCollector.recordBusinessMetric(&quot;inventory.low_stock_items&quot;,
+                lowStockItems,
+                Tags.empty());
+
+            double inventoryTurnover = calculateInventoryTurnover();
+            metricsCollector.recordBusinessMetric(&quot;inventory.turnover.rate&quot;,
+                inventoryTurnover,
+                Tags.of(Tag.of(&quot;period&quot;, &quot;monthly&quot;)));
+
+            // Customer satisfaction metrics
+            double satisfactionScore = getCustomerSatisfactionScore();
+            metricsCollector.recordBusinessMetric(&quot;customer.satisfaction.score&quot;,
+                satisfactionScore,
+                Tags.of(Tag.of(&quot;scale&quot;, &quot;1-10&quot;)));
+
+            // Performance metrics
+            double systemResponseTime = getAverageSystemResponseTime();
+            metricsCollector.recordBusinessMetric(&quot;system.response.time.average&quot;,
+                systemResponseTime,
+                Tags.of(Tag.of(&quot;unit&quot;, &quot;milliseconds&quot;)));
+
+            log.info(&quot;Business metrics collected successfully&quot;);
+
+        } catch (Exception e) {
+            log.error(&quot;Error collecting business metrics&quot;, e);
+            metricsCollector.recordCustomCounter(&quot;business.metrics.errors&quot;,
+                &quot;Business metrics collection errors&quot;,
+                Tags.of(Tag.of(&quot;error_type&quot;, e.getClass().getSimpleName())));
+        }
+    }
+
+    @Scheduled(fixedRate = 60000) // Every minute
+    public void collectPerformanceMetrics() {
+        try {
+            // Database performance
+            long dbConnectionPoolSize = getDatabaseConnectionPoolSize();
+            metricsCollector.recordBusinessMetric(&quot;database.connection_pool.size&quot;,
+                dbConnectionPoolSize,
+                Tags.empty());
+
+            long dbActiveConnections = getDatabaseActiveConnections();
+            metricsCollector.recordBusinessMetric(&quot;database.connections.active&quot;,
+                dbActiveConnections,
+                Tags.empty());
+
+            double dbQueryTime = getAverageDatabaseQueryTime();
+            metricsCollector.recordBusinessMetric(&quot;database.query.time.average&quot;,
+                dbQueryTime,
+                Tags.of(Tag.of(&quot;unit&quot;, &quot;milliseconds&quot;)));
+
+            // Cache performance
+            double cacheHitRate = getCacheHitRate();
+            metricsCollector.recordBusinessMetric(&quot;cache.hit.rate&quot;,
+                cacheHitRate,
+                Tags.of(Tag.of(&quot;unit&quot;, &quot;percentage&quot;)));
+
+            int cacheSize = getCurrentCacheSize();
+            metricsCollector.recordBusinessMetric(&quot;cache.size&quot;,
+                cacheSize,
+                Tags.of(Tag.of(&quot;unit&quot;, &quot;entries&quot;)));
+
+            // Queue metrics
+            int messageQueueDepth = getMessageQueueDepth();
+            metricsCollector.recordBusinessMetric(&quot;message_queue.depth&quot;,
+                messageQueueDepth,
+                Tags.of(Tag.of(&quot;queue&quot;, &quot;order_processing&quot;)));
+
+            double messageProcessingRate = getMessageProcessingRate();
+            metricsCollector.recordBusinessMetric(&quot;message_queue.processing.rate&quot;,
+                messageProcessingRate,
+                Tags.of(Tag.of(&quot;unit&quot;, &quot;messages_per_second&quot;)));
+
+            log.debug(&quot;Performance metrics collected successfully&quot;);
+
+        } catch (Exception e) {
+            log.error(&quot;Error collecting performance metrics&quot;, e);
+            metricsCollector.recordCustomCounter(&quot;performance.metrics.errors&quot;,
+                &quot;Performance metrics collection errors&quot;,
+                Tags.of(Tag.of(&quot;error_type&quot;, e.getClass().getSimpleName())));
+        }
+    }
+
+    // Metric calculation methods
+    private BigDecimal calculateHourlyRevenue() {
+        LocalDateTime oneHourAgo = LocalDateTime.now().minusHours(1);
+        return orderRepository.getTotalRevenueAfter(oneHourAgo);
+    }
+
+    private int getActiveCustomerCount() {
+        LocalDateTime oneHourAgo = LocalDateTime.now().minusHours(1);
+        return customerRepository.getActiveCustomerCountAfter(oneHourAgo);
+    }
+
+    private int getCompletedOrdersCount() {
+        LocalDateTime oneHourAgo = LocalDateTime.now().minusHours(1);
+        return orderRepository.getCompletedOrderCountAfter(oneHourAgo);
+    }
+
+    private double getAverageOrderProcessingTime() {
+        return orderRepository.getAverageProcessingTimeInLastHour();
+    }
+
+    private int getLowStockItemsCount() {
+        return inventoryRepository.getLowStockItemsCount();
+    }
+
+    private double calculateInventoryTurnover() {
+        // Calculate monthly inventory turnover
+        return inventoryRepository.calculateMonthlyTurnover();
+    }
+
+    private double getCustomerSatisfactionScore() {
+        // Get recent customer satisfaction score
+        return customerFeedbackRepository.getAverageSatisfactionScore();
+    }
+
+    private double getAverageSystemResponseTime() {
+        // Calculate from recent response time metrics
+        return performanceRepository.getAverageResponseTime();
+    }
+}
+
+// Metrics Dashboard Controller
+@RestController
+@RequestMapping(&quot;/metrics&quot;)
+public class MetricsDashboardController {
+
+    @Autowired
+    private MeterRegistry meterRegistry;
+
+    @Autowired
+    private BusinessMetricsService businessMetricsService;
+
+    @GetMapping(&quot;/prometheus&quot;)
+    public String prometheusMetrics() {
+        return ((PrometheusMeterRegistry) meterRegistry).scrape();
+    }
+
+    @GetMapping(&quot;/dashboard&quot;)
+    public ResponseEntity&lt;DashboardMetrics&gt; getDashboardMetrics() {
+        DashboardMetrics dashboard = new DashboardMetrics();
+
+        // System metrics
+        dashboard.setSystemMetrics(getSystemMetrics());
+
+        // Business metrics
+        dashboard.setBusinessMetrics(getBusinessMetrics());
+
+        // Performance metrics
+        dashboard.setPerformanceMetrics(getPerformanceMetrics());
+
+        // Alert metrics
+        dashboard.setAlertMetrics(getAlertMetrics());
+
+        return ResponseEntity.ok(dashboard);
+    }
+
+    @GetMapping(&quot;/alerts&quot;)
+    public ResponseEntity&lt;List&lt;MetricAlert&gt;&gt; getMetricAlerts() {
+        List&lt;MetricAlert&gt; alerts = new ArrayList&lt;&gt;();
+
+        // Check for performance alerts
+        double avgResponseTime = getMetricValue(&quot;http.request.duration&quot;);
+        if (avgResponseTime &gt; 1000) { // More than 1 second
+            alerts.add(new MetricAlert(&quot;HIGH_RESPONSE_TIME&quot;, 
+                &quot;Average response time is &quot; + avgResponseTime + &quot;ms&quot;, 
+                AlertSeverity.WARNING));
+        }
+
+        // Check for error rate alerts
+        double errorRate = getMetricValue(&quot;http.requests.errors.rate&quot;);
+        if (errorRate &gt; 0.05) { // More than 5% error rate
+            alerts.add(new MetricAlert(&quot;HIGH_ERROR_RATE&quot;, 
+                &quot;Error rate is &quot; + (errorRate * 100) + &quot;%&quot;, 
+                AlertSeverity.CRITICAL));
+        }
+
+        // Check for resource utilization alerts
+        double memoryUsage = getMetricValue(&quot;jvm.memory.usage&quot;);
+        if (memoryUsage &gt; 0.9) { // More than 90% memory usage
+            alerts.add(new MetricAlert(&quot;HIGH_MEMORY_USAGE&quot;, 
+                &quot;Memory usage is &quot; + (memoryUsage * 100) + &quot;%&quot;, 
+                AlertSeverity.WARNING));
+        }
+
+        return ResponseEntity.ok(alerts);
+    }
+
+    private SystemMetrics getSystemMetrics() {
+        SystemMetrics metrics = new SystemMetrics();
+        metrics.setCpuUsage(getMetricValue(&quot;system.cpu.usage&quot;));
+        metrics.setMemoryUsage(getMetricValue(&quot;jvm.memory.used&quot;));
+        metrics.setDiskUsage(getMetricValue(&quot;disk.usage&quot;));
+        metrics.setActiveThreads(getMetricValue(&quot;jvm.threads.live&quot;));
+        return metrics;
+    }
+
+    private BusinessMetrics getBusinessMetrics() {
+        BusinessMetrics metrics = new BusinessMetrics();
+        metrics.setHourlyRevenue(getMetricValue(&quot;business.revenue.hourly&quot;));
+        metrics.setActiveCustomers(getMetricValue(&quot;business.customers.active&quot;));
+        metrics.setCompletedOrders(getMetricValue(&quot;business.orders.completed.hourly&quot;));
+        metrics.setCustomerSatisfaction(getMetricValue(&quot;business.customer.satisfaction.score&quot;));
+        return metrics;
+    }
+
+    private PerformanceMetrics getPerformanceMetrics() {
+        PerformanceMetrics metrics = new PerformanceMetrics();
+        metrics.setAverageResponseTime(getMetricValue(&quot;http.request.duration&quot;));
+        metrics.setThroughput(getMetricValue(&quot;http.requests.rate&quot;));
+        metrics.setErrorRate(getMetricValue(&quot;http.requests.errors.rate&quot;));
+        metrics.setDatabaseQueryTime(getMetricValue(&quot;database.query.time.average&quot;));
+        return metrics;
+    }
+
+    private AlertMetrics getAlertMetrics() {
+        AlertMetrics metrics = new AlertMetrics();
+        metrics.setActiveAlerts(getActiveAlertsCount());
+        metrics.setCriticalAlerts(getCriticalAlertsCount());
+        metrics.setResolvedAlerts(getResolvedAlertsCount());
+        return metrics;
+    }
+
+    private double getMetricValue(String metricName) {
+        try {
+            return meterRegistry.get(metricName).gauge().value();
+        } catch (Exception e) {
+            log.warn(&quot;Could not retrieve metric value for: {}&quot;, metricName);
+            return 0.0;
+        }
+    }
+}
+</code></pre>
+<h2 id="best-practices">Best Practices</h2>
+<h3 id="1-metric-design-and-definition">1. <strong>Metric Design and Definition</strong></h3>
+<ul>
+<li>Use clear, consistent naming conventions for all metrics</li>
+<li>Include appropriate units and descriptions in metric definitions</li>
+<li>Design metrics with proper cardinality to avoid high-cardinality issues</li>
+<li>Use meaningful tags and labels for dimensional analysis</li>
+<li>Implement metric schemas and documentation for consistency</li>
+</ul>
+<h3 id="2-collection-and-storage-strategy">2. <strong>Collection and Storage Strategy</strong></h3>
+<ul>
+<li>Implement efficient metric collection with minimal performance impact</li>
+<li>Use appropriate sampling strategies for high-volume metrics</li>
+<li>Design retention policies based on metric importance and usage patterns</li>
+<li>Implement metric aggregation and pre-computation for frequently accessed data</li>
+<li>Use specialized time-series databases for optimal storage and query performance</li>
+</ul>
+<h3 id="3-performance-and-scalability">3. <strong>Performance and Scalability</strong></h3>
+<ul>
+<li>Monitor the performance impact of metrics collection on application performance</li>
+<li>Implement asynchronous metric collection where possible</li>
+<li>Use metric batching and buffering for improved efficiency</li>
+<li>Design for horizontal scaling of metrics collection infrastructure</li>
+<li>Implement circuit breakers for metrics collection failures</li>
+</ul>
+<h3 id="4-alerting-and-monitoring">4. <strong>Alerting and Monitoring</strong></h3>
+<ul>
+<li>Define meaningful thresholds and alerting rules for critical metrics</li>
+<li>Implement escalation policies for different alert severities</li>
+<li>Use statistical analysis and machine learning for anomaly detection</li>
+<li>Correlate multiple metrics for comprehensive alerting</li>
+<li>Implement alert fatigue prevention through intelligent filtering</li>
+</ul>
+<h3 id="5-analysis-and-visualization">5. <strong>Analysis and Visualization</strong></h3>
+<ul>
+<li>Create meaningful dashboards for different stakeholder audiences</li>
+<li>Implement drill-down capabilities for detailed analysis</li>
+<li>Use appropriate visualization types for different metric characteristics</li>
+<li>Implement real-time and historical views for metrics analysis</li>
+<li>Design for mobile and cross-platform dashboard access</li>
+</ul>
+<h3 id="6-governance-and-compliance">6. <strong>Governance and Compliance</strong></h3>
+<ul>
+<li>Implement access controls for sensitive metric data</li>
+<li>Maintain audit trails for metric data access and modifications</li>
+<li>Ensure compliance with data protection regulations for metric data</li>
+<li>Implement data lifecycle management for metric retention</li>
+<li>Document metric definitions and business impact for governance</li>
+</ul>
+<p>Metrics Collection is essential for maintaining operational visibility, performance optimization, and data-driven decision making in complex distributed enterprise integration architectures, providing the quantitative foundation for understanding system behavior and business outcomes.</p>
+
+      <a href="../index.html" class="back-to-top">← Back to All Patterns</a>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <p>©2026 <a href="https://dataintegrationmastery.com/">Data Integration Mastery™</a> — All Rights Reserved</p>
+  </footer>
+</body>
+</html>

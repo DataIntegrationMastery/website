@@ -1,0 +1,1263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Compensation Transactions — Integration Architecture Patterns | Data Integration Mastery™</title>
+  <meta name="description" content="The Compensation Transactions pattern is a sophisticated error handling and recovery mechanism in enterprise integration architectures that enables the undoi...">
+  <meta name="keywords" content="compensation transactions, integration pattern, orchestration patterns, integration architecture, EAI patterns, data integration">
+  <link rel="canonical" href="https://dataintegrationmastery.com/patterns/orchestration-patterns/compensation-transactions.html">
+
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://dataintegrationmastery.com/patterns/orchestration-patterns/compensation-transactions.html">
+  <meta property="og:title" content="Compensation Transactions — Integration Architecture Patterns">
+  <meta property="og:description" content="The Compensation Transactions pattern is a sophisticated error handling and recovery mechanism in enterprise integration architectures that enables the undoi...">
+  <meta property="og:image" content="https://dataintegrationmastery.com/assets/images/logo.png">
+  <meta property="og:site_name" content="Data Integration Mastery">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Compensation Transactions — Integration Architecture Patterns">
+  <meta name="twitter:description" content="The Compensation Transactions pattern is a sophisticated error handling and recovery mechanism in enterprise integration architectures that enables the undoi...">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/docs.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Compensation Transactions",
+    "description": "The Compensation Transactions pattern is a sophisticated error handling and recovery mechanism in enterprise integration architectures that enables the undoi...",
+    "url": "https://dataintegrationmastery.com/patterns/orchestration-patterns/compensation-transactions.html",
+    "author": {
+      "@type": "Person",
+      "name": "Ari Vilkman",
+      "jobTitle": "Integration Architect"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Data Integration Mastery",
+      "url": "https://dataintegrationmastery.com"
+    },
+    "isPartOf": {
+      "@type": "CollectionPage",
+      "name": "Integration Architecture Patterns",
+      "url": "https://dataintegrationmastery.com/patterns/"
+    },
+    "about": {
+      "@type": "Thing",
+      "name": "Compensation Transactions"
+    },
+    "inLanguage": "en",
+    "isAccessibleForFree": true
+  }
+  </script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="https://dataintegrationmastery.com/" class="header-brand">
+        <img src="../../assets/images/dim-icon.png" alt="DIM" width="36" height="36">
+        <span class="header-title">Data Integration Mastery™</span>
+      </a>
+      <nav class="header-nav" aria-label="Main navigation">
+        <a href="https://dataintegrationmastery.com/">Home</a>
+        <a href="../index.html">All Patterns</a>
+        <a href="https://dataintegrationmastery.com/#free-course">Free Course</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="docs-layout">
+    <aside class="docs-sidebar" aria-label="Pattern categories">
+      <div class="sidebar-title">Pattern Categories</div>
+<div class="sidebar-section">
+  <a href="../index.html#resilience" class="sidebar-section-title">🛡️ Resilience Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../resilience-patterns/circuit-breaker.html">Circuit Breaker</a></li>
+    <li><a href="../resilience-patterns/retry-mechanism.html">Retry Mechanism</a></li>
+    <li><a href="../resilience-patterns/timeout.html">Timeout</a></li>
+    <li><a href="../resilience-patterns/dead-letter-queue.html">Dead Letter Queue</a></li>
+    <li><a href="../resilience-patterns/bulkhead.html">Bulkhead</a></li>
+    <li><a href="../resilience-patterns/fallback-graceful-degradation.html">Fallback / Graceful Degradation</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#messaging" class="sidebar-section-title">📨 Messaging Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../messaging-patterns/request-reply.html">Request-Reply</a></li>
+    <li><a href="../messaging-patterns/publish-subscribe.html">Publish-Subscribe</a></li>
+    <li><a href="../messaging-patterns/message-queue.html">Message Queue</a></li>
+    <li><a href="../messaging-patterns/event-streaming.html">Event Streaming</a></li>
+    <li><a href="../messaging-patterns/correlation-id.html">Correlation ID</a></li>
+    <li><a href="../messaging-patterns/message-routing.html">Message Routing</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#data-transformation" class="sidebar-section-title">🔄 Data Transformation Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../data-transformation-patterns/message-translator.html">Message Translator</a></li>
+    <li><a href="../data-transformation-patterns/content-filter.html">Content Filter</a></li>
+    <li><a href="../data-transformation-patterns/message-router.html">Message Router</a></li>
+    <li><a href="../data-transformation-patterns/aggregator.html">Aggregator</a></li>
+    <li><a href="../data-transformation-patterns/splitter.html">Splitter</a></li>
+    <li><a href="../data-transformation-patterns/data-mapper.html">Data Mapper</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#routing" class="sidebar-section-title">🔀 Routing Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../routing-patterns/content-based-router.html">Content-Based Router</a></li>
+    <li><a href="../routing-patterns/recipient-list.html">Recipient List</a></li>
+    <li><a href="../routing-patterns/load-balancer.html">Load Balancer</a></li>
+    <li><a href="../routing-patterns/message-filter.html">Message Filter</a></li>
+    <li><a href="../routing-patterns/dynamic-router.html">Dynamic Router</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#security" class="sidebar-section-title">🔐 Security Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../security-patterns/authentication.html">Authentication</a></li>
+    <li><a href="../security-patterns/authorization.html">Authorization</a></li>
+    <li><a href="../security-patterns/encryption.html">Encryption</a></li>
+    <li><a href="../security-patterns/token-management.html">Token Management</a></li>
+    <li><a href="../security-patterns/api-security.html">API Security</a></li>
+    <li><a href="../security-patterns/secret-management.html">Secret Management</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#orchestration" class="sidebar-section-title">🎭 Orchestration Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="saga-pattern.html">Saga Pattern</a></li>
+    <li><a href="process-manager.html">Process Manager</a></li>
+    <li><a href="workflow-engine.html">Workflow Engine</a></li>
+    <li><a href="choreography.html">Choreography</a></li>
+    <li><a href="compensation-transactions.html" class="active">Compensation Transactions</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#observability" class="sidebar-section-title">📊 Monitoring & Observability Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../monitoring-observability-patterns/distributed-tracing.html">Distributed Tracing</a></li>
+    <li><a href="../monitoring-observability-patterns/metrics-collection.html">Metrics Collection</a></li>
+    <li><a href="../monitoring-observability-patterns/health-checks.html">Health Checks</a></li>
+    <li><a href="../monitoring-observability-patterns/logging-strategies.html">Logging Strategies</a></li>
+    <li><a href="../monitoring-observability-patterns/performance-monitoring.html">Performance Monitoring</a></li>
+    <li><a href="../monitoring-observability-patterns/error-tracking.html">Error Tracking</a></li>
+  </ul>
+</div>
+
+    </aside>
+
+    <main id="main-content" class="docs-content">
+      <div class="breadcrumb">
+        <a href="https://dataintegrationmastery.com/">Home</a>
+        <span class="sep">›</span>
+        <a href="../index.html">Patterns</a>
+        <span class="sep">›</span>
+        <a href="../index.html#orchestration">Orchestration Patterns</a>
+        <span class="sep">›</span>
+        <strong>Compensation Transactions</strong>
+      </div>
+
+      <h1>Compensation Transactions</h1>
+
+      <h2 id="overview">Overview</h2>
+<p>The Compensation Transactions pattern is a sophisticated error handling and recovery mechanism in enterprise integration architectures that enables the undoing of completed business operations through semantically inverse operations when distributed transactions fail or need to be reversed. Like a careful financial accountant who maintains detailed records and can reverse any transaction through proper correcting entries, the Compensation Transactions pattern provides a systematic approach to maintaining data consistency and business integrity in distributed systems by defining and executing compensating actions that semantically undo the effects of previously completed operations. This pattern is essential for managing long-running business processes, handling distributed transaction failures, and maintaining system consistency in environments where traditional ACID transactions cannot be used.</p>
+<h3 id="theoretical-foundation">Theoretical Foundation</h3>
+<p>The Compensation Transactions pattern is grounded in <strong>distributed systems theory</strong>, <strong>transaction processing principles</strong>, and <strong>semantic consistency models</strong>. It incorporates concepts from <strong>compensating transaction theory</strong>, <strong>eventual consistency</strong>, <strong>distributed consensus</strong>, and <strong>business process management</strong> to provide a robust framework for handling failures and maintaining consistency in distributed environments. The pattern addresses the fundamental challenges of distributed transaction management where traditional two-phase commit protocols are impractical due to long-running operations, network partitions, or the involvement of external systems that don't support distributed transaction protocols.</p>
+<h3 id="core-principles">Core Principles</h3>
+<h4 id="1-semantic-compensation">1. <strong>Semantic Compensation</strong></h4>
+<p>Implementing business-logic-based reversal of operations:
+- <strong>Semantic equivalence</strong> - compensating actions achieve business-equivalent reversal rather than technical rollback
+- <strong>Business logic integration</strong> - compensation logic integrated with business domain knowledge
+- <strong>State-aware compensation</strong> - compensations consider current system state and business context
+- <strong>Idempotent operations</strong> - compensation actions can be safely retried without side effects</p>
+<h4 id="2-compensation-orchestration">2. <strong>Compensation Orchestration</strong></h4>
+<p>Managing the coordination and execution of compensating actions:
+- <strong>Compensation ordering</strong> - executing compensations in reverse order of original operations
+- <strong>Parallel compensation</strong> - executing independent compensations concurrently for efficiency
+- <strong>Compensation chaining</strong> - handling cascading compensations across multiple services
+- <strong>Compensation state management</strong> - tracking compensation progress and handling partial failures</p>
+<h4 id="3-forward-and-backward-recovery">3. <strong>Forward and Backward Recovery</strong></h4>
+<p>Supporting different recovery strategies based on failure scenarios:
+- <strong>Forward recovery</strong> - attempting to complete the original transaction despite failures
+- <strong>Backward recovery</strong> - systematically undoing completed operations through compensation
+- <strong>Mixed recovery</strong> - combining forward and backward recovery strategies
+- <strong>Selective compensation</strong> - compensating only specific operations while preserving others</p>
+<h4 id="4-compensation-design-patterns">4. <strong>Compensation Design Patterns</strong></h4>
+<p>Implementing proven approaches to compensation logic:
+- <strong>Reversible operations</strong> - designing operations that can be semantically undone
+- <strong>Compensating resources</strong> - maintaining resources needed for future compensation
+- <strong>Compensation workflows</strong> - orchestrating complex multi-step compensations
+- <strong>Compensation persistence</strong> - maintaining compensation state for reliability</p>
+<h3 id="why-compensation-transactions-are-essential-in-integration-architecture">Why Compensation Transactions are Essential in Integration Architecture</h3>
+<h4 id="1-distributed-transaction-management">1. <strong>Distributed Transaction Management</strong></h4>
+<p>In distributed system architectures, compensation transactions provide:
+- <strong>Long-running transaction support</strong> - managing transactions that span extended time periods
+- <strong>Cross-system consistency</strong> - maintaining consistency across systems that don't support 2PC
+- <strong>Failure recovery</strong> - systematic recovery from partial failures in distributed operations
+- <strong>Business process integrity</strong> - ensuring business-level consistency despite technical failures</p>
+<h4 id="2-microservices-and-service-orchestration">2. <strong>Microservices and Service Orchestration</strong></h4>
+<p>For microservices architectures requiring coordination:
+- <strong>Service autonomy preservation</strong> - maintaining service independence while providing consistency
+- <strong>Distributed workflow management</strong> - coordinating complex workflows across multiple services
+- <strong>Failure isolation</strong> - limiting the impact of failures to specific service boundaries
+- <strong>Business process reliability</strong> - ensuring business processes complete successfully or fail gracefully</p>
+<h4 id="3-legacy-and-external-system-integration">3. <strong>Legacy and External System Integration</strong></h4>
+<p>Enabling integration with systems that have limited transaction capabilities:
+- <strong>Legacy system integration</strong> - working with systems that don't support modern transaction protocols
+- <strong>Third-party service integration</strong> - managing consistency with external service providers
+- <strong>Hybrid architecture support</strong> - maintaining consistency across on-premises and cloud systems
+- <strong>API-based integration</strong> - ensuring consistency in REST and other stateless API interactions</p>
+<h4 id="4-business-process-management">4. <strong>Business Process Management</strong></h4>
+<p>Supporting sophisticated business process requirements:
+- <strong>Regulatory compliance</strong> - maintaining audit trails and supporting regulatory rollback requirements
+- <strong>Business rule enforcement</strong> - ensuring business rules are maintained during error recovery
+- <strong>Customer experience</strong> - providing clear and consistent customer experiences during failures
+- <strong>Process optimization</strong> - optimizing process performance through intelligent compensation strategies</p>
+<h3 id="benefits-in-integration-contexts">Benefits in Integration Contexts</h3>
+<h4 id="1-technical-advantages">1. <strong>Technical Advantages</strong></h4>
+<ul>
+<li><strong>Consistency maintenance</strong> - preserving business consistency without traditional ACID guarantees</li>
+<li><strong>Scalability enablement</strong> - avoiding distributed locking and coordination bottlenecks</li>
+<li><strong>Fault tolerance</strong> - continuing operation despite individual component failures</li>
+<li><strong>Flexibility</strong> - supporting diverse transaction patterns and business requirements</li>
+</ul>
+<h4 id="2-business-value">2. <strong>Business Value</strong></h4>
+<ul>
+<li><strong>Process reliability</strong> - ensuring critical business processes complete successfully</li>
+<li><strong>Customer trust</strong> - maintaining customer confidence through reliable error handling</li>
+<li><strong>Operational efficiency</strong> - reducing manual intervention required for failure recovery</li>
+<li><strong>Business continuity</strong> - maintaining business operations despite technical failures</li>
+</ul>
+<h4 id="3-integration-enablement">3. <strong>Integration Enablement</strong></h4>
+<ul>
+<li><strong>Protocol independence</strong> - working across different communication protocols and patterns</li>
+<li><strong>System heterogeneity</strong> - integrating diverse systems with different transaction capabilities</li>
+<li><strong>Temporal decoupling</strong> - handling operations that span different time scales</li>
+<li><strong>Error boundaries</strong> - providing clear error isolation and recovery boundaries</li>
+</ul>
+<h4 id="4-compliance-and-governance">4. <strong>Compliance and Governance</strong></h4>
+<ul>
+<li><strong>Audit trails</strong> - maintaining complete records of operations and compensations</li>
+<li><strong>Regulatory compliance</strong> - supporting regulatory requirements for transaction reversal</li>
+<li><strong>Data governance</strong> - ensuring data integrity through systematic compensation</li>
+<li><strong>Risk management</strong> - reducing business risk through reliable error recovery</li>
+</ul>
+<h3 id="integration-architecture-applications">Integration Architecture Applications</h3>
+<h4 id="1-travel-booking-system">1. <strong>Travel Booking System</strong></h4>
+<p>Comprehensive compensation handling for travel reservations:</p>
+<pre><code class="language-java">// Travel Booking Service with Compensation
+@Component
+public class TravelBookingService {
+
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
+
+    @Autowired
+    private BookingRepository bookingRepository;
+
+    @Autowired
+    private CompensationManager compensationManager;
+
+    public BookingResult processBooking(TravelBookingRequest request) {
+        String bookingId = UUID.randomUUID().toString();
+
+        try {
+            // Create booking record
+            TravelBooking booking = new TravelBooking();
+            booking.setBookingId(bookingId);
+            booking.setCustomerId(request.getCustomerId());
+            booking.setFlightDetails(request.getFlightDetails());
+            booking.setHotelDetails(request.getHotelDetails());
+            booking.setCarRentalDetails(request.getCarRentalDetails());
+            booking.setStatus(BookingStatus.IN_PROGRESS);
+
+            bookingRepository.save(booking);
+
+            // Start compensation context
+            CompensationContext context = compensationManager.createContext(bookingId);
+
+            // Execute booking steps with compensation registration
+            boolean success = true;
+
+            // Step 1: Reserve flight
+            if (request.getFlightDetails() != null) {
+                FlightReservationResult flightResult = reserveFlight(request.getFlightDetails(), context);
+                if (!flightResult.isSuccess()) {
+                    success = false;
+                } else {
+                    booking.setFlightReservationId(flightResult.getReservationId());
+                }
+            }
+
+            // Step 2: Reserve hotel
+            if (success &amp;&amp; request.getHotelDetails() != null) {
+                HotelReservationResult hotelResult = reserveHotel(request.getHotelDetails(), context);
+                if (!hotelResult.isSuccess()) {
+                    success = false;
+                } else {
+                    booking.setHotelReservationId(hotelResult.getReservationId());
+                }
+            }
+
+            // Step 3: Reserve car rental
+            if (success &amp;&amp; request.getCarRentalDetails() != null) {
+                CarRentalResult carResult = reserveCarRental(request.getCarRentalDetails(), context);
+                if (!carResult.isSuccess()) {
+                    success = false;
+                } else {
+                    booking.setCarRentalReservationId(carResult.getReservationId());
+                }
+            }
+
+            // Step 4: Process payment
+            if (success) {
+                PaymentResult paymentResult = processPayment(request.getPaymentDetails(), context);
+                if (!paymentResult.isSuccess()) {
+                    success = false;
+                } else {
+                    booking.setPaymentId(paymentResult.getPaymentId());
+                }
+            }
+
+            if (success) {
+                // Complete booking
+                booking.setStatus(BookingStatus.CONFIRMED);
+                bookingRepository.save(booking);
+
+                // Confirm all reservations
+                compensationManager.confirmAll(context);
+
+                log.info(&quot;Travel booking completed successfully: {}&quot;, bookingId);
+                return BookingResult.success(booking);
+
+            } else {
+                // Execute compensations
+                booking.setStatus(BookingStatus.FAILED);
+                bookingRepository.save(booking);
+
+                compensationManager.executeCompensations(context);
+
+                log.warn(&quot;Travel booking failed, compensations executed: {}&quot;, bookingId);
+                return BookingResult.failure(&quot;Booking failed during processing&quot;);
+            }
+
+        } catch (Exception e) {
+            log.error(&quot;Error during travel booking: {}&quot;, bookingId, e);
+
+            // Execute compensations on exception
+            try {
+                CompensationContext context = compensationManager.getContext(bookingId);
+                if (context != null) {
+                    compensationManager.executeCompensations(context);
+                }
+            } catch (Exception compensationError) {
+                log.error(&quot;Error during compensation execution for booking: {}&quot;, bookingId, compensationError);
+            }
+
+            return BookingResult.failure(&quot;Booking failed due to system error&quot;);
+        }
+    }
+
+    private FlightReservationResult reserveFlight(FlightDetails flightDetails, CompensationContext context) {
+        try {
+            FlightReservationRequest request = new FlightReservationRequest();
+            request.setFlightNumber(flightDetails.getFlightNumber());
+            request.setPassengerDetails(flightDetails.getPassengers());
+            request.setSeatClass(flightDetails.getSeatClass());
+
+            FlightReservationResponse response = flightReservationService.reserveFlight(request);
+
+            if (response.isSuccess()) {
+                // Register compensation action
+                compensationManager.addCompensation(context, 
+                    new FlightCancellationCompensation(response.getReservationId()));
+
+                log.info(&quot;Flight reserved successfully: {}&quot;, response.getReservationId());
+                return FlightReservationResult.success(response.getReservationId());
+
+            } else {
+                log.warn(&quot;Flight reservation failed: {}&quot;, response.getErrorMessage());
+                return FlightReservationResult.failure(response.getErrorMessage());
+            }
+
+        } catch (Exception e) {
+            log.error(&quot;Error during flight reservation&quot;, e);
+            return FlightReservationResult.failure(&quot;Flight reservation system error&quot;);
+        }
+    }
+
+    private HotelReservationResult reserveHotel(HotelDetails hotelDetails, CompensationContext context) {
+        try {
+            HotelReservationRequest request = new HotelReservationRequest();
+            request.setHotelId(hotelDetails.getHotelId());
+            request.setCheckInDate(hotelDetails.getCheckInDate());
+            request.setCheckOutDate(hotelDetails.getCheckOutDate());
+            request.setRoomType(hotelDetails.getRoomType());
+            request.setGuestDetails(hotelDetails.getGuests());
+
+            HotelReservationResponse response = hotelReservationService.reserveHotel(request);
+
+            if (response.isSuccess()) {
+                // Register compensation action
+                compensationManager.addCompensation(context, 
+                    new HotelCancellationCompensation(response.getReservationId()));
+
+                log.info(&quot;Hotel reserved successfully: {}&quot;, response.getReservationId());
+                return HotelReservationResult.success(response.getReservationId());
+
+            } else {
+                log.warn(&quot;Hotel reservation failed: {}&quot;, response.getErrorMessage());
+                return HotelReservationResult.failure(response.getErrorMessage());
+            }
+
+        } catch (Exception e) {
+            log.error(&quot;Error during hotel reservation&quot;, e);
+            return HotelReservationResult.failure(&quot;Hotel reservation system error&quot;);
+        }
+    }
+
+    private CarRentalResult reserveCarRental(CarRentalDetails carDetails, CompensationContext context) {
+        try {
+            CarRentalRequest request = new CarRentalRequest();
+            request.setCarType(carDetails.getCarType());
+            request.setPickupLocation(carDetails.getPickupLocation());
+            request.setDropoffLocation(carDetails.getDropoffLocation());
+            request.setPickupDate(carDetails.getPickupDate());
+            request.setDropoffDate(carDetails.getDropoffDate());
+            request.setDriverDetails(carDetails.getDriverDetails());
+
+            CarRentalResponse response = carRentalService.reserveCar(request);
+
+            if (response.isSuccess()) {
+                // Register compensation action
+                compensationManager.addCompensation(context, 
+                    new CarRentalCancellationCompensation(response.getReservationId()));
+
+                log.info(&quot;Car rental reserved successfully: {}&quot;, response.getReservationId());
+                return CarRentalResult.success(response.getReservationId());
+
+            } else {
+                log.warn(&quot;Car rental reservation failed: {}&quot;, response.getErrorMessage());
+                return CarRentalResult.failure(response.getErrorMessage());
+            }
+
+        } catch (Exception e) {
+            log.error(&quot;Error during car rental reservation&quot;, e);
+            return CarRentalResult.failure(&quot;Car rental system error&quot;);
+        }
+    }
+
+    private PaymentResult processPayment(PaymentDetails paymentDetails, CompensationContext context) {
+        try {
+            PaymentRequest request = new PaymentRequest();
+            request.setAmount(paymentDetails.getTotalAmount());
+            request.setPaymentMethod(paymentDetails.getPaymentMethod());
+            request.setCurrency(paymentDetails.getCurrency());
+            request.setBillingAddress(paymentDetails.getBillingAddress());
+
+            PaymentResponse response = paymentService.processPayment(request);
+
+            if (response.isSuccess()) {
+                // Register compensation action
+                compensationManager.addCompensation(context, 
+                    new PaymentRefundCompensation(response.getPaymentId(), paymentDetails.getTotalAmount()));
+
+                log.info(&quot;Payment processed successfully: {}&quot;, response.getPaymentId());
+                return PaymentResult.success(response.getPaymentId());
+
+            } else {
+                log.warn(&quot;Payment processing failed: {}&quot;, response.getErrorMessage());
+                return PaymentResult.failure(response.getErrorMessage());
+            }
+
+        } catch (Exception e) {
+            log.error(&quot;Error during payment processing&quot;, e);
+            return PaymentResult.failure(&quot;Payment system error&quot;);
+        }
+    }
+}
+
+// Compensation Manager
+@Component
+public class CompensationManager {
+
+    private final Map&lt;String, CompensationContext&gt; activeContexts = new ConcurrentHashMap&lt;&gt;();
+
+    @Autowired
+    private CompensationRepository compensationRepository;
+
+    public CompensationContext createContext(String contextId) {
+        CompensationContext context = new CompensationContext(contextId);
+        activeContexts.put(contextId, context);
+
+        // Persist compensation context
+        CompensationRecord record = new CompensationRecord();
+        record.setContextId(contextId);
+        record.setStatus(CompensationStatus.ACTIVE);
+        record.setCreatedAt(Instant.now());
+
+        compensationRepository.save(record);
+
+        log.info(&quot;Compensation context created: {}&quot;, contextId);
+        return context;
+    }
+
+    public void addCompensation(CompensationContext context, CompensationAction action) {
+        context.addCompensation(action);
+
+        // Persist compensation action
+        CompensationActionRecord actionRecord = new CompensationActionRecord();
+        actionRecord.setContextId(context.getContextId());
+        actionRecord.setActionType(action.getClass().getSimpleName());
+        actionRecord.setActionData(action.serialize());
+        actionRecord.setSequenceNumber(context.getCompensationCount());
+        actionRecord.setStatus(CompensationActionStatus.REGISTERED);
+
+        compensationActionRepository.save(actionRecord);
+
+        log.debug(&quot;Compensation action registered: {} for context: {}&quot;, 
+                action.getClass().getSimpleName(), context.getContextId());
+    }
+
+    public void executeCompensations(CompensationContext context) {
+        log.info(&quot;Executing compensations for context: {}&quot;, context.getContextId());
+
+        List&lt;CompensationAction&gt; actions = context.getCompensations();
+
+        // Execute compensations in reverse order
+        Collections.reverse(actions);
+
+        for (CompensationAction action : actions) {
+            try {
+                log.info(&quot;Executing compensation: {} for context: {}&quot;, 
+                        action.getClass().getSimpleName(), context.getContextId());
+
+                action.execute();
+
+                // Update action status
+                updateCompensationActionStatus(context.getContextId(), action, 
+                                             CompensationActionStatus.COMPLETED);
+
+                log.info(&quot;Compensation completed: {} for context: {}&quot;, 
+                        action.getClass().getSimpleName(), context.getContextId());
+
+            } catch (Exception e) {
+                log.error(&quot;Compensation failed: {} for context: {}&quot;, 
+                         action.getClass().getSimpleName(), context.getContextId(), e);
+
+                // Update action status
+                updateCompensationActionStatus(context.getContextId(), action, 
+                                             CompensationActionStatus.FAILED);
+
+                // Continue with other compensations despite individual failures
+            }
+        }
+
+        // Update context status
+        CompensationRecord record = compensationRepository.findByContextId(context.getContextId());
+        record.setStatus(CompensationStatus.COMPLETED);
+        record.setCompletedAt(Instant.now());
+        compensationRepository.save(record);
+
+        // Remove from active contexts
+        activeContexts.remove(context.getContextId());
+
+        log.info(&quot;All compensations executed for context: {}&quot;, context.getContextId());
+    }
+
+    public void confirmAll(CompensationContext context) {
+        log.info(&quot;Confirming all operations for context: {}&quot;, context.getContextId());
+
+        // Mark all compensation actions as confirmed (no longer needed)
+        List&lt;CompensationActionRecord&gt; actions = compensationActionRepository
+            .findByContextIdOrderBySequenceNumber(context.getContextId());
+
+        for (CompensationActionRecord action : actions) {
+            action.setStatus(CompensationActionStatus.CONFIRMED);
+        }
+
+        compensationActionRepository.saveAll(actions);
+
+        // Update context status
+        CompensationRecord record = compensationRepository.findByContextId(context.getContextId());
+        record.setStatus(CompensationStatus.CONFIRMED);
+        record.setConfirmedAt(Instant.now());
+        compensationRepository.save(record);
+
+        // Remove from active contexts
+        activeContexts.remove(context.getContextId());
+
+        log.info(&quot;All operations confirmed for context: {}&quot;, context.getContextId());
+    }
+
+    public CompensationContext getContext(String contextId) {
+        return activeContexts.get(contextId);
+    }
+}
+
+// Compensation Actions
+public abstract class CompensationAction {
+    protected String actionId;
+    protected Instant createdAt;
+
+    public CompensationAction() {
+        this.actionId = UUID.randomUUID().toString();
+        this.createdAt = Instant.now();
+    }
+
+    public abstract void execute() throws CompensationException;
+
+    public abstract String serialize();
+
+    public String getActionId() {
+        return actionId;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+}
+
+public class FlightCancellationCompensation extends CompensationAction {
+
+    private final String flightReservationId;
+
+    @Autowired
+    private FlightReservationService flightReservationService;
+
+    public FlightCancellationCompensation(String flightReservationId) {
+        super();
+        this.flightReservationId = flightReservationId;
+    }
+
+    @Override
+    public void execute() throws CompensationException {
+        try {
+            FlightCancellationRequest request = new FlightCancellationRequest();
+            request.setReservationId(flightReservationId);
+            request.setReason(&quot;Booking compensation&quot;);
+
+            FlightCancellationResponse response = flightReservationService.cancelReservation(request);
+
+            if (!response.isSuccess()) {
+                throw new CompensationException(&quot;Failed to cancel flight reservation: &quot; + 
+                                              response.getErrorMessage());
+            }
+
+            log.info(&quot;Flight reservation cancelled successfully: {}&quot;, flightReservationId);
+
+        } catch (Exception e) {
+            log.error(&quot;Error cancelling flight reservation: {}&quot;, flightReservationId, e);
+            throw new CompensationException(&quot;Flight cancellation failed&quot;, e);
+        }
+    }
+
+    @Override
+    public String serialize() {
+        return String.format(&quot;FlightCancellation:{\&quot;reservationId\&quot;:\&quot;%s\&quot;}&quot;, flightReservationId);
+    }
+}
+
+public class HotelCancellationCompensation extends CompensationAction {
+
+    private final String hotelReservationId;
+
+    @Autowired
+    private HotelReservationService hotelReservationService;
+
+    public HotelCancellationCompensation(String hotelReservationId) {
+        super();
+        this.hotelReservationId = hotelReservationId;
+    }
+
+    @Override
+    public void execute() throws CompensationException {
+        try {
+            HotelCancellationRequest request = new HotelCancellationRequest();
+            request.setReservationId(hotelReservationId);
+            request.setReason(&quot;Booking compensation&quot;);
+
+            HotelCancellationResponse response = hotelReservationService.cancelReservation(request);
+
+            if (!response.isSuccess()) {
+                throw new CompensationException(&quot;Failed to cancel hotel reservation: &quot; + 
+                                              response.getErrorMessage());
+            }
+
+            log.info(&quot;Hotel reservation cancelled successfully: {}&quot;, hotelReservationId);
+
+        } catch (Exception e) {
+            log.error(&quot;Error cancelling hotel reservation: {}&quot;, hotelReservationId, e);
+            throw new CompensationException(&quot;Hotel cancellation failed&quot;, e);
+        }
+    }
+
+    @Override
+    public String serialize() {
+        return String.format(&quot;HotelCancellation:{\&quot;reservationId\&quot;:\&quot;%s\&quot;}&quot;, hotelReservationId);
+    }
+}
+
+public class PaymentRefundCompensation extends CompensationAction {
+
+    private final String paymentId;
+    private final BigDecimal refundAmount;
+
+    @Autowired
+    private PaymentService paymentService;
+
+    public PaymentRefundCompensation(String paymentId, BigDecimal refundAmount) {
+        super();
+        this.paymentId = paymentId;
+        this.refundAmount = refundAmount;
+    }
+
+    @Override
+    public void execute() throws CompensationException {
+        try {
+            RefundRequest request = new RefundRequest();
+            request.setPaymentId(paymentId);
+            request.setRefundAmount(refundAmount);
+            request.setReason(&quot;Booking compensation&quot;);
+
+            RefundResponse response = paymentService.processRefund(request);
+
+            if (!response.isSuccess()) {
+                throw new CompensationException(&quot;Failed to process refund: &quot; + 
+                                              response.getErrorMessage());
+            }
+
+            log.info(&quot;Payment refunded successfully: {} for amount: {}&quot;, paymentId, refundAmount);
+
+        } catch (Exception e) {
+            log.error(&quot;Error processing refund for payment: {}&quot;, paymentId, e);
+            throw new CompensationException(&quot;Payment refund failed&quot;, e);
+        }
+    }
+
+    @Override
+    public String serialize() {
+        return String.format(&quot;PaymentRefund:{\&quot;paymentId\&quot;:\&quot;%s\&quot;,\&quot;amount\&quot;:\&quot;%s\&quot;}&quot;, 
+                           paymentId, refundAmount.toString());
+    }
+}
+</code></pre>
+<h4 id="2-banking-transfer-compensation">2. <strong>Banking Transfer Compensation</strong></h4>
+<p>Comprehensive compensation for multi-step banking operations:</p>
+<pre><code class="language-java">// Banking Transfer Service with Compensation
+@Component
+public class BankingTransferService {
+
+    @Autowired
+    private CompensationManager compensationManager;
+
+    @Autowired
+    private AccountService accountService;
+
+    @Autowired
+    private AuditService auditService;
+
+    public TransferResult processTransfer(TransferRequest request) {
+        String transferId = UUID.randomUUID().toString();
+        CompensationContext context = compensationManager.createContext(transferId);
+
+        try {
+            // Step 1: Validate accounts
+            AccountValidationResult validation = validateAccounts(request, context);
+            if (!validation.isValid()) {
+                return TransferResult.failure(&quot;Account validation failed: &quot; + validation.getErrorMessage());
+            }
+
+            // Step 2: Place hold on source account
+            HoldResult holdResult = placeAccountHold(request.getFromAccount(), 
+                                                   request.getAmount(), context);
+            if (!holdResult.isSuccess()) {
+                compensationManager.executeCompensations(context);
+                return TransferResult.failure(&quot;Failed to place hold on source account&quot;);
+            }
+
+            // Step 3: Check transfer limits and compliance
+            ComplianceResult complianceResult = checkTransferCompliance(request, context);
+            if (!complianceResult.isApproved()) {
+                compensationManager.executeCompensations(context);
+                return TransferResult.failure(&quot;Transfer failed compliance check: &quot; + 
+                                            complianceResult.getReason());
+            }
+
+            // Step 4: Execute the actual transfer
+            TransferExecutionResult executionResult = executeTransfer(request, context);
+            if (!executionResult.isSuccess()) {
+                compensationManager.executeCompensations(context);
+                return TransferResult.failure(&quot;Transfer execution failed: &quot; + 
+                                            executionResult.getErrorMessage());
+            }
+
+            // Step 5: Send notifications
+            NotificationResult notificationResult = sendTransferNotifications(request, context);
+            if (!notificationResult.isSuccess()) {
+                // Non-critical failure, log but don't compensate the transfer
+                log.warn(&quot;Failed to send transfer notifications for transfer: {}&quot;, transferId);
+            }
+
+            // All steps completed successfully
+            compensationManager.confirmAll(context);
+
+            log.info(&quot;Transfer completed successfully: {}&quot;, transferId);
+            return TransferResult.success(transferId, executionResult.getTransactionReference());
+
+        } catch (Exception e) {
+            log.error(&quot;Error during transfer processing: {}&quot;, transferId, e);
+            compensationManager.executeCompensations(context);
+            return TransferResult.failure(&quot;Transfer failed due to system error&quot;);
+        }
+    }
+
+    private HoldResult placeAccountHold(String accountNumber, BigDecimal amount, 
+                                       CompensationContext context) {
+        try {
+            AccountHoldRequest request = new AccountHoldRequest();
+            request.setAccountNumber(accountNumber);
+            request.setHoldAmount(amount);
+            request.setHoldReason(&quot;Transfer processing&quot;);
+            request.setExpiryTime(Instant.now().plus(Duration.ofMinutes(30)));
+
+            AccountHoldResponse response = accountService.placeHold(request);
+
+            if (response.isSuccess()) {
+                // Register compensation to release the hold
+                compensationManager.addCompensation(context, 
+                    new AccountHoldReleaseCompensation(response.getHoldId()));
+
+                log.info(&quot;Account hold placed successfully: {} for amount: {}&quot;, 
+                        response.getHoldId(), amount);
+                return HoldResult.success(response.getHoldId());
+
+            } else {
+                log.warn(&quot;Failed to place account hold: {}&quot;, response.getErrorMessage());
+                return HoldResult.failure(response.getErrorMessage());
+            }
+
+        } catch (Exception e) {
+            log.error(&quot;Error placing account hold for account: {}&quot;, accountNumber, e);
+            return HoldResult.failure(&quot;Account hold system error&quot;);
+        }
+    }
+
+    private TransferExecutionResult executeTransfer(TransferRequest request, 
+                                                  CompensationContext context) {
+        try {
+            BankingTransferRequest transferRequest = new BankingTransferRequest();
+            transferRequest.setFromAccount(request.getFromAccount());
+            transferRequest.setToAccount(request.getToAccount());
+            transferRequest.setAmount(request.getAmount());
+            transferRequest.setReference(request.getReference());
+            transferRequest.setCurrency(request.getCurrency());
+
+            BankingTransferResponse response = accountService.executeTransfer(transferRequest);
+
+            if (response.isSuccess()) {
+                // Register compensation to reverse the transfer if needed
+                compensationManager.addCompensation(context, 
+                    new TransferReversalCompensation(response.getTransactionId(), 
+                                                   request.getFromAccount(), 
+                                                   request.getToAccount(), 
+                                                   request.getAmount()));
+
+                log.info(&quot;Transfer executed successfully: {} with transaction ID: {}&quot;, 
+                        request.getReference(), response.getTransactionId());
+                return TransferExecutionResult.success(response.getTransactionId(), 
+                                                     response.getTransactionReference());
+
+            } else {
+                log.warn(&quot;Transfer execution failed: {}&quot;, response.getErrorMessage());
+                return TransferExecutionResult.failure(response.getErrorMessage());
+            }
+
+        } catch (Exception e) {
+            log.error(&quot;Error executing transfer: {}&quot;, request.getReference(), e);
+            return TransferExecutionResult.failure(&quot;Transfer execution system error&quot;);
+        }
+    }
+}
+
+// Account Hold Release Compensation
+public class AccountHoldReleaseCompensation extends CompensationAction {
+
+    private final String holdId;
+
+    @Autowired
+    private AccountService accountService;
+
+    public AccountHoldReleaseCompensation(String holdId) {
+        super();
+        this.holdId = holdId;
+    }
+
+    @Override
+    public void execute() throws CompensationException {
+        try {
+            AccountHoldReleaseRequest request = new AccountHoldReleaseRequest();
+            request.setHoldId(holdId);
+            request.setReleaseReason(&quot;Transfer compensation&quot;);
+
+            AccountHoldReleaseResponse response = accountService.releaseHold(request);
+
+            if (!response.isSuccess()) {
+                throw new CompensationException(&quot;Failed to release account hold: &quot; + 
+                                              response.getErrorMessage());
+            }
+
+            log.info(&quot;Account hold released successfully: {}&quot;, holdId);
+
+        } catch (Exception e) {
+            log.error(&quot;Error releasing account hold: {}&quot;, holdId, e);
+            throw new CompensationException(&quot;Account hold release failed&quot;, e);
+        }
+    }
+
+    @Override
+    public String serialize() {
+        return String.format(&quot;AccountHoldRelease:{\&quot;holdId\&quot;:\&quot;%s\&quot;}&quot;, holdId);
+    }
+}
+
+// Transfer Reversal Compensation
+public class TransferReversalCompensation extends CompensationAction {
+
+    private final String originalTransactionId;
+    private final String originalFromAccount;
+    private final String originalToAccount;
+    private final BigDecimal originalAmount;
+
+    @Autowired
+    private AccountService accountService;
+
+    @Autowired
+    private AuditService auditService;
+
+    public TransferReversalCompensation(String originalTransactionId,
+                                      String originalFromAccount,
+                                      String originalToAccount,
+                                      BigDecimal originalAmount) {
+        super();
+        this.originalTransactionId = originalTransactionId;
+        this.originalFromAccount = originalFromAccount;
+        this.originalToAccount = originalToAccount;
+        this.originalAmount = originalAmount;
+    }
+
+    @Override
+    public void execute() throws CompensationException {
+        try {
+            // Create reversal transfer (from destination back to source)
+            BankingTransferRequest reversalRequest = new BankingTransferRequest();
+            reversalRequest.setFromAccount(originalToAccount);
+            reversalRequest.setToAccount(originalFromAccount);
+            reversalRequest.setAmount(originalAmount);
+            reversalRequest.setReference(&quot;REVERSAL:&quot; + originalTransactionId);
+            reversalRequest.setOriginalTransactionId(originalTransactionId);
+
+            BankingTransferResponse response = accountService.executeReversal(reversalRequest);
+
+            if (!response.isSuccess()) {
+                throw new CompensationException(&quot;Failed to execute transfer reversal: &quot; + 
+                                              response.getErrorMessage());
+            }
+
+            // Log reversal for audit purposes
+            auditService.logTransferReversal(originalTransactionId, 
+                                           response.getTransactionId(),
+                                           &quot;Compensation reversal&quot;);
+
+            log.info(&quot;Transfer reversed successfully. Original: {}, Reversal: {}&quot;, 
+                    originalTransactionId, response.getTransactionId());
+
+        } catch (Exception e) {
+            log.error(&quot;Error executing transfer reversal for transaction: {}&quot;, 
+                     originalTransactionId, e);
+            throw new CompensationException(&quot;Transfer reversal failed&quot;, e);
+        }
+    }
+
+    @Override
+    public String serialize() {
+        return String.format(&quot;TransferReversal:{\&quot;originalTxId\&quot;:\&quot;%s\&quot;,\&quot;fromAccount\&quot;:\&quot;%s\&quot;,\&quot;toAccount\&quot;:\&quot;%s\&quot;,\&quot;amount\&quot;:\&quot;%s\&quot;}&quot;, 
+                           originalTransactionId, originalFromAccount, originalToAccount, originalAmount.toString());
+    }
+}
+</code></pre>
+<h4 id="3-apache-camel-compensation-integration">3. <strong>Apache Camel Compensation Integration</strong></h4>
+<p>Event-driven compensation using Apache Camel:</p>
+<pre><code class="language-java">@Component
+public class CamelCompensationRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        // Compensation event processing
+        from(&quot;kafka:compensation-events?groupId=compensation-processor&quot;)
+            .routeId(&quot;compensation-event-processor&quot;)
+            .unmarshal().json(JsonLibrary.Jackson, CompensationEvent.class)
+            .choice()
+                .when(simple(&quot;${body.eventType} == 'COMPENSATION_REQUIRED'&quot;))
+                    .to(&quot;direct:initiateCompensation&quot;)
+                .when(simple(&quot;${body.eventType} == 'COMPENSATION_COMPLETED'&quot;))
+                    .to(&quot;direct:handleCompensationCompleted&quot;)
+                .when(simple(&quot;${body.eventType} == 'COMPENSATION_FAILED'&quot;))
+                    .to(&quot;direct:handleCompensationFailed&quot;)
+                .otherwise()
+                    .log(&quot;Unknown compensation event: ${body.eventType}&quot;)
+            .end();
+
+        from(&quot;direct:initiateCompensation&quot;)
+            .routeId(&quot;initiate-compensation&quot;)
+            .process(exchange -&gt; {
+                CompensationEvent event = exchange.getIn().getBody(CompensationEvent.class);
+
+                // Load compensation context
+                CompensationContext context = compensationManager.getContext(event.getContextId());
+                if (context == null) {
+                    // Try to restore context from persistence
+                    context = compensationManager.restoreContext(event.getContextId());
+                }
+
+                if (context != null) {
+                    exchange.getIn().setBody(context);
+                    exchange.getIn().setHeader(&quot;compensationRequired&quot;, true);
+                } else {
+                    exchange.getIn().setHeader(&quot;compensationRequired&quot;, false);
+                    log.warn(&quot;Compensation context not found: {}&quot;, event.getContextId());
+                }
+            })
+            .choice()
+                .when(header(&quot;compensationRequired&quot;).isEqualTo(true))
+                    .to(&quot;direct:executeCompensationSequence&quot;)
+                .otherwise()
+                    .log(&quot;No compensation context found for: ${body.contextId}&quot;)
+            .end();
+
+        from(&quot;direct:executeCompensationSequence&quot;)
+            .routeId(&quot;execute-compensation-sequence&quot;)
+            .process(exchange -&gt; {
+                CompensationContext context = exchange.getIn().getBody(CompensationContext.class);
+                List&lt;CompensationAction&gt; actions = context.getCompensations();
+
+                // Reverse the order for compensation
+                Collections.reverse(actions);
+
+                exchange.getIn().setBody(actions);
+                exchange.getIn().setHeader(&quot;contextId&quot;, context.getContextId());
+            })
+            .split(body())
+            .parallelProcessing(false) // Sequential execution for compensations
+            .process(exchange -&gt; {
+                CompensationAction action = exchange.getIn().getBody(CompensationAction.class);
+                String contextId = (String) exchange.getIn().getHeader(&quot;contextId&quot;);
+
+                try {
+                    log.info(&quot;Executing compensation action: {} for context: {}&quot;, 
+                            action.getClass().getSimpleName(), contextId);
+
+                    action.execute();
+
+                    // Create success event
+                    CompensationActionEvent successEvent = new CompensationActionEvent();
+                    successEvent.setContextId(contextId);
+                    successEvent.setActionId(action.getActionId());
+                    successEvent.setActionType(action.getClass().getSimpleName());
+                    successEvent.setStatus(CompensationActionStatus.COMPLETED);
+                    successEvent.setTimestamp(Instant.now());
+
+                    exchange.getIn().setBody(successEvent);
+                    exchange.getIn().setHeader(&quot;actionStatus&quot;, &quot;SUCCESS&quot;);
+
+                    log.info(&quot;Compensation action completed: {} for context: {}&quot;, 
+                            action.getClass().getSimpleName(), contextId);
+
+                } catch (Exception e) {
+                    log.error(&quot;Compensation action failed: {} for context: {}&quot;, 
+                             action.getClass().getSimpleName(), contextId, e);
+
+                    // Create failure event
+                    CompensationActionEvent failureEvent = new CompensationActionEvent();
+                    failureEvent.setContextId(contextId);
+                    failureEvent.setActionId(action.getActionId());
+                    failureEvent.setActionType(action.getClass().getSimpleName());
+                    failureEvent.setStatus(CompensationActionStatus.FAILED);
+                    failureEvent.setErrorMessage(e.getMessage());
+                    failureEvent.setTimestamp(Instant.now());
+
+                    exchange.getIn().setBody(failureEvent);
+                    exchange.getIn().setHeader(&quot;actionStatus&quot;, &quot;FAILED&quot;);
+                }
+            })
+            .to(&quot;kafka:compensation-action-events&quot;)
+            .log(&quot;Compensation action event published: ${body.actionType} - ${header.actionStatus}&quot;);
+
+        // Compensation monitoring and retry
+        from(&quot;timer:compensationMonitor?period=60000&quot;)
+            .routeId(&quot;compensation-monitor&quot;)
+            .process(exchange -&gt; {
+                // Find failed compensations that need retry
+                List&lt;CompensationContext&gt; failedCompensations = 
+                    compensationManager.getFailedCompensations();
+
+                exchange.getIn().setBody(failedCompensations);
+            })
+            .split(body())
+            .filter(simple(&quot;${body.retryCount} &lt; 3&quot;)) // Max 3 retries
+            .process(exchange -&gt; {
+                CompensationContext context = exchange.getIn().getBody(CompensationContext.class);
+
+                // Increment retry count
+                context.incrementRetryCount();
+
+                CompensationEvent retryEvent = new CompensationEvent();
+                retryEvent.setEventType(&quot;COMPENSATION_RETRY&quot;);
+                retryEvent.setContextId(context.getContextId());
+                retryEvent.setRetryAttempt(context.getRetryCount());
+                retryEvent.setTimestamp(Instant.now());
+
+                exchange.getIn().setBody(retryEvent);
+            })
+            .to(&quot;kafka:compensation-events&quot;)
+            .log(&quot;Compensation retry initiated for context: ${body.contextId}&quot;);
+
+        // Compensation reporting
+        from(&quot;kafka:compensation-action-events?groupId=compensation-reporting&quot;)
+            .routeId(&quot;compensation-reporting&quot;)
+            .unmarshal().json(JsonLibrary.Jackson, CompensationActionEvent.class)
+            .process(exchange -&gt; {
+                CompensationActionEvent event = exchange.getIn().getBody(CompensationActionEvent.class);
+
+                // Create compensation report entry
+                CompensationReport report = new CompensationReport();
+                report.setContextId(event.getContextId());
+                report.setActionId(event.getActionId());
+                report.setActionType(event.getActionType());
+                report.setStatus(event.getStatus());
+                report.setExecutionTime(event.getTimestamp());
+
+                if (event.getStatus() == CompensationActionStatus.FAILED) {
+                    report.setErrorMessage(event.getErrorMessage());
+                }
+
+                compensationReportRepository.save(report);
+
+                exchange.getIn().setBody(report);
+            })
+            .choice()
+                .when(simple(&quot;${body.status} == 'FAILED'&quot;))
+                    .to(&quot;direct:sendCompensationFailureAlert&quot;)
+                .otherwise()
+                    .log(&quot;Compensation action reported: ${body.actionType}&quot;)
+            .end();
+
+        from(&quot;direct:sendCompensationFailureAlert&quot;)
+            .routeId(&quot;send-compensation-failure-alert&quot;)
+            .process(exchange -&gt; {
+                CompensationReport report = exchange.getIn().getBody(CompensationReport.class);
+
+                AlertMessage alert = new AlertMessage();
+                alert.setAlertType(&quot;COMPENSATION_FAILURE&quot;);
+                alert.setSeverity(AlertSeverity.HIGH);
+                alert.setMessage(String.format(&quot;Compensation action failed: %s for context: %s&quot;, 
+                                              report.getActionType(), report.getContextId()));
+                alert.setTimestamp(Instant.now());
+
+                exchange.getIn().setBody(alert);
+            })
+            .to(&quot;kafka:system-alerts&quot;)
+            .log(&quot;Compensation failure alert sent for context: ${body.contextId}&quot;);
+
+        // Compensation analytics
+        from(&quot;timer:compensationAnalytics?period=3600000&quot;) // Hourly
+            .routeId(&quot;compensation-analytics&quot;)
+            .process(exchange -&gt; {
+                // Generate compensation analytics
+                CompensationAnalytics analytics = new CompensationAnalytics();
+                analytics.setAnalysisTime(Instant.now());
+
+                // Calculate metrics
+                analytics.setTotalCompensations(compensationReportRepository.countTodaysCompensations());
+                analytics.setSuccessfulCompensations(compensationReportRepository.countSuccessfulCompensations());
+                analytics.setFailedCompensations(compensationReportRepository.countFailedCompensations());
+                analytics.setAverageCompensationTime(compensationReportRepository.getAverageCompensationTime());
+
+                // Top failure reasons
+                analytics.setTopFailureReasons(compensationReportRepository.getTopFailureReasons());
+
+                exchange.getIn().setBody(analytics);
+            })
+            .to(&quot;kafka:compensation-analytics&quot;)
+            .log(&quot;Compensation analytics generated: ${body.totalCompensations} total compensations&quot;);
+    }
+}
+</code></pre>
+<h2 id="best-practices">Best Practices</h2>
+<h3 id="1-compensation-design-and-implementation">1. <strong>Compensation Design and Implementation</strong></h3>
+<ul>
+<li>Design compensating actions to be idempotent and safely retryable</li>
+<li>Implement semantic compensation rather than technical rollback when possible</li>
+<li>Design compensations to handle partial state and concurrent modifications</li>
+<li>Use timeout handling for all compensation actions</li>
+<li>Implement comprehensive logging for compensation execution and debugging</li>
+</ul>
+<h3 id="2-compensation-ordering-and-dependencies">2. <strong>Compensation Ordering and Dependencies</strong></h3>
+<ul>
+<li>Execute compensations in reverse order of the original operations</li>
+<li>Handle compensation dependencies and ensure proper sequencing</li>
+<li>Design parallel compensation execution where operations are independent</li>
+<li>Implement compensation batching for related operations</li>
+<li>Handle compensation failures gracefully without stopping the entire sequence</li>
+</ul>
+<h3 id="3-state-management-and-persistence">3. <strong>State Management and Persistence</strong></h3>
+<ul>
+<li>Persist compensation context and action state for reliability</li>
+<li>Use transactional updates for compensation state changes</li>
+<li>Implement compensation context recovery for system restart scenarios</li>
+<li>Design compensation state cleanup for completed operations</li>
+<li>Maintain comprehensive audit trails for all compensation activities</li>
+</ul>
+<h3 id="4-error-handling-and-recovery">4. <strong>Error Handling and Recovery</strong></h3>
+<ul>
+<li>Implement retry mechanisms for failed compensation actions</li>
+<li>Design fallback strategies for compensation failures</li>
+<li>Use dead letter queues for unrecoverable compensation failures</li>
+<li>Plan for manual intervention in complex compensation scenarios</li>
+<li>Implement compensation monitoring and alerting for operational awareness</li>
+</ul>
+<h3 id="5-performance-and-scalability">5. <strong>Performance and Scalability</strong></h3>
+<ul>
+<li>Design compensations to be lightweight and efficient</li>
+<li>Use asynchronous compensation execution where appropriate</li>
+<li>Implement compensation batching for improved throughput</li>
+<li>Monitor compensation performance and optimize slow operations</li>
+<li>Use compensation caching for frequently accessed data</li>
+</ul>
+<h3 id="6-testing-and-validation">6. <strong>Testing and Validation</strong></h3>
+<ul>
+<li>Create comprehensive test suites for all compensation scenarios</li>
+<li>Test compensation effectiveness through end-to-end scenarios</li>
+<li>Validate compensation idempotency through repeated execution</li>
+<li>Test partial failure scenarios and compensation ordering</li>
+<li>Use chaos engineering to validate compensation robustness under failure conditions</li>
+</ul>
+<p>The Compensation Transactions pattern is essential for maintaining data consistency and business integrity in distributed enterprise integration architectures, providing systematic approaches to error recovery and business process reliability without the limitations of traditional distributed transaction mechanisms.</p>
+
+      <a href="../index.html" class="back-to-top">← Back to All Patterns</a>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <p>©2026 <a href="https://dataintegrationmastery.com/">Data Integration Mastery™</a> — All Rights Reserved</p>
+  </footer>
+</body>
+</html>

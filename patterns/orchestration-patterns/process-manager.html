@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Process Manager — Integration Architecture Patterns | Data Integration Mastery™</title>
+  <meta name="description" content="The Process Manager pattern is a sophisticated orchestration mechanism in enterprise integration architectures that coordinates complex, stateful business wo...">
+  <meta name="keywords" content="process manager, integration pattern, orchestration patterns, integration architecture, EAI patterns, data integration">
+  <link rel="canonical" href="https://dataintegrationmastery.com/patterns/orchestration-patterns/process-manager.html">
+
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://dataintegrationmastery.com/patterns/orchestration-patterns/process-manager.html">
+  <meta property="og:title" content="Process Manager — Integration Architecture Patterns">
+  <meta property="og:description" content="The Process Manager pattern is a sophisticated orchestration mechanism in enterprise integration architectures that coordinates complex, stateful business wo...">
+  <meta property="og:image" content="https://dataintegrationmastery.com/assets/images/logo.png">
+  <meta property="og:site_name" content="Data Integration Mastery">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Process Manager — Integration Architecture Patterns">
+  <meta name="twitter:description" content="The Process Manager pattern is a sophisticated orchestration mechanism in enterprise integration architectures that coordinates complex, stateful business wo...">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/docs.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Process Manager",
+    "description": "The Process Manager pattern is a sophisticated orchestration mechanism in enterprise integration architectures that coordinates complex, stateful business wo...",
+    "url": "https://dataintegrationmastery.com/patterns/orchestration-patterns/process-manager.html",
+    "author": {
+      "@type": "Person",
+      "name": "Ari Vilkman",
+      "jobTitle": "Integration Architect"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Data Integration Mastery",
+      "url": "https://dataintegrationmastery.com"
+    },
+    "isPartOf": {
+      "@type": "CollectionPage",
+      "name": "Integration Architecture Patterns",
+      "url": "https://dataintegrationmastery.com/patterns/"
+    },
+    "about": {
+      "@type": "Thing",
+      "name": "Process Manager"
+    },
+    "inLanguage": "en",
+    "isAccessibleForFree": true
+  }
+  </script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="https://dataintegrationmastery.com/" class="header-brand">
+        <img src="../../assets/images/dim-icon.png" alt="DIM" width="36" height="36">
+        <span class="header-title">Data Integration Mastery™</span>
+      </a>
+      <nav class="header-nav" aria-label="Main navigation">
+        <a href="https://dataintegrationmastery.com/">Home</a>
+        <a href="../index.html">All Patterns</a>
+        <a href="https://dataintegrationmastery.com/#free-course">Free Course</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="docs-layout">
+    <aside class="docs-sidebar" aria-label="Pattern categories">
+      <div class="sidebar-title">Pattern Categories</div>
+<div class="sidebar-section">
+  <a href="../index.html#resilience" class="sidebar-section-title">🛡️ Resilience Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../resilience-patterns/circuit-breaker.html">Circuit Breaker</a></li>
+    <li><a href="../resilience-patterns/retry-mechanism.html">Retry Mechanism</a></li>
+    <li><a href="../resilience-patterns/timeout.html">Timeout</a></li>
+    <li><a href="../resilience-patterns/dead-letter-queue.html">Dead Letter Queue</a></li>
+    <li><a href="../resilience-patterns/bulkhead.html">Bulkhead</a></li>
+    <li><a href="../resilience-patterns/fallback-graceful-degradation.html">Fallback / Graceful Degradation</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#messaging" class="sidebar-section-title">📨 Messaging Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../messaging-patterns/request-reply.html">Request-Reply</a></li>
+    <li><a href="../messaging-patterns/publish-subscribe.html">Publish-Subscribe</a></li>
+    <li><a href="../messaging-patterns/message-queue.html">Message Queue</a></li>
+    <li><a href="../messaging-patterns/event-streaming.html">Event Streaming</a></li>
+    <li><a href="../messaging-patterns/correlation-id.html">Correlation ID</a></li>
+    <li><a href="../messaging-patterns/message-routing.html">Message Routing</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#data-transformation" class="sidebar-section-title">🔄 Data Transformation Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../data-transformation-patterns/message-translator.html">Message Translator</a></li>
+    <li><a href="../data-transformation-patterns/content-filter.html">Content Filter</a></li>
+    <li><a href="../data-transformation-patterns/message-router.html">Message Router</a></li>
+    <li><a href="../data-transformation-patterns/aggregator.html">Aggregator</a></li>
+    <li><a href="../data-transformation-patterns/splitter.html">Splitter</a></li>
+    <li><a href="../data-transformation-patterns/data-mapper.html">Data Mapper</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#routing" class="sidebar-section-title">🔀 Routing Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../routing-patterns/content-based-router.html">Content-Based Router</a></li>
+    <li><a href="../routing-patterns/recipient-list.html">Recipient List</a></li>
+    <li><a href="../routing-patterns/load-balancer.html">Load Balancer</a></li>
+    <li><a href="../routing-patterns/message-filter.html">Message Filter</a></li>
+    <li><a href="../routing-patterns/dynamic-router.html">Dynamic Router</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#security" class="sidebar-section-title">🔐 Security Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../security-patterns/authentication.html">Authentication</a></li>
+    <li><a href="../security-patterns/authorization.html">Authorization</a></li>
+    <li><a href="../security-patterns/encryption.html">Encryption</a></li>
+    <li><a href="../security-patterns/token-management.html">Token Management</a></li>
+    <li><a href="../security-patterns/api-security.html">API Security</a></li>
+    <li><a href="../security-patterns/secret-management.html">Secret Management</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#orchestration" class="sidebar-section-title">🎭 Orchestration Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="saga-pattern.html">Saga Pattern</a></li>
+    <li><a href="process-manager.html" class="active">Process Manager</a></li>
+    <li><a href="workflow-engine.html">Workflow Engine</a></li>
+    <li><a href="choreography.html">Choreography</a></li>
+    <li><a href="compensation-transactions.html">Compensation Transactions</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#observability" class="sidebar-section-title">📊 Monitoring & Observability Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../monitoring-observability-patterns/distributed-tracing.html">Distributed Tracing</a></li>
+    <li><a href="../monitoring-observability-patterns/metrics-collection.html">Metrics Collection</a></li>
+    <li><a href="../monitoring-observability-patterns/health-checks.html">Health Checks</a></li>
+    <li><a href="../monitoring-observability-patterns/logging-strategies.html">Logging Strategies</a></li>
+    <li><a href="../monitoring-observability-patterns/performance-monitoring.html">Performance Monitoring</a></li>
+    <li><a href="../monitoring-observability-patterns/error-tracking.html">Error Tracking</a></li>
+  </ul>
+</div>
+
+    </aside>
+
+    <main id="main-content" class="docs-content">
+      <div class="breadcrumb">
+        <a href="https://dataintegrationmastery.com/">Home</a>
+        <span class="sep">›</span>
+        <a href="../index.html">Patterns</a>
+        <span class="sep">›</span>
+        <a href="../index.html#orchestration">Orchestration Patterns</a>
+        <span class="sep">›</span>
+        <strong>Process Manager</strong>
+      </div>
+
+      <h1>Process Manager</h1>
+
+      <h2 id="overview">Overview</h2>
+<p>The Process Manager pattern is a sophisticated orchestration mechanism in enterprise integration architectures that coordinates complex, stateful business workflows by maintaining process state and managing the flow of messages between participating services. Like a conductor directing an orchestra where each musician must play their part at the right time and in the right order, the Process Manager ensures that multi-step business processes execute correctly by tracking progress, managing state transitions, and handling exceptional conditions. This pattern is essential for managing long-running, stateful business processes that require coordination between multiple services while maintaining visibility, control, and reliability throughout the entire workflow lifecycle.</p>
+<h3 id="theoretical-foundation">Theoretical Foundation</h3>
+<p>The Process Manager pattern is grounded in <strong>workflow management theory</strong>, <strong>finite state machine principles</strong>, and <strong>distributed coordination patterns</strong>. It incorporates concepts from <strong>business process management (BPM)</strong>, <strong>state machine design</strong>, <strong>event-driven architecture</strong>, and <strong>distributed systems coordination</strong> to provide a robust framework for managing complex business processes that span multiple services, systems, and organizational boundaries. The pattern addresses the challenges of maintaining state consistency, handling process variations, and ensuring reliable completion of long-running workflows in distributed environments.</p>
+<h3 id="core-principles">Core Principles</h3>
+<h4 id="1-stateful-orchestration">1. <strong>Stateful Orchestration</strong></h4>
+<p>Managing complex business process state and coordination:
+- <strong>Process state management</strong> - maintaining complete workflow state throughout execution
+- <strong>State transitions</strong> - managing transitions between process steps based on business rules
+- <strong>Process correlation</strong> - tracking related messages and events across the workflow
+- <strong>Context preservation</strong> - maintaining business context and data throughout the process</p>
+<h4 id="2-message-driven-coordination">2. <strong>Message-Driven Coordination</strong></h4>
+<p>Coordinating services through intelligent message management:
+- <strong>Message routing</strong> - directing messages to appropriate services based on process state
+- <strong>Response correlation</strong> - matching responses to outstanding requests using correlation identifiers
+- <strong>Timeout management</strong> - handling delayed or missing responses from participating services
+- <strong>Message ordering</strong> - ensuring messages are processed in the correct sequence</p>
+<h4 id="3-process-flow-control">3. <strong>Process Flow Control</strong></h4>
+<p>Managing the execution flow of complex business processes:
+- <strong>Conditional branching</strong> - executing different paths based on business conditions
+- <strong>Parallel execution</strong> - coordinating concurrent process steps for improved performance
+- <strong>Process synchronization</strong> - coordinating parallel branches and collecting results
+- <strong>Loop handling</strong> - managing iterative process steps and batch processing scenarios</p>
+<h4 id="4-exception-and-error-handling">4. <strong>Exception and Error Handling</strong></h4>
+<p>Comprehensive strategies for managing process failures and exceptions:
+- <strong>Error detection</strong> - identifying failures and exceptional conditions during process execution
+- <strong>Process compensation</strong> - undoing completed steps when process failures occur
+- <strong>Alternative flows</strong> - executing alternative process paths when primary flows fail
+- <strong>Human intervention</strong> - escalating complex exceptions to human operators for resolution</p>
+<h3 id="why-process-manager-is-essential-in-integration-architecture">Why Process Manager is Essential in Integration Architecture</h3>
+<h4 id="1-complex-workflow-coordination">1. <strong>Complex Workflow Coordination</strong></h4>
+<p>In enterprise integration scenarios, the Process Manager pattern provides:
+- <strong>Multi-service coordination</strong> - orchestrating interactions between numerous independent services
+- <strong>Long-running process management</strong> - handling business processes that span days, weeks, or months
+- <strong>State consistency</strong> - maintaining consistent process state across distributed services
+- <strong>Process visibility</strong> - providing complete visibility into workflow progress and status</p>
+<h4 id="2-business-process-automation">2. <strong>Business Process Automation</strong></h4>
+<p>For sophisticated business workflow scenarios:
+- <strong>Approval workflows</strong> - managing multi-level approval processes with conditional routing
+- <strong>Order fulfillment</strong> - coordinating complex order processing across multiple systems
+- <strong>Customer onboarding</strong> - orchestrating multi-step customer registration and verification processes
+- <strong>Supply chain management</strong> - coordinating procurement, manufacturing, and distribution workflows</p>
+<h4 id="3-system-integration">3. <strong>System Integration</strong></h4>
+<p>Enabling seamless integration across heterogeneous systems:
+- <strong>Legacy system integration</strong> - coordinating with existing systems through standardized interfaces
+- <strong>Third-party service integration</strong> - managing interactions with external service providers
+- <strong>Cross-platform coordination</strong> - orchestrating processes across different technology platforms
+- <strong>Multi-tenant process management</strong> - managing workflows for multiple organizational units</p>
+<h4 id="4-operational-excellence">4. <strong>Operational Excellence</strong></h4>
+<p>Enhancing operational efficiency and reliability:
+- <strong>Process monitoring</strong> - providing real-time visibility into workflow execution status
+- <strong>Error handling</strong> - systematic approaches to handling and recovering from failures
+- <strong>Performance optimization</strong> - optimizing workflow execution through parallel processing and caching
+- <strong>Compliance support</strong> - maintaining audit trails and supporting regulatory compliance requirements</p>
+<h3 id="benefits-in-integration-contexts">Benefits in Integration Contexts</h3>
+<h4 id="1-technical-advantages">1. <strong>Technical Advantages</strong></h4>
+<ul>
+<li><strong>Centralized coordination</strong> - single point of control for complex multi-service workflows</li>
+<li><strong>State management</strong> - reliable persistence and recovery of process state information</li>
+<li><strong>Message correlation</strong> - accurate tracking and correlation of related messages and events</li>
+<li><strong>Exception handling</strong> - sophisticated error handling and recovery mechanisms</li>
+</ul>
+<h4 id="2-business-value">2. <strong>Business Value</strong></h4>
+<ul>
+<li><strong>Process visibility</strong> - complete transparency into business process execution and status</li>
+<li><strong>Business agility</strong> - ability to rapidly modify and adapt business processes</li>
+<li><strong>Compliance assurance</strong> - maintaining comprehensive audit trails for regulatory compliance</li>
+<li><strong>Operational efficiency</strong> - optimized resource utilization through intelligent workflow coordination</li>
+</ul>
+<h4 id="3-integration-enablement">3. <strong>Integration Enablement</strong></h4>
+<ul>
+<li><strong>Service orchestration</strong> - coordinating complex interactions between multiple services</li>
+<li><strong>Protocol mediation</strong> - handling communication between services using different protocols</li>
+<li><strong>Data transformation</strong> - managing data format conversions throughout the workflow</li>
+<li><strong>Transaction coordination</strong> - ensuring transactional consistency across distributed operations</li>
+</ul>
+<h4 id="4-maintainability-and-evolution">4. <strong>Maintainability and Evolution</strong></h4>
+<ul>
+<li><strong>Process modularity</strong> - clear separation between process logic and service implementations</li>
+<li><strong>Change management</strong> - ability to modify process flows without changing individual services</li>
+<li><strong>Testing support</strong> - comprehensive testing capabilities for complex workflow scenarios</li>
+<li><strong>Version management</strong> - managing multiple versions of business processes simultaneously</li>
+</ul>
+<h3 id="integration-architecture-applications">Integration Architecture Applications</h3>
+<h4 id="1-financial-services">1. <strong>Financial Services</strong></h4>
+<p>Process Manager applications in financial workflows:</p>
+<pre><code class="language-java">@Component
+public class LoanApplicationProcessManager {
+
+    @Autowired
+    private ProcessStateRepository processStateRepository;
+
+    @Autowired
+    private CreditCheckService creditCheckService;
+
+    @Autowired
+    private DocumentVerificationService documentService;
+
+    @Autowired
+    private UnderwritingService underwritingService;
+
+    @EventListener
+    public void handleLoanApplicationSubmitted(LoanApplicationSubmittedEvent event) {
+        ProcessState state = new ProcessState();
+        state.setProcessId(event.getProcessId());
+        state.setApplicationId(event.getApplicationId());
+        state.setCurrentStep(ProcessStep.CREDIT_CHECK_INITIATED);
+        state.setProcessData(event.getApplicationData());
+
+        processStateRepository.save(state);
+
+        // Initiate credit check
+        CreditCheckRequest request = new CreditCheckRequest();
+        request.setProcessId(event.getProcessId());
+        request.setCustomerSSN(event.getApplicationData().getCustomerSSN());
+        request.setRequestedAmount(event.getApplicationData().getLoanAmount());
+
+        creditCheckService.initiateCheck(request);
+
+        // Set timeout for credit check response
+        scheduleTimeout(event.getProcessId(), CREDIT_CHECK_TIMEOUT, 
+                       ProcessTimeoutType.CREDIT_CHECK);
+    }
+
+    @EventListener
+    public void handleCreditCheckCompleted(CreditCheckCompletedEvent event) {
+        ProcessState state = processStateRepository.findByProcessId(event.getProcessId());
+
+        if (state.getCurrentStep() != ProcessStep.CREDIT_CHECK_INITIATED) {
+            log.warn(&quot;Unexpected credit check response for process {}&quot;, event.getProcessId());
+            return;
+        }
+
+        state.setCurrentStep(ProcessStep.CREDIT_CHECK_COMPLETED);
+        state.addProcessData(&quot;creditScore&quot;, event.getCreditScore());
+        state.addProcessData(&quot;creditCheckResult&quot;, event.getResult());
+
+        if (event.getResult() == CreditCheckResult.APPROVED) {
+            // Proceed to document verification
+            state.setCurrentStep(ProcessStep.DOCUMENT_VERIFICATION_INITIATED);
+            processStateRepository.save(state);
+
+            DocumentVerificationRequest docRequest = new DocumentVerificationRequest();
+            docRequest.setProcessId(event.getProcessId());
+            docRequest.setDocuments(state.getProcessData().getDocuments());
+
+            documentService.initiateVerification(docRequest);
+
+            scheduleTimeout(event.getProcessId(), DOCUMENT_VERIFICATION_TIMEOUT,
+                           ProcessTimeoutType.DOCUMENT_VERIFICATION);
+        } else {
+            // Handle credit check failure
+            state.setCurrentStep(ProcessStep.PROCESS_REJECTED);
+            state.setRejectionReason(&quot;Credit check failed: &quot; + event.getReason());
+            processStateRepository.save(state);
+
+            publishApplicationRejectedEvent(event.getProcessId(), event.getReason());
+        }
+    }
+
+    @EventListener
+    public void handleDocumentVerificationCompleted(DocumentVerificationCompletedEvent event) {
+        ProcessState state = processStateRepository.findByProcessId(event.getProcessId());
+
+        if (state.getCurrentStep() != ProcessStep.DOCUMENT_VERIFICATION_INITIATED) {
+            log.warn(&quot;Unexpected document verification response for process {}&quot;, 
+                    event.getProcessId());
+            return;
+        }
+
+        state.setCurrentStep(ProcessStep.DOCUMENT_VERIFICATION_COMPLETED);
+        state.addProcessData(&quot;documentVerificationResult&quot;, event.getResult());
+
+        if (event.getResult() == VerificationResult.VERIFIED) {
+            // Proceed to underwriting
+            state.setCurrentStep(ProcessStep.UNDERWRITING_INITIATED);
+            processStateRepository.save(state);
+
+            UnderwritingRequest underwritingRequest = new UnderwritingRequest();
+            underwritingRequest.setProcessId(event.getProcessId());
+            underwritingRequest.setCreditScore(state.getProcessData().getCreditScore());
+            underwritingRequest.setApplicationData(state.getProcessData());
+            underwritingRequest.setDocumentationStatus(event.getResult());
+
+            underwritingService.initiateUnderwriting(underwritingRequest);
+
+            scheduleTimeout(event.getProcessId(), UNDERWRITING_TIMEOUT,
+                           ProcessTimeoutType.UNDERWRITING);
+        } else {
+            // Handle document verification failure
+            state.setCurrentStep(ProcessStep.PROCESS_REJECTED);
+            state.setRejectionReason(&quot;Document verification failed&quot;);
+            processStateRepository.save(state);
+
+            publishApplicationRejectedEvent(event.getProcessId(), 
+                                          &quot;Document verification failed&quot;);
+        }
+    }
+
+    @EventListener
+    public void handleUnderwritingCompleted(UnderwritingCompletedEvent event) {
+        ProcessState state = processStateRepository.findByProcessId(event.getProcessId());
+
+        if (state.getCurrentStep() != ProcessStep.UNDERWRITING_INITIATED) {
+            log.warn(&quot;Unexpected underwriting response for process {}&quot;, event.getProcessId());
+            return;
+        }
+
+        state.setCurrentStep(ProcessStep.UNDERWRITING_COMPLETED);
+        state.addProcessData(&quot;underwritingResult&quot;, event.getResult());
+        state.addProcessData(&quot;approvedAmount&quot;, event.getApprovedAmount());
+        state.addProcessData(&quot;interestRate&quot;, event.getInterestRate());
+
+        if (event.getResult() == UnderwritingResult.APPROVED) {
+            state.setCurrentStep(ProcessStep.PROCESS_COMPLETED);
+            processStateRepository.save(state);
+
+            publishApplicationApprovedEvent(event.getProcessId(), 
+                                          event.getApprovedAmount(), 
+                                          event.getInterestRate());
+        } else {
+            state.setCurrentStep(ProcessStep.PROCESS_REJECTED);
+            state.setRejectionReason(&quot;Underwriting declined: &quot; + event.getReason());
+            processStateRepository.save(state);
+
+            publishApplicationRejectedEvent(event.getProcessId(), event.getReason());
+        }
+    }
+
+    @EventListener
+    public void handleProcessTimeout(ProcessTimeoutEvent event) {
+        ProcessState state = processStateRepository.findByProcessId(event.getProcessId());
+
+        switch (event.getTimeoutType()) {
+            case CREDIT_CHECK:
+                if (state.getCurrentStep() == ProcessStep.CREDIT_CHECK_INITIATED) {
+                    handleCreditCheckTimeout(state);
+                }
+                break;
+            case DOCUMENT_VERIFICATION:
+                if (state.getCurrentStep() == ProcessStep.DOCUMENT_VERIFICATION_INITIATED) {
+                    handleDocumentVerificationTimeout(state);
+                }
+                break;
+            case UNDERWRITING:
+                if (state.getCurrentStep() == ProcessStep.UNDERWRITING_INITIATED) {
+                    handleUnderwritingTimeout(state);
+                }
+                break;
+        }
+    }
+}
+</code></pre>
+<h4 id="2-e-commerce-order-processing">2. <strong>E-commerce Order Processing</strong></h4>
+<p>Process Manager for complex order fulfillment:</p>
+<pre><code class="language-java">@Component
+public class OrderFulfillmentProcessManager {
+
+    @Autowired
+    private ProcessStateRepository processStateRepository;
+
+    @Autowired
+    private InventoryService inventoryService;
+
+    @Autowired
+    private PaymentService paymentService;
+
+    @Autowired
+    private ShippingService shippingService;
+
+    @Autowired
+    private NotificationService notificationService;
+
+    @EventListener
+    public void handleOrderPlaced(OrderPlacedEvent event) {
+        ProcessState state = new ProcessState();
+        state.setProcessId(event.getOrderId());
+        state.setCurrentStep(ProcessStep.INVENTORY_RESERVATION_INITIATED);
+        state.setProcessData(event.getOrderData());
+
+        processStateRepository.save(state);
+
+        // Start parallel inventory reservations for all items
+        for (OrderItem item : event.getOrderData().getItems()) {
+            InventoryReservationRequest request = new InventoryReservationRequest();
+            request.setProcessId(event.getOrderId());
+            request.setItemId(item.getItemId());
+            request.setQuantity(item.getQuantity());
+            request.setReservationId(generateReservationId());
+
+            inventoryService.reserveInventory(request);
+        }
+
+        scheduleTimeout(event.getOrderId(), INVENTORY_RESERVATION_TIMEOUT,
+                       ProcessTimeoutType.INVENTORY_RESERVATION);
+    }
+
+    @EventListener
+    public void handleInventoryReserved(InventoryReservedEvent event) {
+        ProcessState state = processStateRepository.findByProcessId(event.getProcessId());
+
+        // Track inventory reservations
+        state.addProcessData(&quot;reservedItems.&quot; + event.getItemId(), event.getReservationId());
+
+        // Check if all items are reserved
+        OrderData orderData = state.getProcessData();
+        boolean allItemsReserved = orderData.getItems().stream()
+            .allMatch(item -&gt; state.getProcessData()
+                .containsKey(&quot;reservedItems.&quot; + item.getItemId()));
+
+        if (allItemsReserved) {
+            // Proceed to payment processing
+            state.setCurrentStep(ProcessStep.PAYMENT_PROCESSING_INITIATED);
+            processStateRepository.save(state);
+
+            PaymentRequest paymentRequest = new PaymentRequest();
+            paymentRequest.setProcessId(event.getProcessId());
+            paymentRequest.setAmount(orderData.getTotalAmount());
+            paymentRequest.setPaymentMethod(orderData.getPaymentMethod());
+            paymentRequest.setCustomerId(orderData.getCustomerId());
+
+            paymentService.processPayment(paymentRequest);
+
+            scheduleTimeout(event.getProcessId(), PAYMENT_PROCESSING_TIMEOUT,
+                           ProcessTimeoutType.PAYMENT_PROCESSING);
+        }
+
+        processStateRepository.save(state);
+    }
+
+    @EventListener
+    public void handleInventoryReservationFailed(InventoryReservationFailedEvent event) {
+        ProcessState state = processStateRepository.findByProcessId(event.getProcessId());
+
+        // Handle inventory reservation failure
+        state.setCurrentStep(ProcessStep.INVENTORY_COMPENSATION_INITIATED);
+        state.addProcessData(&quot;failureReason&quot;, event.getReason());
+
+        // Release any successful reservations
+        compensateInventoryReservations(state);
+
+        // Notify customer of order failure
+        state.setCurrentStep(ProcessStep.PROCESS_FAILED);
+        processStateRepository.save(state);
+
+        publishOrderFailedEvent(event.getProcessId(), &quot;Inventory not available: &quot; + event.getReason());
+    }
+
+    @EventListener
+    public void handlePaymentProcessed(PaymentProcessedEvent event) {
+        ProcessState state = processStateRepository.findByProcessId(event.getProcessId());
+
+        if (event.getResult() == PaymentResult.SUCCESS) {
+            state.setCurrentStep(ProcessStep.SHIPPING_INITIATED);
+            state.addProcessData(&quot;paymentId&quot;, event.getPaymentId());
+
+            // Create shipping request
+            ShippingRequest shippingRequest = new ShippingRequest();
+            shippingRequest.setProcessId(event.getProcessId());
+            shippingRequest.setOrderData(state.getProcessData());
+            shippingRequest.setShippingAddress(state.getProcessData().getShippingAddress());
+
+            shippingService.initiateShipping(shippingRequest);
+
+            scheduleTimeout(event.getProcessId(), SHIPPING_INITIATION_TIMEOUT,
+                           ProcessTimeoutType.SHIPPING_INITIATION);
+        } else {
+            // Payment failed - compensate inventory reservations
+            state.setCurrentStep(ProcessStep.PAYMENT_COMPENSATION_INITIATED);
+            state.addProcessData(&quot;paymentFailureReason&quot;, event.getFailureReason());
+
+            compensateInventoryReservations(state);
+
+            state.setCurrentStep(ProcessStep.PROCESS_FAILED);
+            processStateRepository.save(state);
+
+            publishOrderFailedEvent(event.getProcessId(), &quot;Payment failed: &quot; + event.getFailureReason());
+        }
+
+        processStateRepository.save(state);
+    }
+
+    @EventListener
+    public void handleShippingInitiated(ShippingInitiatedEvent event) {
+        ProcessState state = processStateRepository.findByProcessId(event.getProcessId());
+
+        state.setCurrentStep(ProcessStep.ORDER_FULFILLED);
+        state.addProcessData(&quot;trackingNumber&quot;, event.getTrackingNumber());
+        state.addProcessData(&quot;estimatedDelivery&quot;, event.getEstimatedDelivery());
+
+        processStateRepository.save(state);
+
+        // Send order confirmation to customer
+        publishOrderFulfilledEvent(event.getProcessId(), 
+                                 event.getTrackingNumber(), 
+                                 event.getEstimatedDelivery());
+    }
+
+    private void compensateInventoryReservations(ProcessState state) {
+        OrderData orderData = state.getProcessData();
+
+        for (OrderItem item : orderData.getItems()) {
+            String reservationKey = &quot;reservedItems.&quot; + item.getItemId();
+            if (state.getProcessData().containsKey(reservationKey)) {
+                String reservationId = state.getProcessData().get(reservationKey);
+
+                InventoryReleaseRequest releaseRequest = new InventoryReleaseRequest();
+                releaseRequest.setProcessId(state.getProcessId());
+                releaseRequest.setItemId(item.getItemId());
+                releaseRequest.setReservationId(reservationId);
+
+                inventoryService.releaseReservation(releaseRequest);
+            }
+        }
+    }
+}
+</code></pre>
+<h4 id="3-apache-camel-integration">3. <strong>Apache Camel Integration</strong></h4>
+<p>Camel-based Process Manager implementation:</p>
+<pre><code class="language-java">@Component
+public class CamelProcessManagerRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        // Order processing workflow
+        from(&quot;kafka:order-events?groupId=process-manager&quot;)
+            .routeId(&quot;order-process-manager&quot;)
+            .unmarshal().json(JsonLibrary.Jackson, OrderEvent.class)
+            .choice()
+                .when(simple(&quot;${body.eventType} == 'ORDER_PLACED'&quot;))
+                    .to(&quot;direct:initiateOrderProcess&quot;)
+                .when(simple(&quot;${body.eventType} == 'INVENTORY_RESERVED'&quot;))
+                    .to(&quot;direct:handleInventoryReserved&quot;)
+                .when(simple(&quot;${body.eventType} == 'PAYMENT_PROCESSED'&quot;))
+                    .to(&quot;direct:handlePaymentProcessed&quot;)
+                .when(simple(&quot;${body.eventType} == 'SHIPPING_INITIATED'&quot;))
+                    .to(&quot;direct:handleShippingInitiated&quot;)
+                .otherwise()
+                    .log(&quot;Unknown order event type: ${body.eventType}&quot;)
+            .end();
+
+        from(&quot;direct:initiateOrderProcess&quot;)
+            .routeId(&quot;initiate-order-process&quot;)
+            .process(exchange -&gt; {
+                OrderEvent orderEvent = exchange.getIn().getBody(OrderEvent.class);
+                ProcessState state = new ProcessState();
+                state.setProcessId(orderEvent.getOrderId());
+                state.setCurrentStep(&quot;INVENTORY_CHECK_INITIATED&quot;);
+                state.setProcessData(orderEvent.getOrderData());
+
+                // Save process state
+                processStateRepository.save(state);
+
+                exchange.getIn().setBody(state);
+            })
+            .multicast().parallelProcessing()
+                .to(&quot;direct:checkInventoryAvailability&quot;)
+                .to(&quot;direct:validatePaymentMethod&quot;)
+            .end()
+            .log(&quot;Order process initiated for order: ${body.processId}&quot;);
+
+        from(&quot;direct:checkInventoryAvailability&quot;)
+            .routeId(&quot;check-inventory-availability&quot;)
+            .process(exchange -&gt; {
+                ProcessState state = exchange.getIn().getBody(ProcessState.class);
+                OrderData orderData = state.getProcessData();
+
+                for (OrderItem item : orderData.getItems()) {
+                    InventoryCheckRequest request = new InventoryCheckRequest();
+                    request.setProcessId(state.getProcessId());
+                    request.setItemId(item.getItemId());
+                    request.setQuantity(item.getQuantity());
+
+                    exchange.getIn().setBody(request);
+                }
+            })
+            .to(&quot;kafka:inventory-check-requests&quot;)
+            .log(&quot;Inventory check initiated for process: ${body.processId}&quot;);
+
+        from(&quot;direct:handleInventoryReserved&quot;)
+            .routeId(&quot;handle-inventory-reserved&quot;)
+            .process(exchange -&gt; {
+                OrderEvent event = exchange.getIn().getBody(OrderEvent.class);
+                ProcessState state = processStateRepository.findByProcessId(event.getProcessId());
+
+                // Update process state
+                state.addInventoryReservation(event.getItemId(), event.getReservationId());
+
+                // Check if all items are reserved
+                if (state.allItemsReserved()) {
+                    state.setCurrentStep(&quot;PAYMENT_PROCESSING_INITIATED&quot;);
+
+                    PaymentRequest paymentRequest = new PaymentRequest();
+                    paymentRequest.setProcessId(event.getProcessId());
+                    paymentRequest.setAmount(state.getProcessData().getTotalAmount());
+
+                    exchange.getIn().setBody(paymentRequest);
+
+                    processStateRepository.save(state);
+                } else {
+                    exchange.getIn().setBody(null);
+                }
+            })
+            .choice()
+                .when(body().isNotNull())
+                    .to(&quot;kafka:payment-processing-requests&quot;)
+                    .log(&quot;Payment processing initiated for process: ${body.processId}&quot;)
+                .otherwise()
+                    .log(&quot;Waiting for more inventory reservations&quot;)
+            .end();
+
+        from(&quot;direct:handlePaymentProcessed&quot;)
+            .routeId(&quot;handle-payment-processed&quot;)
+            .process(exchange -&gt; {
+                OrderEvent event = exchange.getIn().getBody(OrderEvent.class);
+                ProcessState state = processStateRepository.findByProcessId(event.getProcessId());
+
+                if (event.getPaymentResult().equals(&quot;SUCCESS&quot;)) {
+                    state.setCurrentStep(&quot;SHIPPING_INITIATED&quot;);
+                    state.addProcessData(&quot;paymentId&quot;, event.getPaymentId());
+
+                    ShippingRequest shippingRequest = new ShippingRequest();
+                    shippingRequest.setProcessId(event.getProcessId());
+                    shippingRequest.setOrderData(state.getProcessData());
+
+                    exchange.getIn().setBody(shippingRequest);
+
+                    processStateRepository.save(state);
+                } else {
+                    // Handle payment failure
+                    exchange.getIn().setHeader(&quot;compensationRequired&quot;, true);
+                    exchange.getIn().setBody(state);
+                }
+            })
+            .choice()
+                .when(header(&quot;compensationRequired&quot;).isEqualTo(true))
+                    .to(&quot;direct:compensateOrderProcess&quot;)
+                .otherwise()
+                    .to(&quot;kafka:shipping-requests&quot;)
+                    .log(&quot;Shipping initiated for process: ${body.processId}&quot;)
+            .end();
+
+        from(&quot;direct:compensateOrderProcess&quot;)
+            .routeId(&quot;compensate-order-process&quot;)
+            .process(exchange -&gt; {
+                ProcessState state = exchange.getIn().getBody(ProcessState.class);
+
+                // Release inventory reservations
+                for (String itemId : state.getReservedItems().keySet()) {
+                    String reservationId = state.getReservedItems().get(itemId);
+
+                    InventoryReleaseRequest releaseRequest = new InventoryReleaseRequest();
+                    releaseRequest.setProcessId(state.getProcessId());
+                    releaseRequest.setItemId(itemId);
+                    releaseRequest.setReservationId(reservationId);
+
+                    // Send release request
+                }
+
+                state.setCurrentStep(&quot;PROCESS_COMPENSATED&quot;);
+                processStateRepository.save(state);
+            })
+            .to(&quot;kafka:inventory-release-requests&quot;)
+            .log(&quot;Order process compensated for process: ${body.processId}&quot;);
+
+        // Process timeout handling
+        from(&quot;timer:processTimeoutChecker?period=60000&quot;)
+            .routeId(&quot;process-timeout-checker&quot;)
+            .process(exchange -&gt; {
+                List&lt;ProcessState&gt; timedOutProcesses = processStateRepository.findTimedOutProcesses();
+                exchange.getIn().setBody(timedOutProcesses);
+            })
+            .split(body())
+            .process(exchange -&gt; {
+                ProcessState state = exchange.getIn().getBody(ProcessState.class);
+
+                ProcessTimeoutEvent timeoutEvent = new ProcessTimeoutEvent();
+                timeoutEvent.setProcessId(state.getProcessId());
+                timeoutEvent.setCurrentStep(state.getCurrentStep());
+                timeoutEvent.setTimeoutDuration(state.getTimeoutDuration());
+
+                exchange.getIn().setBody(timeoutEvent);
+            })
+            .to(&quot;kafka:process-timeout-events&quot;)
+            .log(&quot;Process timeout detected for process: ${body.processId}&quot;);
+    }
+}
+</code></pre>
+<h2 id="best-practices">Best Practices</h2>
+<h3 id="1-process-design-and-architecture">1. <strong>Process Design and Architecture</strong></h3>
+<ul>
+<li>Design processes with clear state transitions and well-defined steps</li>
+<li>Implement comprehensive process state persistence to handle system failures</li>
+<li>Use correlation identifiers to track related messages and events</li>
+<li>Design for process versioning to handle evolving business requirements</li>
+<li>Implement process instance isolation to prevent cross-contamination</li>
+</ul>
+<h3 id="2-state-management-and-persistence">2. <strong>State Management and Persistence</strong></h3>
+<ul>
+<li>Persist process state consistently using transactional updates</li>
+<li>Implement process state snapshots for long-running workflows</li>
+<li>Use event sourcing for complete process audit trails</li>
+<li>Design process state recovery mechanisms for system restart scenarios</li>
+<li>Implement process state cleanup for completed workflows</li>
+</ul>
+<h3 id="3-message-coordination-and-correlation">3. <strong>Message Coordination and Correlation</strong></h3>
+<ul>
+<li>Use unique correlation identifiers for all related messages</li>
+<li>Implement message deduplication to handle duplicate deliveries</li>
+<li>Design timeout handling for all external service interactions</li>
+<li>Use message versioning to handle evolving service interfaces</li>
+<li>Implement comprehensive message logging for debugging and monitoring</li>
+</ul>
+<h3 id="4-error-handling-and-compensation">4. <strong>Error Handling and Compensation</strong></h3>
+<ul>
+<li>Design comprehensive error handling for all process steps</li>
+<li>Implement compensation logic for reversible operations</li>
+<li>Use dead letter queues for unprocessable messages</li>
+<li>Plan for manual intervention in exceptional scenarios</li>
+<li>Implement process recovery mechanisms for partial failures</li>
+</ul>
+<h3 id="5-performance-and-scalability">5. <strong>Performance and Scalability</strong></h3>
+<ul>
+<li>Use parallel processing where business logic allows</li>
+<li>Implement process step caching where appropriate and safe</li>
+<li>Design for horizontal scaling of process manager instances</li>
+<li>Use asynchronous messaging for improved throughput</li>
+<li>Monitor and optimize process execution performance</li>
+</ul>
+<h3 id="6-monitoring-and-observability">6. <strong>Monitoring and Observability</strong></h3>
+<ul>
+<li>Implement comprehensive process execution logging</li>
+<li>Provide real-time dashboards for process monitoring</li>
+<li>Create alerts for process failures and timeout scenarios</li>
+<li>Track process completion rates and performance metrics</li>
+<li>Implement distributed tracing for complex process debugging</li>
+</ul>
+<p>The Process Manager pattern is essential for orchestrating complex, stateful business workflows in distributed enterprise integration architectures, providing centralized coordination, state management, and reliable process execution across multiple services and systems.</p>
+
+      <a href="../index.html" class="back-to-top">← Back to All Patterns</a>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <p>©2026 <a href="https://dataintegrationmastery.com/">Data Integration Mastery™</a> — All Rights Reserved</p>
+  </footer>
+</body>
+</html>

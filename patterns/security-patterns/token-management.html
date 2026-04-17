@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Token Management Pattern — Integration Architecture Patterns | Data Integration Mastery™</title>
+  <meta name="description" content="The Token Management pattern is a critical security mechanism in enterprise integration architectures that handles the complete lifecycle of security tokens ...">
+  <meta name="keywords" content="token management pattern, integration pattern, security patterns, integration architecture, EAI patterns, data integration">
+  <link rel="canonical" href="https://dataintegrationmastery.com/patterns/security-patterns/token-management.html">
+
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://dataintegrationmastery.com/patterns/security-patterns/token-management.html">
+  <meta property="og:title" content="Token Management Pattern — Integration Architecture Patterns">
+  <meta property="og:description" content="The Token Management pattern is a critical security mechanism in enterprise integration architectures that handles the complete lifecycle of security tokens ...">
+  <meta property="og:image" content="https://dataintegrationmastery.com/assets/images/logo.png">
+  <meta property="og:site_name" content="Data Integration Mastery">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Token Management Pattern — Integration Architecture Patterns">
+  <meta name="twitter:description" content="The Token Management pattern is a critical security mechanism in enterprise integration architectures that handles the complete lifecycle of security tokens ...">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/docs.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Token Management Pattern",
+    "description": "The Token Management pattern is a critical security mechanism in enterprise integration architectures that handles the complete lifecycle of security tokens ...",
+    "url": "https://dataintegrationmastery.com/patterns/security-patterns/token-management.html",
+    "author": {
+      "@type": "Person",
+      "name": "Ari Vilkman",
+      "jobTitle": "Integration Architect"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Data Integration Mastery",
+      "url": "https://dataintegrationmastery.com"
+    },
+    "isPartOf": {
+      "@type": "CollectionPage",
+      "name": "Integration Architecture Patterns",
+      "url": "https://dataintegrationmastery.com/patterns/"
+    },
+    "about": {
+      "@type": "Thing",
+      "name": "Token Management Pattern"
+    },
+    "inLanguage": "en",
+    "isAccessibleForFree": true
+  }
+  </script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="https://dataintegrationmastery.com/" class="header-brand">
+        <img src="../../assets/images/dim-icon.png" alt="DIM" width="36" height="36">
+        <span class="header-title">Data Integration Mastery™</span>
+      </a>
+      <nav class="header-nav" aria-label="Main navigation">
+        <a href="https://dataintegrationmastery.com/">Home</a>
+        <a href="../index.html">All Patterns</a>
+        <a href="https://dataintegrationmastery.com/#free-course">Free Course</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="docs-layout">
+    <aside class="docs-sidebar" aria-label="Pattern categories">
+      <div class="sidebar-title">Pattern Categories</div>
+<div class="sidebar-section">
+  <a href="../index.html#resilience" class="sidebar-section-title">🛡️ Resilience Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../resilience-patterns/circuit-breaker.html">Circuit Breaker</a></li>
+    <li><a href="../resilience-patterns/retry-mechanism.html">Retry Mechanism</a></li>
+    <li><a href="../resilience-patterns/timeout.html">Timeout</a></li>
+    <li><a href="../resilience-patterns/dead-letter-queue.html">Dead Letter Queue</a></li>
+    <li><a href="../resilience-patterns/bulkhead.html">Bulkhead</a></li>
+    <li><a href="../resilience-patterns/fallback-graceful-degradation.html">Fallback / Graceful Degradation</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#messaging" class="sidebar-section-title">📨 Messaging Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../messaging-patterns/request-reply.html">Request-Reply</a></li>
+    <li><a href="../messaging-patterns/publish-subscribe.html">Publish-Subscribe</a></li>
+    <li><a href="../messaging-patterns/message-queue.html">Message Queue</a></li>
+    <li><a href="../messaging-patterns/event-streaming.html">Event Streaming</a></li>
+    <li><a href="../messaging-patterns/correlation-id.html">Correlation ID</a></li>
+    <li><a href="../messaging-patterns/message-routing.html">Message Routing</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#data-transformation" class="sidebar-section-title">🔄 Data Transformation Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../data-transformation-patterns/message-translator.html">Message Translator</a></li>
+    <li><a href="../data-transformation-patterns/content-filter.html">Content Filter</a></li>
+    <li><a href="../data-transformation-patterns/message-router.html">Message Router</a></li>
+    <li><a href="../data-transformation-patterns/aggregator.html">Aggregator</a></li>
+    <li><a href="../data-transformation-patterns/splitter.html">Splitter</a></li>
+    <li><a href="../data-transformation-patterns/data-mapper.html">Data Mapper</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#routing" class="sidebar-section-title">🔀 Routing Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../routing-patterns/content-based-router.html">Content-Based Router</a></li>
+    <li><a href="../routing-patterns/recipient-list.html">Recipient List</a></li>
+    <li><a href="../routing-patterns/load-balancer.html">Load Balancer</a></li>
+    <li><a href="../routing-patterns/message-filter.html">Message Filter</a></li>
+    <li><a href="../routing-patterns/dynamic-router.html">Dynamic Router</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#security" class="sidebar-section-title">🔐 Security Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="authentication.html">Authentication</a></li>
+    <li><a href="authorization.html">Authorization</a></li>
+    <li><a href="encryption.html">Encryption</a></li>
+    <li><a href="token-management.html" class="active">Token Management</a></li>
+    <li><a href="api-security.html">API Security</a></li>
+    <li><a href="secret-management.html">Secret Management</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#orchestration" class="sidebar-section-title">🎭 Orchestration Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../orchestration-patterns/saga-pattern.html">Saga Pattern</a></li>
+    <li><a href="../orchestration-patterns/process-manager.html">Process Manager</a></li>
+    <li><a href="../orchestration-patterns/workflow-engine.html">Workflow Engine</a></li>
+    <li><a href="../orchestration-patterns/choreography.html">Choreography</a></li>
+    <li><a href="../orchestration-patterns/compensation-transactions.html">Compensation Transactions</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#observability" class="sidebar-section-title">📊 Monitoring & Observability Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../monitoring-observability-patterns/distributed-tracing.html">Distributed Tracing</a></li>
+    <li><a href="../monitoring-observability-patterns/metrics-collection.html">Metrics Collection</a></li>
+    <li><a href="../monitoring-observability-patterns/health-checks.html">Health Checks</a></li>
+    <li><a href="../monitoring-observability-patterns/logging-strategies.html">Logging Strategies</a></li>
+    <li><a href="../monitoring-observability-patterns/performance-monitoring.html">Performance Monitoring</a></li>
+    <li><a href="../monitoring-observability-patterns/error-tracking.html">Error Tracking</a></li>
+  </ul>
+</div>
+
+    </aside>
+
+    <main id="main-content" class="docs-content">
+      <div class="breadcrumb">
+        <a href="https://dataintegrationmastery.com/">Home</a>
+        <span class="sep">›</span>
+        <a href="../index.html">Patterns</a>
+        <span class="sep">›</span>
+        <a href="../index.html#security">Security Patterns</a>
+        <span class="sep">›</span>
+        <strong>Token Management Pattern</strong>
+      </div>
+
+      <h1>Token Management Pattern</h1>
+
+      <h2 id="overview">Overview</h2>
+<p>The Token Management pattern is a critical security mechanism in enterprise integration architectures that handles the complete lifecycle of security tokens used for authentication, authorization, and secure communication. Like a sophisticated ticket management system at a large venue that issues, validates, tracks, and revokes access tickets, token management ensures that security tokens are properly created, distributed, validated, refreshed, and revoked throughout their lifecycle. This pattern encompasses various token types, from simple API keys to complex JSON Web Tokens (JWT) and OAuth tokens, providing the foundation for stateless authentication and secure service-to-service communication.</p>
+<h3 id="core-principles">Core Principles</h3>
+<h4 id="1-token-lifecycle-management">1. <strong>Token Lifecycle Management</strong></h4>
+<p>Systematic control of tokens from creation to destruction:
+- <strong>Token generation</strong> - creating cryptographically secure tokens with appropriate claims and metadata
+- <strong>Token distribution</strong> - securely delivering tokens to authorized clients and services
+- <strong>Token validation</strong> - verifying token authenticity, integrity, and validity
+- <strong>Token renewal</strong> - refreshing tokens before expiration to maintain continuous access
+- <strong>Token revocation</strong> - invalidating tokens when compromised or no longer needed</p>
+<h4 id="2-token-security">2. <strong>Token Security</strong></h4>
+<p>Ensuring tokens remain secure throughout their lifecycle:
+- <strong>Cryptographic protection</strong> - using digital signatures and encryption to protect token integrity
+- <strong>Secure transmission</strong> - protecting tokens during network communication
+- <strong>Secure storage</strong> - properly storing tokens and related cryptographic material
+- <strong>Access control</strong> - controlling who can create, modify, and revoke tokens</p>
+<h2 id="implementation-patterns">Implementation Patterns</h2>
+<h3 id="jwt-token-management-service">JWT Token Management Service</h3>
+<pre><code class="language-java">@Service
+public class JWTTokenManagementService {
+
+    @Autowired
+    private TokenSigningService signingService;
+
+    @Autowired
+    private TokenValidationService validationService;
+
+    @Autowired
+    private TokenBlacklistService blacklistService;
+
+    public TokenPair generateTokenPair(UserDetails user) {
+        // Generate access token
+        String accessToken = generateAccessToken(user);
+
+        // Generate refresh token
+        String refreshToken = generateRefreshToken(user);
+
+        return TokenPair.builder()
+            .accessToken(accessToken)
+            .refreshToken(refreshToken)
+            .tokenType(&quot;Bearer&quot;)
+            .expiresIn(3600) // 1 hour
+            .build();
+    }
+
+    public TokenValidationResult validateToken(String token) {
+        try {
+            // Check blacklist first
+            if (blacklistService.isBlacklisted(token)) {
+                return TokenValidationResult.invalid(&quot;Token has been revoked&quot;);
+            }
+
+            // Validate token signature and claims
+            DecodedJWT decodedJWT = validationService.validateAndDecode(token);
+
+            return TokenValidationResult.valid(decodedJWT);
+
+        } catch (TokenExpiredException e) {
+            return TokenValidationResult.expired();
+        } catch (JWTVerificationException e) {
+            return TokenValidationResult.invalid(e.getMessage());
+        }
+    }
+
+    public void revokeToken(String token) {
+        blacklistService.blacklist(token);
+        auditService.recordTokenRevocation(token);
+    }
+}
+</code></pre>
+<h2 id="apache-camel-implementation">Apache Camel Implementation</h2>
+<pre><code class="language-java">@Component
+public class TokenManagementRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from(&quot;direct:tokenValidation&quot;)
+            .routeId(&quot;token-validation-route&quot;)
+            .process(exchange -&gt; {
+                String token = exchange.getIn().getHeader(&quot;Authorization&quot;, String.class);
+
+                if (token == null || !token.startsWith(&quot;Bearer &quot;)) {
+                    throw new UnauthorizedException(&quot;Missing or invalid token&quot;);
+                }
+
+                String actualToken = token.substring(7);
+                TokenValidationResult result = tokenManagementService.validateToken(actualToken);
+
+                if (!result.isValid()) {
+                    throw new UnauthorizedException(&quot;Invalid token: &quot; + result.getErrorMessage());
+                }
+
+                exchange.getIn().setHeader(&quot;validatedToken&quot;, result.getDecodedToken());
+            })
+            .log(&quot;Token validated successfully&quot;)
+            .to(&quot;direct:processAuthenticatedRequest&quot;);
+    }
+}
+</code></pre>
+<h2 id="best-practices">Best Practices</h2>
+<h3 id="1-token-security">1. <strong>Token Security</strong></h3>
+<ul>
+<li>Use strong cryptographic algorithms for token signing and encryption</li>
+<li>Implement proper token expiration times based on security requirements</li>
+<li>Use secure random number generators for token generation</li>
+<li>Implement token blacklisting for immediate revocation capability</li>
+<li>Store tokens securely and transmit only over encrypted channels</li>
+</ul>
+<h3 id="2-lifecycle-management">2. <strong>Lifecycle Management</strong></h3>
+<ul>
+<li>Implement automated token rotation and renewal processes</li>
+<li>Monitor token usage patterns and detect anomalies</li>
+<li>Provide clear token expiration and renewal notifications</li>
+<li>Implement graceful handling of token expiration scenarios</li>
+<li>Maintain comprehensive audit logs of token operations</li>
+</ul>
+<h3 id="3-performance-and-scalability">3. <strong>Performance and Scalability</strong></h3>
+<ul>
+<li>Use efficient token validation algorithms and caching strategies</li>
+<li>Implement distributed token blacklisting for multi-node deployments</li>
+<li>Cache frequently validated tokens while respecting security boundaries</li>
+<li>Monitor token validation performance and optimize bottlenecks</li>
+<li>Design for horizontal scaling of token management services</li>
+</ul>
+<p>The Token Management pattern is essential for maintaining secure, scalable authentication and authorization in modern enterprise integration architectures, providing the foundation for stateless security that enables cloud-native and distributed system designs.</p>
+
+      <a href="../index.html" class="back-to-top">← Back to All Patterns</a>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <p>©2026 <a href="https://dataintegrationmastery.com/">Data Integration Mastery™</a> — All Rights Reserved</p>
+  </footer>
+</body>
+</html>

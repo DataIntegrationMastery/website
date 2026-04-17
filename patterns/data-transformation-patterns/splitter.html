@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Splitter Pattern — Integration Architecture Patterns | Data Integration Mastery™</title>
+  <meta name="description" content="The Splitter pattern is a fundamental decomposition pattern in enterprise integration architectures that divides a single composite message into multiple ind...">
+  <meta name="keywords" content="splitter pattern, integration pattern, data transformation patterns, integration architecture, EAI patterns, data integration">
+  <link rel="canonical" href="https://dataintegrationmastery.com/patterns/data-transformation-patterns/splitter.html">
+
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://dataintegrationmastery.com/patterns/data-transformation-patterns/splitter.html">
+  <meta property="og:title" content="Splitter Pattern — Integration Architecture Patterns">
+  <meta property="og:description" content="The Splitter pattern is a fundamental decomposition pattern in enterprise integration architectures that divides a single composite message into multiple ind...">
+  <meta property="og:image" content="https://dataintegrationmastery.com/assets/images/logo.png">
+  <meta property="og:site_name" content="Data Integration Mastery">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Splitter Pattern — Integration Architecture Patterns">
+  <meta name="twitter:description" content="The Splitter pattern is a fundamental decomposition pattern in enterprise integration architectures that divides a single composite message into multiple ind...">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/docs.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Splitter Pattern",
+    "description": "The Splitter pattern is a fundamental decomposition pattern in enterprise integration architectures that divides a single composite message into multiple ind...",
+    "url": "https://dataintegrationmastery.com/patterns/data-transformation-patterns/splitter.html",
+    "author": {
+      "@type": "Person",
+      "name": "Ari Vilkman",
+      "jobTitle": "Integration Architect"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Data Integration Mastery",
+      "url": "https://dataintegrationmastery.com"
+    },
+    "isPartOf": {
+      "@type": "CollectionPage",
+      "name": "Integration Architecture Patterns",
+      "url": "https://dataintegrationmastery.com/patterns/"
+    },
+    "about": {
+      "@type": "Thing",
+      "name": "Splitter Pattern"
+    },
+    "inLanguage": "en",
+    "isAccessibleForFree": true
+  }
+  </script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="https://dataintegrationmastery.com/" class="header-brand">
+        <img src="../../assets/images/dim-icon.png" alt="DIM" width="36" height="36">
+        <span class="header-title">Data Integration Mastery™</span>
+      </a>
+      <nav class="header-nav" aria-label="Main navigation">
+        <a href="https://dataintegrationmastery.com/">Home</a>
+        <a href="../index.html">All Patterns</a>
+        <a href="https://dataintegrationmastery.com/#free-course">Free Course</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="docs-layout">
+    <aside class="docs-sidebar" aria-label="Pattern categories">
+      <div class="sidebar-title">Pattern Categories</div>
+<div class="sidebar-section">
+  <a href="../index.html#resilience" class="sidebar-section-title">🛡️ Resilience Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../resilience-patterns/circuit-breaker.html">Circuit Breaker</a></li>
+    <li><a href="../resilience-patterns/retry-mechanism.html">Retry Mechanism</a></li>
+    <li><a href="../resilience-patterns/timeout.html">Timeout</a></li>
+    <li><a href="../resilience-patterns/dead-letter-queue.html">Dead Letter Queue</a></li>
+    <li><a href="../resilience-patterns/bulkhead.html">Bulkhead</a></li>
+    <li><a href="../resilience-patterns/fallback-graceful-degradation.html">Fallback / Graceful Degradation</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#messaging" class="sidebar-section-title">📨 Messaging Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../messaging-patterns/request-reply.html">Request-Reply</a></li>
+    <li><a href="../messaging-patterns/publish-subscribe.html">Publish-Subscribe</a></li>
+    <li><a href="../messaging-patterns/message-queue.html">Message Queue</a></li>
+    <li><a href="../messaging-patterns/event-streaming.html">Event Streaming</a></li>
+    <li><a href="../messaging-patterns/correlation-id.html">Correlation ID</a></li>
+    <li><a href="../messaging-patterns/message-routing.html">Message Routing</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#data-transformation" class="sidebar-section-title">🔄 Data Transformation Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="message-translator.html">Message Translator</a></li>
+    <li><a href="content-filter.html">Content Filter</a></li>
+    <li><a href="message-router.html">Message Router</a></li>
+    <li><a href="aggregator.html">Aggregator</a></li>
+    <li><a href="splitter.html" class="active">Splitter</a></li>
+    <li><a href="data-mapper.html">Data Mapper</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#routing" class="sidebar-section-title">🔀 Routing Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../routing-patterns/content-based-router.html">Content-Based Router</a></li>
+    <li><a href="../routing-patterns/recipient-list.html">Recipient List</a></li>
+    <li><a href="../routing-patterns/load-balancer.html">Load Balancer</a></li>
+    <li><a href="../routing-patterns/message-filter.html">Message Filter</a></li>
+    <li><a href="../routing-patterns/dynamic-router.html">Dynamic Router</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#security" class="sidebar-section-title">🔐 Security Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../security-patterns/authentication.html">Authentication</a></li>
+    <li><a href="../security-patterns/authorization.html">Authorization</a></li>
+    <li><a href="../security-patterns/encryption.html">Encryption</a></li>
+    <li><a href="../security-patterns/token-management.html">Token Management</a></li>
+    <li><a href="../security-patterns/api-security.html">API Security</a></li>
+    <li><a href="../security-patterns/secret-management.html">Secret Management</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#orchestration" class="sidebar-section-title">🎭 Orchestration Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../orchestration-patterns/saga-pattern.html">Saga Pattern</a></li>
+    <li><a href="../orchestration-patterns/process-manager.html">Process Manager</a></li>
+    <li><a href="../orchestration-patterns/workflow-engine.html">Workflow Engine</a></li>
+    <li><a href="../orchestration-patterns/choreography.html">Choreography</a></li>
+    <li><a href="../orchestration-patterns/compensation-transactions.html">Compensation Transactions</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#observability" class="sidebar-section-title">📊 Monitoring & Observability Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../monitoring-observability-patterns/distributed-tracing.html">Distributed Tracing</a></li>
+    <li><a href="../monitoring-observability-patterns/metrics-collection.html">Metrics Collection</a></li>
+    <li><a href="../monitoring-observability-patterns/health-checks.html">Health Checks</a></li>
+    <li><a href="../monitoring-observability-patterns/logging-strategies.html">Logging Strategies</a></li>
+    <li><a href="../monitoring-observability-patterns/performance-monitoring.html">Performance Monitoring</a></li>
+    <li><a href="../monitoring-observability-patterns/error-tracking.html">Error Tracking</a></li>
+  </ul>
+</div>
+
+    </aside>
+
+    <main id="main-content" class="docs-content">
+      <div class="breadcrumb">
+        <a href="https://dataintegrationmastery.com/">Home</a>
+        <span class="sep">›</span>
+        <a href="../index.html">Patterns</a>
+        <span class="sep">›</span>
+        <a href="../index.html#data-transformation">Data Transformation Patterns</a>
+        <span class="sep">›</span>
+        <strong>Splitter Pattern</strong>
+      </div>
+
+      <h1>Splitter Pattern</h1>
+
+      <h2 id="overview">Overview</h2>
+<p>The Splitter pattern is a fundamental decomposition pattern in enterprise integration architectures that divides a single composite message into multiple individual messages for separate processing. Like a prism that separates white light into its constituent colors, the Splitter pattern takes complex, compound messages and breaks them into smaller, manageable pieces that can be processed independently, in parallel, or through different processing paths based on their individual characteristics.</p>
+<h3 id="theoretical-foundation">Theoretical Foundation</h3>
+<p>The Splitter pattern is grounded in <strong>divide-and-conquer algorithms</strong> and <strong>parallel processing theory</strong>, specifically addressing the challenge of <strong>message decomposition</strong> and <strong>workload distribution</strong> in distributed systems. The pattern embodies the principle of <strong>"granular processing"</strong> - breaking down large or complex operations into smaller, more manageable units that can be processed efficiently and reliably.</p>
+<h3 id="core-principles">Core Principles</h3>
+<h4 id="1-message-decomposition">1. <strong>Message Decomposition</strong></h4>
+<p>The Splitter analyzes composite messages and intelligently separates them into constituent parts:
+- <strong>Structural splitting</strong> - dividing messages based on data structure (arrays, collections, nested objects)
+- <strong>Logical splitting</strong> - separating messages based on business logic or processing requirements
+- <strong>Size-based splitting</strong> - breaking large messages into smaller chunks for efficient processing
+- <strong>Content-based splitting</strong> - dividing messages based on content characteristics or data types</p>
+<h4 id="2-context-preservation">2. <strong>Context Preservation</strong></h4>
+<p>During splitting, the pattern maintains important contextual information:
+- <strong>Correlation tracking</strong> - preserving correlation IDs to track related split messages
+- <strong>Sequence ordering</strong> - maintaining order information when sequence matters
+- <strong>Parent message metadata</strong> - preserving headers, properties, and context from the original message
+- <strong>Processing instructions</strong> - carrying forward processing directives and routing information</p>
+<h4 id="3-independent-processing-enablement">3. <strong>Independent Processing Enablement</strong></h4>
+<p>Split messages are designed for independent processing:
+- <strong>Atomic operations</strong> - each split message can be processed as a complete unit
+- <strong>Parallel processing</strong> - split messages can be processed concurrently
+- <strong>Isolated failures</strong> - failure of one split message doesn't affect others
+- <strong>Individual routing</strong> - each split message can follow different processing paths</p>
+<h4 id="4-scalability-and-performance-optimization">4. <strong>Scalability and Performance Optimization</strong></h4>
+<p>The pattern enhances system scalability through:
+- <strong>Load distribution</strong> - spreading processing load across multiple workers or services
+- <strong>Resource utilization</strong> - better utilization of available processing capacity
+- <strong>Throughput improvement</strong> - processing multiple smaller messages faster than one large message
+- <strong>Memory management</strong> - reducing memory pressure by processing smaller message chunks</p>
+<h3 id="why-splitters-are-essential-in-integration-architecture">Why Splitters are Essential in Integration Architecture</h3>
+<h4 id="1-batch-processing-and-data-integration">1. <strong>Batch Processing and Data Integration</strong></h4>
+<p>In data processing scenarios, splitters enable:
+- <strong>File processing</strong> - breaking large files into processable records or chunks
+- <strong>Bulk operations</strong> - dividing bulk updates into individual operations
+- <strong>Data migration</strong> - splitting large datasets for incremental migration
+- <strong>ETL optimization</strong> - processing data in parallel streams for better performance</p>
+<h4 id="2-microservices-architecture-support">2. <strong>Microservices Architecture Support</strong></h4>
+<p>In microservices environments, splitters facilitate:
+- <strong>Service granularity</strong> - matching message size to service processing capabilities
+- <strong>Independent scaling</strong> - allowing services to scale based on individual message processing rates
+- <strong>Fault isolation</strong> - isolating failures to individual message processing
+- <strong>Service specialization</strong> - routing different message types to specialized services</p>
+<h4 id="3-event-driven-and-streaming-architecture">3. <strong>Event-Driven and Streaming Architecture</strong></h4>
+<p>For event processing and streaming systems:
+- <strong>Event stream decomposition</strong> - breaking compound events into individual event streams
+- <strong>Parallel event processing</strong> - processing multiple events concurrently
+- <strong>Event routing</strong> - sending different event types to appropriate processors
+- <strong>Stream partitioning</strong> - distributing events across processing partitions</p>
+<h4 id="4-legacy-system-integration">4. <strong>Legacy System Integration</strong></h4>
+<p>When integrating with legacy systems:
+- <strong>Message size adaptation</strong> - splitting large messages to match legacy system limits
+- <strong>Protocol limitations</strong> - accommodating size restrictions in older protocols
+- <strong>Processing capacity</strong> - matching message size to legacy system processing capabilities
+- <strong>Resource constraints</strong> - working within memory and processing limitations</p>
+<h3 id="benefits-in-integration-contexts">Benefits in Integration Contexts</h3>
+<h4 id="1-performance-enhancement">1. <strong>Performance Enhancement</strong></h4>
+<ul>
+<li><strong>Parallel processing</strong> - simultaneous processing of split messages improves throughput</li>
+<li><strong>Resource optimization</strong> - better utilization of multi-core systems and distributed resources</li>
+<li><strong>Memory efficiency</strong> - processing smaller messages reduces memory requirements</li>
+<li><strong>Response time improvement</strong> - faster processing of individual components</li>
+</ul>
+<h4 id="2-scalability-and-elasticity">2. <strong>Scalability and Elasticity</strong></h4>
+<ul>
+<li><strong>Horizontal scaling</strong> - split messages can be distributed across multiple processing instances</li>
+<li><strong>Load balancing</strong> - even distribution of processing load</li>
+<li><strong>Auto-scaling support</strong> - better matching of resource allocation to processing demand</li>
+<li><strong>Capacity planning</strong> - easier to plan capacity for smaller, uniform message sizes</li>
+</ul>
+<h4 id="3-fault-tolerance-and-reliability">3. <strong>Fault Tolerance and Reliability</strong></h4>
+<ul>
+<li><strong>Failure isolation</strong> - failure in processing one split message doesn't affect others</li>
+<li><strong>Partial success handling</strong> - some split messages can succeed even if others fail</li>
+<li><strong>Retry granularity</strong> - individual failed messages can be retried without reprocessing successful ones</li>
+<li><strong>Error analysis</strong> - easier to identify and analyze specific failure causes</li>
+</ul>
+<h4 id="4-processing-flexibility">4. <strong>Processing Flexibility</strong></h4>
+<ul>
+<li><strong>Different processing paths</strong> - split messages can follow different business logic</li>
+<li><strong>Conditional processing</strong> - some split messages may require different validation or transformation</li>
+<li><strong>Priority handling</strong> - high-priority split messages can be processed first</li>
+<li><strong>Routing optimization</strong> - split messages can be routed to most appropriate processors</li>
+</ul>
+<h3 id="integration-architecture-applications">Integration Architecture Applications</h3>
+<h4 id="1-api-gateway-and-request-processing">1. <strong>API Gateway and Request Processing</strong></h4>
+<p>Splitters in API gateways enable:
+- <strong>Bulk request decomposition</strong> - breaking bulk API requests into individual operations
+- <strong>Batch operation processing</strong> - processing array parameters as separate operations
+- <strong>Multi-resource operations</strong> - splitting requests that affect multiple resources
+- <strong>Parallel backend calls</strong> - splitting client requests into multiple backend service calls</p>
+<h4 id="2-message-queue-and-event-processing">2. <strong>Message Queue and Event Processing</strong></h4>
+<p>In messaging systems:
+- <strong>Queue optimization</strong> - splitting large messages for better queue performance
+- <strong>Consumer distribution</strong> - distributing split messages across multiple consumers
+- <strong>Event decomposition</strong> - breaking complex business events into atomic events
+- <strong>Dead letter handling</strong> - isolating problematic parts of composite messages</p>
+<h4 id="3-data-pipeline-and-etl">3. <strong>Data Pipeline and ETL</strong></h4>
+<p>In data processing workflows:
+- <strong>File processing</strong> - splitting large files into manageable chunks
+- <strong>Record-level processing</strong> - converting batch operations to record-level operations
+- <strong>Parallel data transformation</strong> - processing data elements in parallel streams
+- <strong>Data validation</strong> - validating individual data elements independently</p>
+<h4 id="4-workflow-and-process-orchestration">4. <strong>Workflow and Process Orchestration</strong></h4>
+<p>For business process management:
+- <strong>Workflow step decomposition</strong> - breaking complex workflows into individual steps
+- <strong>Task distribution</strong> - distributing work across multiple workers or services
+- <strong>Parallel approval processes</strong> - splitting approval requests for concurrent processing
+- <strong>Activity monitoring</strong> - tracking progress of individual workflow components</p>
+<h2 id="implementation-patterns">Implementation Patterns</h2>
+<h3 id="1-arraycollection-splitter">1. <strong>Array/Collection Splitter</strong></h3>
+<pre><code class="language-java">// Split arrays and collections into individual elements
+@Component
+public class CollectionSplitter {
+
+    public List&lt;IndividualMessage&gt; splitCollection(CollectionMessage collectionMessage) {
+        List&lt;IndividualMessage&gt; splitMessages = new ArrayList&lt;&gt;();
+        String correlationId = collectionMessage.getCorrelationId();
+
+        List&lt;Object&gt; items = collectionMessage.getItems();
+        for (int i = 0; i &lt; items.size(); i++) {
+            IndividualMessage splitMessage = IndividualMessage.builder()
+                .correlationId(correlationId)
+                .sequenceNumber(i + 1)
+                .totalCount(items.size())
+                .payload(items.get(i))
+                .originalMessageId(collectionMessage.getMessageId())
+                .timestamp(Instant.now())
+                .build();
+
+            splitMessages.add(splitMessage);
+        }
+
+        return splitMessages;
+    }
+}
+
+// Usage in service
+@Service
+public class OrderProcessingService {
+
+    @Autowired
+    private CollectionSplitter collectionSplitter;
+
+    public void processOrderBatch(OrderBatch orderBatch) {
+        List&lt;IndividualMessage&gt; orderMessages = collectionSplitter.splitCollection(
+            CollectionMessage.builder()
+                .correlationId(orderBatch.getBatchId())
+                .items(orderBatch.getOrders())
+                .messageId(orderBatch.getMessageId())
+                .build()
+        );
+
+        // Process each order individually
+        orderMessages.forEach(this::processIndividualOrder);
+    }
+}
+</code></pre>
+<h3 id="2-size-based-content-splitter">2. <strong>Size-Based Content Splitter</strong></h3>
+<pre><code class="language-java">// Split large messages into size-based chunks
+@Component
+public class SizeBasedSplitter {
+
+    private static final int MAX_CHUNK_SIZE = 64 * 1024; // 64KB chunks
+
+    public List&lt;MessageChunk&gt; splitBySize(LargeMessage largeMessage) {
+        List&lt;MessageChunk&gt; chunks = new ArrayList&lt;&gt;();
+        byte[] content = largeMessage.getContent();
+        String correlationId = largeMessage.getCorrelationId();
+
+        int totalChunks = (int) Math.ceil((double) content.length / MAX_CHUNK_SIZE);
+
+        for (int i = 0; i &lt; totalChunks; i++) {
+            int startIndex = i * MAX_CHUNK_SIZE;
+            int endIndex = Math.min(startIndex + MAX_CHUNK_SIZE, content.length);
+
+            byte[] chunkContent = Arrays.copyOfRange(content, startIndex, endIndex);
+
+            MessageChunk chunk = MessageChunk.builder()
+                .correlationId(correlationId)
+                .chunkNumber(i + 1)
+                .totalChunks(totalChunks)
+                .chunkSize(chunkContent.length)
+                .content(chunkContent)
+                .originalMessageId(largeMessage.getMessageId())
+                .checksum(calculateChecksum(chunkContent))
+                .build();
+
+            chunks.add(chunk);
+        }
+
+        return chunks;
+    }
+
+    private String calculateChecksum(byte[] content) {
+        try {
+            MessageDigest md = MessageDigest.getInstance(&quot;MD5&quot;);
+            byte[] digest = md.digest(content);
+            return Base64.getEncoder().encodeToString(digest);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(&quot;MD5 algorithm not available&quot;, e);
+        }
+    }
+}
+</code></pre>
+<h3 id="3-content-based-logical-splitter">3. <strong>Content-Based Logical Splitter</strong></h3>
+<pre><code class="language-java">// Split messages based on content type and business logic
+@Component
+public class ContentBasedSplitter {
+
+    public List&lt;TypedMessage&gt; splitByContent(CompositeBusinessMessage compositeMessage) {
+        List&lt;TypedMessage&gt; splitMessages = new ArrayList&lt;&gt;();
+        String correlationId = compositeMessage.getCorrelationId();
+
+        // Split customer-related data
+        if (compositeMessage.getCustomerData() != null) {
+            TypedMessage customerMessage = TypedMessage.builder()
+                .correlationId(correlationId)
+                .messageType(MessageType.CUSTOMER_UPDATE)
+                .payload(compositeMessage.getCustomerData())
+                .processingPriority(Priority.HIGH)
+                .targetSystem(&quot;CRM&quot;)
+                .build();
+            splitMessages.add(customerMessage);
+        }
+
+        // Split order-related data
+        if (compositeMessage.getOrderData() != null) {
+            TypedMessage orderMessage = TypedMessage.builder()
+                .correlationId(correlationId)
+                .messageType(MessageType.ORDER_PROCESSING)
+                .payload(compositeMessage.getOrderData())
+                .processingPriority(Priority.MEDIUM)
+                .targetSystem(&quot;ORDER_MANAGEMENT&quot;)
+                .build();
+            splitMessages.add(orderMessage);
+        }
+
+        // Split financial data
+        if (compositeMessage.getFinancialData() != null) {
+            TypedMessage financialMessage = TypedMessage.builder()
+                .correlationId(correlationId)
+                .messageType(MessageType.FINANCIAL_TRANSACTION)
+                .payload(compositeMessage.getFinancialData())
+                .processingPriority(Priority.HIGH)
+                .targetSystem(&quot;FINANCIAL_SYSTEM&quot;)
+                .requiresApproval(true)
+                .build();
+            splitMessages.add(financialMessage);
+        }
+
+        return splitMessages;
+    }
+}
+</code></pre>
+<h3 id="4-streaming-file-splitter">4. <strong>Streaming File Splitter</strong></h3>
+<pre><code class="language-java">// Split large files into streaming chunks for memory-efficient processing
+@Component
+public class StreamingFileSplitter {
+
+    private static final int BUFFER_SIZE = 8192;
+    private static final long MAX_CHUNK_SIZE = 1024 * 1024; // 1MB chunks
+
+    @Async
+    public CompletableFuture&lt;Void&gt; splitFileAsync(FileMessage fileMessage, 
+                                                  Consumer&lt;FileChunk&gt; chunkProcessor) {
+        return CompletableFuture.runAsync(() -&gt; {
+            try (InputStream inputStream = fileMessage.getInputStream()) {
+                splitFileStream(inputStream, fileMessage.getCorrelationId(), chunkProcessor);
+            } catch (IOException e) {
+                throw new RuntimeException(&quot;Error processing file stream&quot;, e);
+            }
+        });
+    }
+
+    private void splitFileStream(InputStream inputStream, String correlationId, 
+                                Consumer&lt;FileChunk&gt; chunkProcessor) throws IOException {
+
+        byte[] buffer = new byte[BUFFER_SIZE];
+        ByteArrayOutputStream chunkBuffer = new ByteArrayOutputStream();
+        int chunkNumber = 1;
+        int bytesRead;
+
+        while ((bytesRead = inputStream.read(buffer)) != -1) {
+            chunkBuffer.write(buffer, 0, bytesRead);
+
+            if (chunkBuffer.size() &gt;= MAX_CHUNK_SIZE) {
+                processChunk(chunkBuffer, correlationId, chunkNumber++, chunkProcessor);
+                chunkBuffer.reset();
+            }
+        }
+
+        // Process final chunk if any data remains
+        if (chunkBuffer.size() &gt; 0) {
+            processChunk(chunkBuffer, correlationId, chunkNumber, chunkProcessor);
+        }
+    }
+
+    private void processChunk(ByteArrayOutputStream chunkBuffer, String correlationId, 
+                             int chunkNumber, Consumer&lt;FileChunk&gt; chunkProcessor) {
+
+        FileChunk chunk = FileChunk.builder()
+            .correlationId(correlationId)
+            .chunkNumber(chunkNumber)
+            .chunkSize(chunkBuffer.size())
+            .content(chunkBuffer.toByteArray())
+            .timestamp(Instant.now())
+            .build();
+
+        chunkProcessor.accept(chunk);
+    }
+}
+</code></pre>
+<h2 id="apache-camel-implementation">Apache Camel Implementation</h2>
+<h3 id="1-simple-array-splitter">1. <strong>Simple Array Splitter</strong></h3>
+<pre><code class="language-java">@Component
+public class ArraySplitterRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from(&quot;direct:splitArray&quot;)
+            .routeId(&quot;array-splitter&quot;)
+            .log(&quot;Splitting array message: ${body}&quot;)
+            .split(jsonpath(&quot;$.items[*]&quot;)) // Split JSON array
+                .streaming() // Use streaming for large arrays
+                .parallelProcessing() // Process split messages in parallel
+                .to(&quot;direct:processIndividualItem&quot;)
+            .end()
+            .log(&quot;Array splitting completed&quot;);
+
+        from(&quot;direct:processIndividualItem&quot;)
+            .log(&quot;Processing individual item: ${body}&quot;)
+            .process(exchange -&gt; {
+                // Add correlation information
+                String correlationId = exchange.getIn().getHeader(&quot;correlationId&quot;, String.class);
+                Integer splitIndex = exchange.getProperty(Exchange.SPLIT_INDEX, Integer.class);
+                Integer splitSize = exchange.getProperty(Exchange.SPLIT_SIZE, Integer.class);
+
+                exchange.getIn().setHeader(&quot;originalCorrelationId&quot;, correlationId);
+                exchange.getIn().setHeader(&quot;splitIndex&quot;, splitIndex);
+                exchange.getIn().setHeader(&quot;splitTotal&quot;, splitSize);
+            })
+            .to(&quot;direct:businessProcessing&quot;);
+    }
+}
+</code></pre>
+<h3 id="2-file-content-splitter">2. <strong>File Content Splitter</strong></h3>
+<pre><code class="language-java">@Component
+public class FileSplitterRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from(&quot;file:input?include=*.csv&quot;)
+            .routeId(&quot;file-content-splitter&quot;)
+            .log(&quot;Processing file: ${header.CamelFileName}&quot;)
+            .split(body().tokenize(&quot;\n&quot;))
+                .streaming()
+                .skipFirst(1) // Skip header row
+                .process(exchange -&gt; {
+                    // Add file context to each split line
+                    String fileName = exchange.getIn().getHeader(&quot;CamelFileName&quot;, String.class);
+                    Integer lineNumber = exchange.getProperty(Exchange.SPLIT_INDEX, Integer.class);
+
+                    exchange.getIn().setHeader(&quot;sourceFileName&quot;, fileName);
+                    exchange.getIn().setHeader(&quot;lineNumber&quot;, lineNumber + 1); // +1 because we skipped header
+                })
+                .to(&quot;direct:processCSVLine&quot;)
+            .end()
+            .log(&quot;File processing completed: ${header.CamelFileName}&quot;);
+
+        from(&quot;direct:processCSVLine&quot;)
+            .log(&quot;Processing CSV line ${header.lineNumber} from ${header.sourceFileName}&quot;)
+            .process(exchange -&gt; {
+                String csvLine = exchange.getIn().getBody(String.class);
+                String[] fields = csvLine.split(&quot;,&quot;);
+
+                // Convert CSV line to structured data
+                CSVRecord record = CSVRecord.builder()
+                    .sourceFile(exchange.getIn().getHeader(&quot;sourceFileName&quot;, String.class))
+                    .lineNumber(exchange.getIn().getHeader(&quot;lineNumber&quot;, Integer.class))
+                    .fields(Arrays.asList(fields))
+                    .build();
+
+                exchange.getIn().setBody(record);
+            })
+            .to(&quot;direct:validateAndProcess&quot;);
+    }
+}
+</code></pre>
+<h3 id="3-size-based-chunk-splitter">3. <strong>Size-Based Chunk Splitter</strong></h3>
+<pre><code class="language-java">@Component
+public class ChunkSplitterRoute extends RouteBuilder {
+
+    private static final int CHUNK_SIZE = 1000; // Process in chunks of 1000 items
+
+    @Override
+    public void configure() throws Exception {
+        from(&quot;direct:splitLargeDataset&quot;)
+            .routeId(&quot;chunk-splitter&quot;)
+            .log(&quot;Splitting large dataset into chunks&quot;)
+            .process(exchange -&gt; {
+                List&lt;?&gt; largeDataset = exchange.getIn().getBody(List.class);
+                String correlationId = UUID.randomUUID().toString();
+                exchange.getIn().setHeader(&quot;correlationId&quot;, correlationId);
+                exchange.getIn().setHeader(&quot;totalItems&quot;, largeDataset.size());
+            })
+            .split(method(ChunkSplitterBean.class, &quot;createChunks&quot;))
+                .process(exchange -&gt; {
+                    DataChunk chunk = exchange.getIn().getBody(DataChunk.class);
+                    exchange.getIn().setHeader(&quot;chunkNumber&quot;, chunk.getChunkNumber());
+                    exchange.getIn().setHeader(&quot;chunkSize&quot;, chunk.getItems().size());
+                })
+                .to(&quot;direct:processChunk&quot;)
+            .end()
+            .log(&quot;Large dataset processing completed&quot;);
+
+        from(&quot;direct:processChunk&quot;)
+            .log(&quot;Processing chunk ${header.chunkNumber} with ${header.chunkSize} items&quot;)
+            .process(exchange -&gt; {
+                DataChunk chunk = exchange.getIn().getBody(DataChunk.class);
+
+                // Process each item in the chunk
+                List&lt;ProcessedItem&gt; processedItems = chunk.getItems().stream()
+                    .map(this::processItem)
+                    .collect(Collectors.toList());
+
+                ChunkResult result = ChunkResult.builder()
+                    .correlationId(chunk.getCorrelationId())
+                    .chunkNumber(chunk.getChunkNumber())
+                    .processedItems(processedItems)
+                    .processingTime(Duration.between(chunk.getStartTime(), Instant.now()))
+                    .build();
+
+                exchange.getIn().setBody(result);
+            })
+            .to(&quot;direct:aggregateChunkResults&quot;);
+    }
+}
+
+@Component
+public class ChunkSplitterBean {
+
+    public List&lt;DataChunk&gt; createChunks(List&lt;?&gt; dataset, @Header(&quot;correlationId&quot;) String correlationId) {
+        List&lt;DataChunk&gt; chunks = new ArrayList&lt;&gt;();
+
+        for (int i = 0; i &lt; dataset.size(); i += CHUNK_SIZE) {
+            int endIndex = Math.min(i + CHUNK_SIZE, dataset.size());
+            List&lt;?&gt; chunkItems = dataset.subList(i, endIndex);
+
+            DataChunk chunk = DataChunk.builder()
+                .correlationId(correlationId)
+                .chunkNumber((i / CHUNK_SIZE) + 1)
+                .totalChunks((int) Math.ceil((double) dataset.size() / CHUNK_SIZE))
+                .items(chunkItems)
+                .startTime(Instant.now())
+                .build();
+
+            chunks.add(chunk);
+        }
+
+        return chunks;
+    }
+}
+</code></pre>
+<h3 id="4-conditional-content-splitter">4. <strong>Conditional Content Splitter</strong></h3>
+<pre><code class="language-java">@Component
+public class ConditionalSplitterRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from(&quot;direct:conditionalSplit&quot;)
+            .routeId(&quot;conditional-splitter&quot;)
+            .log(&quot;Analyzing message for conditional splitting&quot;)
+            .choice()
+                .when(jsonpath(&quot;$.messageType == 'COMPOSITE'&quot;))
+                    .to(&quot;direct:splitCompositeMessage&quot;)
+                .when(jsonpath(&quot;$.messageType == 'BATCH'&quot;))
+                    .to(&quot;direct:splitBatchMessage&quot;)
+                .when(jsonpath(&quot;$.messageType == 'HIERARCHICAL'&quot;))
+                    .to(&quot;direct:splitHierarchicalMessage&quot;)
+                .otherwise()
+                    .log(&quot;Message doesn't require splitting&quot;)
+                    .to(&quot;direct:processAtomic&quot;)
+            .end();
+
+        from(&quot;direct:splitCompositeMessage&quot;)
+            .log(&quot;Splitting composite message&quot;)
+            .process(exchange -&gt; {
+                CompositeMessage composite = exchange.getIn().getBody(CompositeMessage.class);
+                List&lt;AtomicMessage&gt; atomicMessages = new ArrayList&lt;&gt;();
+
+                // Split customer data
+                if (composite.getCustomerData() != null) {
+                    AtomicMessage customerMsg = createAtomicMessage(
+                        composite, &quot;CUSTOMER&quot;, composite.getCustomerData());
+                    atomicMessages.add(customerMsg);
+                }
+
+                // Split order data
+                if (composite.getOrderData() != null) {
+                    AtomicMessage orderMsg = createAtomicMessage(
+                        composite, &quot;ORDER&quot;, composite.getOrderData());
+                    atomicMessages.add(orderMsg);
+                }
+
+                exchange.getIn().setBody(atomicMessages);
+            })
+            .split(body())
+                .to(&quot;direct:processAtomicMessage&quot;)
+            .end();
+
+        from(&quot;direct:processAtomicMessage&quot;)
+            .log(&quot;Processing atomic message: ${header.messageSubType}&quot;)
+            .choice()
+                .when(header(&quot;messageSubType&quot;).isEqualTo(&quot;CUSTOMER&quot;))
+                    .to(&quot;direct:processCustomer&quot;)
+                .when(header(&quot;messageSubType&quot;).isEqualTo(&quot;ORDER&quot;))
+                    .to(&quot;direct:processOrder&quot;)
+                .otherwise()
+                    .to(&quot;direct:processGeneric&quot;)
+            .end();
+    }
+
+    private AtomicMessage createAtomicMessage(CompositeMessage composite, 
+                                            String subType, Object data) {
+        return AtomicMessage.builder()
+            .correlationId(composite.getCorrelationId())
+            .messageSubType(subType)
+            .payload(data)
+            .originalMessageId(composite.getMessageId())
+            .timestamp(Instant.now())
+            .build();
+    }
+}
+</code></pre>
+<h3 id="5-streaming-xml-splitter">5. <strong>Streaming XML Splitter</strong></h3>
+<pre><code class="language-java">@Component
+public class XMLStreamingSplitterRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from(&quot;direct:splitXMLStream&quot;)
+            .routeId(&quot;xml-streaming-splitter&quot;)
+            .log(&quot;Starting XML streaming split&quot;)
+            .split(stax(Contact.class))
+                .streaming()
+                .process(exchange -&gt; {
+                    Contact contact = exchange.getIn().getBody(Contact.class);
+
+                    // Add processing context
+                    Integer splitIndex = exchange.getProperty(Exchange.SPLIT_INDEX, Integer.class);
+                    exchange.getIn().setHeader(&quot;contactSequence&quot;, splitIndex + 1);
+                    exchange.getIn().setHeader(&quot;contactId&quot;, contact.getId());
+                })
+                .to(&quot;direct:processContact&quot;)
+            .end()
+            .log(&quot;XML streaming split completed&quot;);
+
+        from(&quot;direct:processContact&quot;)
+            .log(&quot;Processing contact ${header.contactId} (sequence ${header.contactSequence})&quot;)
+            .marshal().jacksonXml() // Convert to JSON for further processing
+            .to(&quot;direct:validateContact&quot;);
+    }
+}
+
+// XML Contact class for StAX processing
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
+public class Contact {
+    @XmlElement
+    private String id;
+    @XmlElement
+    private String firstName;
+    @XmlElement
+    private String lastName;
+    @XmlElement
+    private String email;
+
+    // getters and setters
+}
+</code></pre>
+<h2 id="best-practices">Best Practices</h2>
+<h3 id="1-memory-management-and-performance">1. <strong>Memory Management and Performance</strong></h3>
+<ul>
+<li>Use streaming splits for large datasets to avoid memory exhaustion</li>
+<li>Implement appropriate chunk sizes based on available memory and processing capacity</li>
+<li>Consider parallel processing for independent split messages</li>
+<li>Monitor memory usage during split operations</li>
+<li>Use backpressure mechanisms when split message production exceeds consumption</li>
+</ul>
+<h3 id="2-correlation-and-tracking">2. <strong>Correlation and Tracking</strong></h3>
+<ul>
+<li>Preserve correlation IDs from original messages in all split messages</li>
+<li>Include sequence information (split index, total count) for proper ordering</li>
+<li>Maintain parent message metadata for traceability and debugging</li>
+<li>Implement proper correlation strategies for downstream aggregation</li>
+<li>Use unique identifiers for each split message</li>
+</ul>
+<h3 id="3-error-handling-and-recovery">3. <strong>Error Handling and Recovery</strong></h3>
+<ul>
+<li>Implement individual error handling for each split message</li>
+<li>Provide dead letter queues for split messages that can't be processed</li>
+<li>Consider partial success scenarios where some splits succeed and others fail</li>
+<li>Implement retry mechanisms at the split message level</li>
+<li>Maintain error correlation back to original composite messages</li>
+</ul>
+<h3 id="4-processing-strategy">4. <strong>Processing Strategy</strong></h3>
+<ul>
+<li>Choose appropriate splitting strategies based on message characteristics</li>
+<li>Consider downstream processing capabilities when determining split size</li>
+<li>Implement conditional splitting based on message content and business rules</li>
+<li>Use appropriate splitting patterns (sequential vs. parallel) based on requirements</li>
+<li>Balance splitting granularity with processing overhead</li>
+</ul>
+<h3 id="5-monitoring-and-observability">5. <strong>Monitoring and Observability</strong></h3>
+<ul>
+<li>Track splitting metrics (split count, processing time, success rate)</li>
+<li>Monitor split message processing progress and completion</li>
+<li>Implement distributed tracing through split message boundaries</li>
+<li>Alert on unusual splitting patterns or failures</li>
+<li>Provide visibility into split message lifecycle and status</li>
+</ul>
+<p>The Splitter pattern is crucial for building scalable, high-performance integration solutions that can handle large, complex messages efficiently while enabling parallel processing and improving overall system throughput and resilience.</p>
+
+      <a href="../index.html" class="back-to-top">← Back to All Patterns</a>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <p>©2026 <a href="https://dataintegrationmastery.com/">Data Integration Mastery™</a> — All Rights Reserved</p>
+  </footer>
+</body>
+</html>

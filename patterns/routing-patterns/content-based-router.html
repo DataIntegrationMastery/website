@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Content-Based Router Pattern — Integration Architecture Patterns | Data Integration Mastery™</title>
+  <meta name="description" content="The Content-Based Router pattern is a sophisticated message routing pattern in enterprise integration architectures that examines message content, headers, o...">
+  <meta name="keywords" content="content-based router pattern, integration pattern, routing patterns, integration architecture, EAI patterns, data integration">
+  <link rel="canonical" href="https://dataintegrationmastery.com/patterns/routing-patterns/content-based-router.html">
+
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://dataintegrationmastery.com/patterns/routing-patterns/content-based-router.html">
+  <meta property="og:title" content="Content-Based Router Pattern — Integration Architecture Patterns">
+  <meta property="og:description" content="The Content-Based Router pattern is a sophisticated message routing pattern in enterprise integration architectures that examines message content, headers, o...">
+  <meta property="og:image" content="https://dataintegrationmastery.com/assets/images/logo.png">
+  <meta property="og:site_name" content="Data Integration Mastery">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Content-Based Router Pattern — Integration Architecture Patterns">
+  <meta name="twitter:description" content="The Content-Based Router pattern is a sophisticated message routing pattern in enterprise integration architectures that examines message content, headers, o...">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/docs.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Content-Based Router Pattern",
+    "description": "The Content-Based Router pattern is a sophisticated message routing pattern in enterprise integration architectures that examines message content, headers, o...",
+    "url": "https://dataintegrationmastery.com/patterns/routing-patterns/content-based-router.html",
+    "author": {
+      "@type": "Person",
+      "name": "Ari Vilkman",
+      "jobTitle": "Integration Architect"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Data Integration Mastery",
+      "url": "https://dataintegrationmastery.com"
+    },
+    "isPartOf": {
+      "@type": "CollectionPage",
+      "name": "Integration Architecture Patterns",
+      "url": "https://dataintegrationmastery.com/patterns/"
+    },
+    "about": {
+      "@type": "Thing",
+      "name": "Content-Based Router Pattern"
+    },
+    "inLanguage": "en",
+    "isAccessibleForFree": true
+  }
+  </script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="https://dataintegrationmastery.com/" class="header-brand">
+        <img src="../../assets/images/dim-icon.png" alt="DIM" width="36" height="36">
+        <span class="header-title">Data Integration Mastery™</span>
+      </a>
+      <nav class="header-nav" aria-label="Main navigation">
+        <a href="https://dataintegrationmastery.com/">Home</a>
+        <a href="../index.html">All Patterns</a>
+        <a href="https://dataintegrationmastery.com/#free-course">Free Course</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="docs-layout">
+    <aside class="docs-sidebar" aria-label="Pattern categories">
+      <div class="sidebar-title">Pattern Categories</div>
+<div class="sidebar-section">
+  <a href="../index.html#resilience" class="sidebar-section-title">🛡️ Resilience Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../resilience-patterns/circuit-breaker.html">Circuit Breaker</a></li>
+    <li><a href="../resilience-patterns/retry-mechanism.html">Retry Mechanism</a></li>
+    <li><a href="../resilience-patterns/timeout.html">Timeout</a></li>
+    <li><a href="../resilience-patterns/dead-letter-queue.html">Dead Letter Queue</a></li>
+    <li><a href="../resilience-patterns/bulkhead.html">Bulkhead</a></li>
+    <li><a href="../resilience-patterns/fallback-graceful-degradation.html">Fallback / Graceful Degradation</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#messaging" class="sidebar-section-title">📨 Messaging Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../messaging-patterns/request-reply.html">Request-Reply</a></li>
+    <li><a href="../messaging-patterns/publish-subscribe.html">Publish-Subscribe</a></li>
+    <li><a href="../messaging-patterns/message-queue.html">Message Queue</a></li>
+    <li><a href="../messaging-patterns/event-streaming.html">Event Streaming</a></li>
+    <li><a href="../messaging-patterns/correlation-id.html">Correlation ID</a></li>
+    <li><a href="../messaging-patterns/message-routing.html">Message Routing</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#data-transformation" class="sidebar-section-title">🔄 Data Transformation Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../data-transformation-patterns/message-translator.html">Message Translator</a></li>
+    <li><a href="../data-transformation-patterns/content-filter.html">Content Filter</a></li>
+    <li><a href="../data-transformation-patterns/message-router.html">Message Router</a></li>
+    <li><a href="../data-transformation-patterns/aggregator.html">Aggregator</a></li>
+    <li><a href="../data-transformation-patterns/splitter.html">Splitter</a></li>
+    <li><a href="../data-transformation-patterns/data-mapper.html">Data Mapper</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#routing" class="sidebar-section-title">🔀 Routing Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="content-based-router.html" class="active">Content-Based Router</a></li>
+    <li><a href="recipient-list.html">Recipient List</a></li>
+    <li><a href="load-balancer.html">Load Balancer</a></li>
+    <li><a href="message-filter.html">Message Filter</a></li>
+    <li><a href="dynamic-router.html">Dynamic Router</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#security" class="sidebar-section-title">🔐 Security Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../security-patterns/authentication.html">Authentication</a></li>
+    <li><a href="../security-patterns/authorization.html">Authorization</a></li>
+    <li><a href="../security-patterns/encryption.html">Encryption</a></li>
+    <li><a href="../security-patterns/token-management.html">Token Management</a></li>
+    <li><a href="../security-patterns/api-security.html">API Security</a></li>
+    <li><a href="../security-patterns/secret-management.html">Secret Management</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#orchestration" class="sidebar-section-title">🎭 Orchestration Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../orchestration-patterns/saga-pattern.html">Saga Pattern</a></li>
+    <li><a href="../orchestration-patterns/process-manager.html">Process Manager</a></li>
+    <li><a href="../orchestration-patterns/workflow-engine.html">Workflow Engine</a></li>
+    <li><a href="../orchestration-patterns/choreography.html">Choreography</a></li>
+    <li><a href="../orchestration-patterns/compensation-transactions.html">Compensation Transactions</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#observability" class="sidebar-section-title">📊 Monitoring & Observability Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../monitoring-observability-patterns/distributed-tracing.html">Distributed Tracing</a></li>
+    <li><a href="../monitoring-observability-patterns/metrics-collection.html">Metrics Collection</a></li>
+    <li><a href="../monitoring-observability-patterns/health-checks.html">Health Checks</a></li>
+    <li><a href="../monitoring-observability-patterns/logging-strategies.html">Logging Strategies</a></li>
+    <li><a href="../monitoring-observability-patterns/performance-monitoring.html">Performance Monitoring</a></li>
+    <li><a href="../monitoring-observability-patterns/error-tracking.html">Error Tracking</a></li>
+  </ul>
+</div>
+
+    </aside>
+
+    <main id="main-content" class="docs-content">
+      <div class="breadcrumb">
+        <a href="https://dataintegrationmastery.com/">Home</a>
+        <span class="sep">›</span>
+        <a href="../index.html">Patterns</a>
+        <span class="sep">›</span>
+        <a href="../index.html#routing">Routing Patterns</a>
+        <span class="sep">›</span>
+        <strong>Content-Based Router Pattern</strong>
+      </div>
+
+      <h1>Content-Based Router Pattern</h1>
+
+      <h2 id="overview">Overview</h2>
+<p>The Content-Based Router pattern is a sophisticated message routing pattern in enterprise integration architectures that examines message content, headers, or properties to dynamically determine the appropriate destination for each message. Unlike static routing rules, the Content-Based Router makes intelligent routing decisions at runtime by analyzing the actual message payload, enabling flexible and adaptive message flow control based on business logic, data characteristics, and contextual information.</p>
+<h3 id="theoretical-foundation">Theoretical Foundation</h3>
+<p>The Content-Based Router pattern is grounded in <strong>decision tree algorithms</strong> and <strong>rule-based systems theory</strong>, specifically addressing the challenge of <strong>dynamic message classification</strong> and <strong>intelligent routing</strong> in distributed systems. The pattern embodies the principle of <strong>"content-driven dispatch"</strong> - making routing decisions based on actual message data and business semantics rather than predetermined static configurations.</p>
+<h3 id="core-principles">Core Principles</h3>
+<h4 id="1-intelligent-content-analysis">1. <strong>Intelligent Content Analysis</strong></h4>
+<p>The Content-Based Router performs sophisticated examination of message characteristics:
+- <strong>Payload inspection</strong> - analyzing message content structure, data types, and values
+- <strong>Header analysis</strong> - examining message metadata, routing hints, and context information
+- <strong>Business rule evaluation</strong> - applying complex business logic to determine appropriate destinations
+- <strong>Pattern matching</strong> - using regular expressions, XPath, JSONPath, or custom matchers to identify content patterns</p>
+<h4 id="2-dynamic-destination-selection">2. <strong>Dynamic Destination Selection</strong></h4>
+<p>Based on content analysis, the router selects appropriate destinations:
+- <strong>Single destination routing</strong> - directing messages to one specific endpoint
+- <strong>Multi-destination routing</strong> - sending messages to multiple endpoints based on content
+- <strong>Conditional routing</strong> - applying different routing logic based on content characteristics
+- <strong>Priority-based routing</strong> - selecting destinations based on message priority or urgency</p>
+<h4 id="3-business-logic-integration">3. <strong>Business Logic Integration</strong></h4>
+<p>The pattern enables sophisticated business-driven routing:
+- <strong>Customer segmentation</strong> - routing based on customer type, geography, or business value
+- <strong>Product categorization</strong> - directing messages based on product types or categories
+- <strong>Regulatory compliance</strong> - routing based on jurisdictional or compliance requirements
+- <strong>Service level agreements</strong> - routing based on SLA requirements or service tiers</p>
+<h4 id="4-scalability-and-performance">4. <strong>Scalability and Performance</strong></h4>
+<p>The Content-Based Router optimizes routing performance:
+- <strong>Efficient content parsing</strong> - minimizing overhead of content inspection
+- <strong>Rule caching</strong> - caching frequently used routing rules and patterns
+- <strong>Parallel evaluation</strong> - evaluating multiple routing conditions concurrently
+- <strong>Short-circuit optimization</strong> - stopping evaluation once a matching rule is found</p>
+<h3 id="why-content-based-routers-are-essential-in-integration-architecture">Why Content-Based Routers are Essential in Integration Architecture</h3>
+<h4 id="1-business-process-flexibility">1. <strong>Business Process Flexibility</strong></h4>
+<p>In dynamic business environments, content-based routing enables:
+- <strong>Workflow automation</strong> - automatically routing work items based on content characteristics
+- <strong>Exception handling</strong> - directing error conditions or special cases to appropriate handlers
+- <strong>Approval workflows</strong> - routing requests to correct approval chains based on amount, type, or risk
+- <strong>Escalation management</strong> - routing time-sensitive or high-value transactions to priority queues</p>
+<h4 id="2-multi-tenant-and-multi-channel-support">2. <strong>Multi-Tenant and Multi-Channel Support</strong></h4>
+<p>For complex enterprise architectures:
+- <strong>Tenant isolation</strong> - routing messages to tenant-specific processing pipelines
+- <strong>Channel differentiation</strong> - handling web, mobile, API, and batch requests differently
+- <strong>Geographic routing</strong> - directing messages based on customer location or data residency
+- <strong>Brand segmentation</strong> - routing messages based on brand affiliation or business unit</p>
+<h4 id="3-legacy-system-integration">3. <strong>Legacy System Integration</strong></h4>
+<p>When integrating diverse legacy systems:
+- <strong>Format adaptation</strong> - routing messages to systems that support specific data formats
+- <strong>Protocol mediation</strong> - directing messages to appropriate protocol handlers
+- <strong>Capability matching</strong> - routing to systems based on their processing capabilities
+- <strong>Load distribution</strong> - balancing load across systems with different capacity characteristics</p>
+<h4 id="4-microservices-architecture">4. <strong>Microservices Architecture</strong></h4>
+<p>In microservices environments:
+- <strong>Service specialization</strong> - routing to services optimized for specific data types or operations
+- <strong>Version management</strong> - routing to appropriate service versions based on message schema
+- <strong>Feature flagging</strong> - routing to different service implementations based on feature flags
+- <strong>A/B testing</strong> - distributing traffic to different service variants for testing</p>
+<h3 id="benefits-in-integration-contexts">Benefits in Integration Contexts</h3>
+<h4 id="1-operational-efficiency">1. <strong>Operational Efficiency</strong></h4>
+<ul>
+<li><strong>Automated decision making</strong> - reducing manual routing and processing decisions</li>
+<li><strong>Optimized resource utilization</strong> - directing work to most appropriate processing resources</li>
+<li><strong>Reduced processing time</strong> - eliminating unnecessary processing steps through intelligent routing</li>
+<li><strong>Improved throughput</strong> - parallel processing of different message types</li>
+</ul>
+<h4 id="2-business-agility">2. <strong>Business Agility</strong></h4>
+<ul>
+<li><strong>Dynamic rule changes</strong> - updating routing logic without code deployment</li>
+<li><strong>Rapid business adaptation</strong> - quickly implementing new business routing requirements</li>
+<li><strong>Market responsiveness</strong> - adapting message flows for new business scenarios</li>
+<li><strong>Compliance flexibility</strong> - easily implementing new regulatory routing requirements</li>
+</ul>
+<h4 id="3-system-resilience">3. <strong>System Resilience</strong></h4>
+<ul>
+<li><strong>Fault isolation</strong> - routing around failed or degraded systems</li>
+<li><strong>Load distribution</strong> - preventing system overload through intelligent routing</li>
+<li><strong>Graceful degradation</strong> - routing to backup systems when primary systems are unavailable</li>
+<li><strong>Error containment</strong> - isolating problematic messages to specialized error handling systems</li>
+</ul>
+<h4 id="4-customer-experience-enhancement">4. <strong>Customer Experience Enhancement</strong></h4>
+<ul>
+<li><strong>Personalized processing</strong> - routing customer requests based on preferences or history</li>
+<li><strong>Priority handling</strong> - ensuring high-value customers receive priority processing</li>
+<li><strong>Regional optimization</strong> - routing to geographically optimal processing centers</li>
+<li><strong>Service customization</strong> - adapting processing based on customer service levels</li>
+</ul>
+<h3 id="integration-architecture-applications">Integration Architecture Applications</h3>
+<h4 id="1-enterprise-service-bus-esb">1. <strong>Enterprise Service Bus (ESB)</strong></h4>
+<p>Content-Based Routers in ESB architectures provide:
+- <strong>Service endpoint selection</strong> - routing to appropriate service implementations
+- <strong>Message transformation routing</strong> - directing to transformation services based on content
+- <strong>Error handling routing</strong> - sending errors to specialized error processing services
+- <strong>Audit and compliance routing</strong> - directing sensitive messages to audit services</p>
+<h4 id="2-api-gateway-and-management">2. <strong>API Gateway and Management</strong></h4>
+<p>In API gateway implementations:
+- <strong>Backend service routing</strong> - directing API calls to appropriate backend services
+- <strong>Rate limiting routing</strong> - routing high-volume clients to specialized handling
+- <strong>Authentication routing</strong> - directing to different authentication services based on client type
+- <strong>Version compatibility routing</strong> - routing to compatible service versions</p>
+<h4 id="3-event-driven-architecture">3. <strong>Event-Driven Architecture</strong></h4>
+<p>For event processing systems:
+- <strong>Event type routing</strong> - directing different event types to specialized processors
+- <strong>Stream partitioning</strong> - routing events to appropriate stream partitions
+- <strong>Consumer group routing</strong> - directing events to specific consumer groups
+- <strong>Priority event handling</strong> - routing critical events to high-priority processors</p>
+<h4 id="4-data-pipeline-and-analytics">4. <strong>Data Pipeline and Analytics</strong></h4>
+<p>In data processing workflows:
+- <strong>Data source routing</strong> - directing data based on source system characteristics
+- <strong>Quality-based routing</strong> - routing high-quality data to real-time systems, low-quality to batch processing
+- <strong>Compliance routing</strong> - directing sensitive data to compliant processing pipelines
+- <strong>Analytics routing</strong> - routing operational data to analytical systems</p>
+<h2 id="implementation-patterns">Implementation Patterns</h2>
+<h3 id="1-simple-content-inspection-router">1. <strong>Simple Content Inspection Router</strong></h3>
+<pre><code class="language-java">// Basic content-based routing using message analysis
+@Component
+public class ContentInspectionRouter {
+
+    public String determineRoute(MessageDto message) {
+        // Route based on message type
+        if (message.getMessageType() == MessageType.PAYMENT) {
+            return routePaymentMessage(message);
+        } else if (message.getMessageType() == MessageType.CUSTOMER_UPDATE) {
+            return routeCustomerMessage(message);
+        } else if (message.getMessageType() == MessageType.ORDER) {
+            return routeOrderMessage(message);
+        }
+
+        return &quot;default-processor&quot;;
+    }
+
+    private String routePaymentMessage(MessageDto message) {
+        PaymentDto payment = message.getPayload(PaymentDto.class);
+
+        // Route high-value payments to secure processor
+        if (payment.getAmount().compareTo(new BigDecimal(&quot;10000&quot;)) &gt; 0) {
+            return &quot;high-value-payment-processor&quot;;
+        }
+
+        // Route international payments to specialized processor
+        if (!payment.getCurrency().equals(&quot;EUR&quot;)) {
+            return &quot;international-payment-processor&quot;;
+        }
+
+        return &quot;standard-payment-processor&quot;;
+    }
+
+    private String routeCustomerMessage(MessageDto message) {
+        CustomerUpdateDto customer = message.getPayload(CustomerUpdateDto.class);
+
+        // Route VIP customers to priority processor
+        if (customer.getCustomerTier() == CustomerTier.VIP) {
+            return &quot;vip-customer-processor&quot;;
+        }
+
+        // Route by geographic region
+        String region = customer.getAddress().getCountry();
+        return switch (region) {
+            case &quot;FI&quot;, &quot;SE&quot;, &quot;NO&quot;, &quot;DK&quot; -&gt; &quot;nordic-customer-processor&quot;;
+            case &quot;DE&quot;, &quot;FR&quot;, &quot;ES&quot;, &quot;IT&quot; -&gt; &quot;eu-customer-processor&quot;;
+            default -&gt; &quot;international-customer-processor&quot;;
+        };
+    }
+
+    private String routeOrderMessage(MessageDto message) {
+        OrderDto order = message.getPayload(OrderDto.class);
+
+        // Route based on order characteristics
+        if (order.isExpressDelivery()) {
+            return &quot;express-order-processor&quot;;
+        }
+
+        if (order.getItems().size() &gt; 10) {
+            return &quot;bulk-order-processor&quot;;
+        }
+
+        return &quot;standard-order-processor&quot;;
+    }
+}
+</code></pre>
+<h3 id="2-rule-based-content-router">2. <strong>Rule-Based Content Router</strong></h3>
+<pre><code class="language-java">// Advanced routing using configurable business rules
+@Component
+public class RuleBasedContentRouter {
+
+    @Autowired
+    private RoutingRuleEngine ruleEngine;
+
+    @Autowired
+    private MessageContentAnalyzer contentAnalyzer;
+
+    public RoutingDecision routeMessage(Message message) {
+        MessageContext context = contentAnalyzer.analyzeMessage(message);
+
+        List&lt;RoutingRule&gt; applicableRules = ruleEngine.getApplicableRules(context);
+
+        for (RoutingRule rule : applicableRules) {
+            if (rule.evaluate(context)) {
+                return RoutingDecision.builder()
+                    .destination(rule.getDestination())
+                    .ruleId(rule.getId())
+                    .confidence(rule.getConfidence())
+                    .metadata(rule.getMetadata())
+                    .build();
+            }
+        }
+
+        return RoutingDecision.defaultRoute();
+    }
+}
+
+@Service
+public class RoutingRuleEngine {
+
+    private final List&lt;RoutingRule&gt; rules;
+
+    public List&lt;RoutingRule&gt; getApplicableRules(MessageContext context) {
+        return rules.stream()
+            .filter(rule -&gt; rule.isApplicable(context))
+            .sorted(Comparator.comparing(RoutingRule::getPriority).reversed())
+            .collect(Collectors.toList());
+    }
+}
+
+public interface RoutingRule {
+    boolean isApplicable(MessageContext context);
+    boolean evaluate(MessageContext context);
+    String getDestination();
+    String getId();
+    int getPriority();
+    double getConfidence();
+    Map&lt;String, Object&gt; getMetadata();
+}
+
+public class CustomerTypeRoutingRule implements RoutingRule {
+    private final CustomerType targetCustomerType;
+    private final String destination;
+    private final int priority;
+
+    @Override
+    public boolean evaluate(MessageContext context) {
+        return context.getCustomerType() == targetCustomerType;
+    }
+
+    @Override
+    public String getDestination() {
+        return destination;
+    }
+
+    // Additional methods...
+}
+</code></pre>
+<h3 id="3-jsonxml-content-path-router">3. <strong>JSON/XML Content Path Router</strong></h3>
+<pre><code class="language-java">// Content routing using path expressions for structured data
+@Component
+public class PathBasedContentRouter {
+
+    @Autowired
+    private JsonPathEvaluator jsonPathEvaluator;
+
+    @Autowired
+    private XPathEvaluator xPathEvaluator;
+
+    public String routeByContentPath(String messageContent, String contentType) {
+        if (&quot;application/json&quot;.equals(contentType)) {
+            return routeJsonContent(messageContent);
+        } else if (&quot;application/xml&quot;.equals(contentType) || &quot;text/xml&quot;.equals(contentType)) {
+            return routeXmlContent(messageContent);
+        }
+
+        return &quot;default-processor&quot;;
+    }
+
+    private String routeJsonContent(String jsonContent) {
+        try {
+            // Route based on event type
+            String eventType = jsonPathEvaluator.evaluate(jsonContent, &quot;$.eventType&quot;);
+            if (&quot;user.created&quot;.equals(eventType)) {
+                return &quot;user-onboarding-processor&quot;;
+            } else if (&quot;order.placed&quot;.equals(eventType)) {
+                return &quot;order-processing-service&quot;;
+            }
+
+            // Route based on data characteristics
+            Integer amount = jsonPathEvaluator.evaluate(jsonContent, &quot;$.order.totalAmount&quot;);
+            if (amount != null &amp;&amp; amount &gt; 1000) {
+                return &quot;high-value-processor&quot;;
+            }
+
+            // Route based on customer segment
+            String segment = jsonPathEvaluator.evaluate(jsonContent, &quot;$.customer.segment&quot;);
+            if (&quot;ENTERPRISE&quot;.equals(segment)) {
+                return &quot;enterprise-processor&quot;;
+            }
+
+        } catch (Exception e) {
+            log.warn(&quot;Error evaluating JSON path for routing&quot;, e);
+        }
+
+        return &quot;default-processor&quot;;
+    }
+
+    private String routeXmlContent(String xmlContent) {
+        try {
+            // Route based on XML element values
+            String messageType = xPathEvaluator.evaluate(xmlContent, &quot;/message/@type&quot;);
+            String priority = xPathEvaluator.evaluate(xmlContent, &quot;/message/header/priority/text()&quot;);
+
+            if (&quot;urgent&quot;.equalsIgnoreCase(priority)) {
+                return &quot;urgent-processor&quot;;
+            }
+
+            if (&quot;invoice&quot;.equals(messageType)) {
+                String amount = xPathEvaluator.evaluate(xmlContent, &quot;/message/body/invoice/amount/text()&quot;);
+                if (amount != null &amp;&amp; Double.parseDouble(amount) &gt; 5000) {
+                    return &quot;large-invoice-processor&quot;;
+                }
+                return &quot;standard-invoice-processor&quot;;
+            }
+
+        } catch (Exception e) {
+            log.warn(&quot;Error evaluating XPath for routing&quot;, e);
+        }
+
+        return &quot;default-processor&quot;;
+    }
+}
+</code></pre>
+<h3 id="4-multi-criteria-content-router">4. <strong>Multi-Criteria Content Router</strong></h3>
+<pre><code class="language-java">// Complex routing based on multiple content criteria
+@Component
+public class MultiCriteriaContentRouter {
+
+    public List&lt;String&gt; determineDestinations(ComplexMessage message) {
+        List&lt;String&gt; destinations = new ArrayList&lt;&gt;();
+
+        RoutingCriteria criteria = analyzeCriteria(message);
+
+        // Primary destination based on message type and priority
+        destinations.add(determinePrimaryDestination(criteria));
+
+        // Additional destinations based on content characteristics
+        destinations.addAll(determineSecondaryDestinations(criteria));
+
+        // Compliance and audit destinations
+        destinations.addAll(determineComplianceDestinations(criteria));
+
+        return destinations.stream().distinct().collect(Collectors.toList());
+    }
+
+    private RoutingCriteria analyzeCriteria(ComplexMessage message) {
+        return RoutingCriteria.builder()
+            .messageType(message.getType())
+            .priority(message.getPriority())
+            .customerTier(extractCustomerTier(message))
+            .geographicRegion(extractRegion(message))
+            .dataClassification(extractDataClassification(message))
+            .complianceRequirements(extractComplianceRequirements(message))
+            .messageSize(message.getPayload().length())
+            .urgency(calculateUrgency(message))
+            .build();
+    }
+
+    private String determinePrimaryDestination(RoutingCriteria criteria) {
+        if (criteria.getUrgency() == Urgency.CRITICAL) {
+            return &quot;critical-processor&quot;;
+        }
+
+        if (criteria.getCustomerTier() == CustomerTier.ENTERPRISE) {
+            return &quot;enterprise-processor&quot;;
+        }
+
+        // Route based on message type and region
+        return criteria.getMessageType().toString().toLowerCase() + &quot;-&quot; + 
+               criteria.getGeographicRegion().toString().toLowerCase() + &quot;-processor&quot;;
+    }
+
+    private List&lt;String&gt; determineSecondaryDestinations(RoutingCriteria criteria) {
+        List&lt;String&gt; destinations = new ArrayList&lt;&gt;();
+
+        // Analytics destinations
+        if (criteria.getMessageType().isAnalyticsEligible()) {
+            destinations.add(&quot;analytics-collector&quot;);
+        }
+
+        // Monitoring destinations
+        if (criteria.getUrgency().ordinal() &gt;= Urgency.HIGH.ordinal()) {
+            destinations.add(&quot;priority-monitor&quot;);
+        }
+
+        // Backup destinations for high-value messages
+        if (criteria.getCustomerTier() == CustomerTier.VIP) {
+            destinations.add(&quot;vip-backup-processor&quot;);
+        }
+
+        return destinations;
+    }
+
+    private List&lt;String&gt; determineComplianceDestinations(RoutingCriteria criteria) {
+        List&lt;String&gt; destinations = new ArrayList&lt;&gt;();
+
+        // GDPR compliance
+        if (criteria.getGeographicRegion().isEURegion() &amp;&amp; 
+            criteria.getDataClassification().isPersonalData()) {
+            destinations.add(&quot;gdpr-compliance-processor&quot;);
+        }
+
+        // Financial compliance
+        if (criteria.getMessageType().isFinancial() &amp;&amp; 
+            criteria.getComplianceRequirements().contains(ComplianceType.FINANCIAL)) {
+            destinations.add(&quot;financial-compliance-processor&quot;);
+        }
+
+        // Audit requirements
+        if (criteria.getDataClassification().requiresAudit()) {
+            destinations.add(&quot;audit-logger&quot;);
+        }
+
+        return destinations;
+    }
+}
+</code></pre>
+<h2 id="apache-camel-implementation">Apache Camel Implementation</h2>
+<h3 id="1-simple-content-based-router">1. <strong>Simple Content-Based Router</strong></h3>
+<pre><code class="language-java">@Component
+public class SimpleContentBasedRouterRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from(&quot;direct:contentBasedRoute&quot;)
+            .routeId(&quot;content-based-router&quot;)
+            .log(&quot;Analyzing message content for routing&quot;)
+            .choice()
+                .when(jsonpath(&quot;$.messageType == 'PAYMENT'&quot;))
+                    .to(&quot;direct:routePayment&quot;)
+                .when(jsonpath(&quot;$.messageType == 'ORDER'&quot;))
+                    .to(&quot;direct:routeOrder&quot;)
+                .when(jsonpath(&quot;$.messageType == 'CUSTOMER'&quot;))
+                    .to(&quot;direct:routeCustomer&quot;)
+                .when(header(&quot;urgent&quot;).isEqualTo(&quot;true&quot;))
+                    .to(&quot;direct:urgentProcessor&quot;)
+                .otherwise()
+                    .to(&quot;direct:defaultProcessor&quot;)
+            .end();
+
+        from(&quot;direct:routePayment&quot;)
+            .log(&quot;Routing payment message&quot;)
+            .choice()
+                .when(jsonpath(&quot;$.amount &gt; 10000&quot;))
+                    .to(&quot;direct:highValuePaymentProcessor&quot;)
+                .when(jsonpath(&quot;$.currency != 'EUR'&quot;))
+                    .to(&quot;direct:internationalPaymentProcessor&quot;)
+                .otherwise()
+                    .to(&quot;direct:standardPaymentProcessor&quot;)
+            .end();
+
+        from(&quot;direct:routeOrder&quot;)
+            .log(&quot;Routing order message&quot;)
+            .choice()
+                .when(jsonpath(&quot;$.expressDelivery == true&quot;))
+                    .to(&quot;direct:expressOrderProcessor&quot;)
+                .when(jsonpath(&quot;$.items.length() &gt; 10&quot;))
+                    .to(&quot;direct:bulkOrderProcessor&quot;)
+                .otherwise()
+                    .to(&quot;direct:standardOrderProcessor&quot;)
+            .end();
+    }
+}
+</code></pre>
+<h3 id="2-header-and-content-combined-router">2. <strong>Header and Content Combined Router</strong></h3>
+<pre><code class="language-java">@Component
+public class HeaderContentRouterRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from(&quot;direct:combinedContentRouter&quot;)
+            .routeId(&quot;header-content-router&quot;)
+            .log(&quot;Routing based on headers and content&quot;)
+            .choice()
+                // Route based on customer tier (header) and message content
+                .when(and(header(&quot;customerTier&quot;).isEqualTo(&quot;VIP&quot;), 
+                         jsonpath(&quot;$.priority == 'HIGH'&quot;)))
+                    .to(&quot;direct:vipHighPriorityProcessor&quot;)
+
+                // Route based on region and message type
+                .when(and(header(&quot;region&quot;).in(&quot;EU&quot;, &quot;NORDICS&quot;), 
+                         jsonpath(&quot;$.messageType == 'COMPLIANCE'&quot;)))
+                    .to(&quot;direct:euComplianceProcessor&quot;)
+
+                // Route based on content size and type
+                .when(and(jsonpath(&quot;$.data.length() &gt; 1000&quot;), 
+                         header(&quot;messageType&quot;).isEqualTo(&quot;BATCH&quot;)))
+                    .to(&quot;direct:largeBatchProcessor&quot;)
+
+                // Route based on customer segment from content
+                .when(jsonpath(&quot;$.customer.segment == 'ENTERPRISE'&quot;))
+                    .to(&quot;direct:enterpriseProcessor&quot;)
+
+                // Default routing
+                .otherwise()
+                    .to(&quot;direct:standardProcessor&quot;)
+            .end();
+    }
+}
+</code></pre>
+<h3 id="3-xpath-based-xml-content-router">3. <strong>XPath-Based XML Content Router</strong></h3>
+<pre><code class="language-java">@Component
+public class XPathContentRouterRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from(&quot;direct:xmlContentRouter&quot;)
+            .routeId(&quot;xpath-content-router&quot;)
+            .log(&quot;Routing XML content based on XPath expressions&quot;)
+            .choice()
+                // Route based on document type
+                .when(xpath(&quot;/document/@type = 'invoice'&quot;))
+                    .to(&quot;direct:routeInvoice&quot;)
+
+                // Route based on priority
+                .when(xpath(&quot;/document/header/priority/text() = 'urgent'&quot;))
+                    .to(&quot;direct:urgentProcessor&quot;)
+
+                // Route based on customer type
+                .when(xpath(&quot;//customer/@type = 'enterprise'&quot;))
+                    .to(&quot;direct:enterpriseProcessor&quot;)
+
+                // Route based on amount
+                .when(xpath(&quot;//amount/text() &gt; 5000&quot;))
+                    .to(&quot;direct:highValueProcessor&quot;)
+
+                .otherwise()
+                    .to(&quot;direct:defaultXmlProcessor&quot;)
+            .end();
+
+        from(&quot;direct:routeInvoice&quot;)
+            .choice()
+                .when(xpath(&quot;//invoice/amount/text() &gt; 10000&quot;))
+                    .to(&quot;direct:largeInvoiceProcessor&quot;)
+                .when(xpath(&quot;//invoice/@type = 'credit'&quot;))
+                    .to(&quot;direct:creditInvoiceProcessor&quot;)
+                .otherwise()
+                    .to(&quot;direct:standardInvoiceProcessor&quot;)
+            .end();
+    }
+}
+</code></pre>
+<h3 id="4-dynamic-content-router-with-rules">4. <strong>Dynamic Content Router with Rules</strong></h3>
+<pre><code class="language-java">@Component
+public class DynamicContentRouterRoute extends RouteBuilder {
+
+    @Autowired
+    private ContentRoutingService routingService;
+
+    @Override
+    public void configure() throws Exception {
+        from(&quot;direct:dynamicContentRouter&quot;)
+            .routeId(&quot;dynamic-content-router&quot;)
+            .log(&quot;Applying dynamic content routing rules&quot;)
+            .process(exchange -&gt; {
+                Object messageBody = exchange.getIn().getBody();
+                Map&lt;String, Object&gt; headers = exchange.getIn().getHeaders();
+
+                RoutingDecision decision = routingService.determineRoute(messageBody, headers);
+
+                exchange.getIn().setHeader(&quot;routingDecision&quot;, decision);
+                exchange.getIn().setHeader(&quot;primaryDestination&quot;, decision.getPrimaryDestination());
+                exchange.getIn().setHeader(&quot;secondaryDestinations&quot;, decision.getSecondaryDestinations());
+            })
+            .log(&quot;Primary destination: ${header.primaryDestination}&quot;)
+            .recipientList(header(&quot;primaryDestination&quot;))
+            .choice()
+                .when(header(&quot;secondaryDestinations&quot;).isNotNull())
+                    .process(exchange -&gt; {
+                        List&lt;String&gt; secondaryDestinations = 
+                            exchange.getIn().getHeader(&quot;secondaryDestinations&quot;, List.class);
+
+                        if (secondaryDestinations != null &amp;&amp; !secondaryDestinations.isEmpty()) {
+                            String destinations = String.join(&quot;,&quot;, secondaryDestinations);
+                            exchange.getIn().setHeader(&quot;additionalDestinations&quot;, destinations);
+                        }
+                    })
+                    .recipientList(header(&quot;additionalDestinations&quot;))
+                        .parallelProcessing()
+                        .stopOnException()
+            .end();
+    }
+}
+
+@Service
+public class ContentRoutingService {
+
+    public RoutingDecision determineRoute(Object messageBody, Map&lt;String, Object&gt; headers) {
+        MessageAnalysisResult analysis = analyzeMessage(messageBody, headers);
+
+        String primaryDestination = determinePrimaryRoute(analysis);
+        List&lt;String&gt; secondaryDestinations = determineSecondaryRoutes(analysis);
+
+        return RoutingDecision.builder()
+            .primaryDestination(primaryDestination)
+            .secondaryDestinations(secondaryDestinations)
+            .analysisResult(analysis)
+            .build();
+    }
+
+    private MessageAnalysisResult analyzeMessage(Object messageBody, Map&lt;String, Object&gt; headers) {
+        // Implement message analysis logic
+        return MessageAnalysisResult.builder()
+            .messageType(extractMessageType(messageBody, headers))
+            .priority(extractPriority(messageBody, headers))
+            .customerInfo(extractCustomerInfo(messageBody, headers))
+            .contentCharacteristics(analyzeContent(messageBody))
+            .build();
+    }
+}
+</code></pre>
+<h3 id="5-multi-destination-content-router">5. <strong>Multi-Destination Content Router</strong></h3>
+<pre><code class="language-java">@Component
+public class MultiDestinationContentRouterRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from(&quot;direct:multiDestinationRouter&quot;)
+            .routeId(&quot;multi-destination-content-router&quot;)
+            .log(&quot;Routing to multiple destinations based on content&quot;)
+            .process(exchange -&gt; {
+                List&lt;String&gt; destinations = new ArrayList&lt;&gt;();
+
+                // Always route to primary processor
+                destinations.add(&quot;direct:primaryProcessor&quot;);
+
+                // Add audit destination for sensitive data
+                if (containsSensitiveData(exchange.getIn().getBody())) {
+                    destinations.add(&quot;direct:auditProcessor&quot;);
+                }
+
+                // Add compliance destination for regulated industries
+                if (isRegulatedIndustry(exchange.getIn().getHeaders())) {
+                    destinations.add(&quot;direct:complianceProcessor&quot;);
+                }
+
+                // Add analytics destination for business events
+                if (isBusinessEvent(exchange.getIn().getBody())) {
+                    destinations.add(&quot;direct:analyticsProcessor&quot;);
+                }
+
+                String recipientList = String.join(&quot;,&quot;, destinations);
+                exchange.getIn().setHeader(&quot;recipientList&quot;, recipientList);
+            })
+            .log(&quot;Sending to destinations: ${header.recipientList}&quot;)
+            .recipientList(header(&quot;recipientList&quot;))
+                .parallelProcessing()
+                .stopOnException();
+    }
+
+    private boolean containsSensitiveData(Object body) {
+        // Implementation to detect sensitive data
+        if (body instanceof Map) {
+            Map&lt;?, ?&gt; data = (Map&lt;?, ?&gt;) body;
+            return data.containsKey(&quot;ssn&quot;) || data.containsKey(&quot;creditCard&quot;) || 
+                   data.containsKey(&quot;personalData&quot;);
+        }
+        return false;
+    }
+
+    private boolean isRegulatedIndustry(Map&lt;String, Object&gt; headers) {
+        String industry = (String) headers.get(&quot;industry&quot;);
+        return &quot;FINANCIAL&quot;.equals(industry) || &quot;HEALTHCARE&quot;.equals(industry) || 
+               &quot;PHARMACEUTICAL&quot;.equals(industry);
+    }
+
+    private boolean isBusinessEvent(Object body) {
+        if (body instanceof Map) {
+            Map&lt;?, ?&gt; data = (Map&lt;?, ?&gt;) body;
+            String eventType = (String) data.get(&quot;eventType&quot;);
+            return eventType != null &amp;&amp; (eventType.startsWith(&quot;business.&quot;) || 
+                   eventType.contains(&quot;transaction&quot;));
+        }
+        return false;
+    }
+}
+</code></pre>
+<h2 id="best-practices">Best Practices</h2>
+<h3 id="1-content-analysis-optimization">1. <strong>Content Analysis Optimization</strong></h3>
+<ul>
+<li>Minimize content inspection overhead by analyzing only necessary fields</li>
+<li>Use efficient parsing libraries and techniques for content extraction</li>
+<li>Cache content analysis results when the same message is processed multiple times</li>
+<li>Implement early exit strategies in routing rule evaluation</li>
+<li>Consider using streaming parsers for large messages</li>
+</ul>
+<h3 id="2-routing-rule-management">2. <strong>Routing Rule Management</strong></h3>
+<ul>
+<li>Externalize routing rules to enable runtime configuration changes</li>
+<li>Implement rule versioning and rollback capabilities</li>
+<li>Use rule engines for complex routing logic</li>
+<li>Validate routing rules before deployment</li>
+<li>Provide clear documentation and business justification for routing rules</li>
+</ul>
+<h3 id="3-error-handling-and-fallbacks">3. <strong>Error Handling and Fallbacks</strong></h3>
+<ul>
+<li>Implement default routing destinations for unmatched content</li>
+<li>Provide graceful handling of malformed or unparseable content</li>
+<li>Use circuit breakers for unreliable destination systems</li>
+<li>Implement retry logic for transient routing failures</li>
+<li>Log routing decisions for debugging and audit purposes</li>
+</ul>
+<h3 id="4-performance-and-scalability">4. <strong>Performance and Scalability</strong></h3>
+<ul>
+<li>Use appropriate content parsing strategies (DOM vs. streaming)</li>
+<li>Implement parallel routing rule evaluation where possible</li>
+<li>Cache frequently accessed routing configuration</li>
+<li>Monitor routing performance and optimize slow rules</li>
+<li>Consider using content hashing for routing decisions when appropriate</li>
+</ul>
+<h3 id="5-security-and-compliance">5. <strong>Security and Compliance</strong></h3>
+<ul>
+<li>Ensure routing rules don't expose sensitive content in logs</li>
+<li>Implement proper access controls for routing configuration</li>
+<li>Validate routing destinations to prevent injection attacks</li>
+<li>Audit routing decisions for compliance requirements</li>
+<li>Use secure channels for routing configuration management</li>
+</ul>
+<p>The Content-Based Router pattern is fundamental for building intelligent, adaptive integration solutions that can make sophisticated routing decisions based on message content, enabling flexible and business-driven message flows in complex enterprise architectures.</p>
+
+      <a href="../index.html" class="back-to-top">← Back to All Patterns</a>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <p>©2026 <a href="https://dataintegrationmastery.com/">Data Integration Mastery™</a> — All Rights Reserved</p>
+  </footer>
+</body>
+</html>

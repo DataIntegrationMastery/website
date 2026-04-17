@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Message Router Pattern — Integration Architecture Patterns | Data Integration Mastery™</title>
+  <meta name="description" content="The Message Router pattern is a fundamental routing and decision-making pattern in enterprise integration architectures that dynamically determines the desti...">
+  <meta name="keywords" content="message router pattern, integration pattern, data transformation patterns, integration architecture, EAI patterns, data integration">
+  <link rel="canonical" href="https://dataintegrationmastery.com/patterns/data-transformation-patterns/message-router.html">
+
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://dataintegrationmastery.com/patterns/data-transformation-patterns/message-router.html">
+  <meta property="og:title" content="Message Router Pattern — Integration Architecture Patterns">
+  <meta property="og:description" content="The Message Router pattern is a fundamental routing and decision-making pattern in enterprise integration architectures that dynamically determines the desti...">
+  <meta property="og:image" content="https://dataintegrationmastery.com/assets/images/logo.png">
+  <meta property="og:site_name" content="Data Integration Mastery">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Message Router Pattern — Integration Architecture Patterns">
+  <meta name="twitter:description" content="The Message Router pattern is a fundamental routing and decision-making pattern in enterprise integration architectures that dynamically determines the desti...">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/docs.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Message Router Pattern",
+    "description": "The Message Router pattern is a fundamental routing and decision-making pattern in enterprise integration architectures that dynamically determines the desti...",
+    "url": "https://dataintegrationmastery.com/patterns/data-transformation-patterns/message-router.html",
+    "author": {
+      "@type": "Person",
+      "name": "Ari Vilkman",
+      "jobTitle": "Integration Architect"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Data Integration Mastery",
+      "url": "https://dataintegrationmastery.com"
+    },
+    "isPartOf": {
+      "@type": "CollectionPage",
+      "name": "Integration Architecture Patterns",
+      "url": "https://dataintegrationmastery.com/patterns/"
+    },
+    "about": {
+      "@type": "Thing",
+      "name": "Message Router Pattern"
+    },
+    "inLanguage": "en",
+    "isAccessibleForFree": true
+  }
+  </script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="https://dataintegrationmastery.com/" class="header-brand">
+        <img src="../../assets/images/dim-icon.png" alt="DIM" width="36" height="36">
+        <span class="header-title">Data Integration Mastery™</span>
+      </a>
+      <nav class="header-nav" aria-label="Main navigation">
+        <a href="https://dataintegrationmastery.com/">Home</a>
+        <a href="../index.html">All Patterns</a>
+        <a href="https://dataintegrationmastery.com/#free-course">Free Course</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="docs-layout">
+    <aside class="docs-sidebar" aria-label="Pattern categories">
+      <div class="sidebar-title">Pattern Categories</div>
+<div class="sidebar-section">
+  <a href="../index.html#resilience" class="sidebar-section-title">🛡️ Resilience Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../resilience-patterns/circuit-breaker.html">Circuit Breaker</a></li>
+    <li><a href="../resilience-patterns/retry-mechanism.html">Retry Mechanism</a></li>
+    <li><a href="../resilience-patterns/timeout.html">Timeout</a></li>
+    <li><a href="../resilience-patterns/dead-letter-queue.html">Dead Letter Queue</a></li>
+    <li><a href="../resilience-patterns/bulkhead.html">Bulkhead</a></li>
+    <li><a href="../resilience-patterns/fallback-graceful-degradation.html">Fallback / Graceful Degradation</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#messaging" class="sidebar-section-title">📨 Messaging Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../messaging-patterns/request-reply.html">Request-Reply</a></li>
+    <li><a href="../messaging-patterns/publish-subscribe.html">Publish-Subscribe</a></li>
+    <li><a href="../messaging-patterns/message-queue.html">Message Queue</a></li>
+    <li><a href="../messaging-patterns/event-streaming.html">Event Streaming</a></li>
+    <li><a href="../messaging-patterns/correlation-id.html">Correlation ID</a></li>
+    <li><a href="../messaging-patterns/message-routing.html">Message Routing</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#data-transformation" class="sidebar-section-title">🔄 Data Transformation Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="message-translator.html">Message Translator</a></li>
+    <li><a href="content-filter.html">Content Filter</a></li>
+    <li><a href="message-router.html" class="active">Message Router</a></li>
+    <li><a href="aggregator.html">Aggregator</a></li>
+    <li><a href="splitter.html">Splitter</a></li>
+    <li><a href="data-mapper.html">Data Mapper</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#routing" class="sidebar-section-title">🔀 Routing Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../routing-patterns/content-based-router.html">Content-Based Router</a></li>
+    <li><a href="../routing-patterns/recipient-list.html">Recipient List</a></li>
+    <li><a href="../routing-patterns/load-balancer.html">Load Balancer</a></li>
+    <li><a href="../routing-patterns/message-filter.html">Message Filter</a></li>
+    <li><a href="../routing-patterns/dynamic-router.html">Dynamic Router</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#security" class="sidebar-section-title">🔐 Security Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../security-patterns/authentication.html">Authentication</a></li>
+    <li><a href="../security-patterns/authorization.html">Authorization</a></li>
+    <li><a href="../security-patterns/encryption.html">Encryption</a></li>
+    <li><a href="../security-patterns/token-management.html">Token Management</a></li>
+    <li><a href="../security-patterns/api-security.html">API Security</a></li>
+    <li><a href="../security-patterns/secret-management.html">Secret Management</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#orchestration" class="sidebar-section-title">🎭 Orchestration Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../orchestration-patterns/saga-pattern.html">Saga Pattern</a></li>
+    <li><a href="../orchestration-patterns/process-manager.html">Process Manager</a></li>
+    <li><a href="../orchestration-patterns/workflow-engine.html">Workflow Engine</a></li>
+    <li><a href="../orchestration-patterns/choreography.html">Choreography</a></li>
+    <li><a href="../orchestration-patterns/compensation-transactions.html">Compensation Transactions</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#observability" class="sidebar-section-title">📊 Monitoring & Observability Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../monitoring-observability-patterns/distributed-tracing.html">Distributed Tracing</a></li>
+    <li><a href="../monitoring-observability-patterns/metrics-collection.html">Metrics Collection</a></li>
+    <li><a href="../monitoring-observability-patterns/health-checks.html">Health Checks</a></li>
+    <li><a href="../monitoring-observability-patterns/logging-strategies.html">Logging Strategies</a></li>
+    <li><a href="../monitoring-observability-patterns/performance-monitoring.html">Performance Monitoring</a></li>
+    <li><a href="../monitoring-observability-patterns/error-tracking.html">Error Tracking</a></li>
+  </ul>
+</div>
+
+    </aside>
+
+    <main id="main-content" class="docs-content">
+      <div class="breadcrumb">
+        <a href="https://dataintegrationmastery.com/">Home</a>
+        <span class="sep">›</span>
+        <a href="../index.html">Patterns</a>
+        <span class="sep">›</span>
+        <a href="../index.html#data-transformation">Data Transformation Patterns</a>
+        <span class="sep">›</span>
+        <strong>Message Router Pattern</strong>
+      </div>
+
+      <h1>Message Router Pattern</h1>
+
+      <h2 id="overview">Overview</h2>
+<p>The Message Router pattern is a fundamental routing and decision-making pattern in enterprise integration architectures that dynamically determines the destination for each message based on message content, headers, or routing logic. Unlike static routing configurations, the Message Router pattern provides intelligent, content-aware message distribution that enables flexible and adaptive integration flows based on runtime conditions and data characteristics.</p>
+<h3 id="theoretical-foundation">Theoretical Foundation</h3>
+<p>The Message Router pattern is grounded in <strong>decision theory</strong> and <strong>dynamic dispatch principles</strong>, addressing the challenge of <strong>runtime routing decisions</strong> in distributed systems. The pattern embodies the principle of <strong>"content-based routing"</strong> - making routing decisions based on actual message data rather than predetermined static rules, enabling intelligent message flow control in complex integration scenarios.</p>
+<h3 id="core-principles">Core Principles</h3>
+<h4 id="1-dynamic-route-selection">1. <strong>Dynamic Route Selection</strong></h4>
+<p>The Message Router analyzes message content, headers, or context to dynamically select the appropriate destination for each message. This enables runtime routing decisions based on:
+- <strong>Message content analysis</strong> - routing based on data values, message types, or payload characteristics
+- <strong>Header-based routing</strong> - using message metadata for routing decisions
+- <strong>Context-aware routing</strong> - considering environmental factors like time, load, or system state
+- <strong>Business rule evaluation</strong> - applying complex business logic to determine routing</p>
+<h4 id="2-decoupled-message-flow">2. <strong>Decoupled Message Flow</strong></h4>
+<p>By centralizing routing logic, the pattern provides:
+- <strong>Source-destination independence</strong> - senders don't need to know specific destination endpoints
+- <strong>Dynamic endpoint management</strong> - destinations can be added or removed without changing source systems
+- <strong>Load distribution flexibility</strong> - routing can balance load across multiple equivalent destinations
+- <strong>Failover and redundancy</strong> - automatic rerouting when primary destinations are unavailable</p>
+<h4 id="3-content-aware-processing">3. <strong>Content-Aware Processing</strong></h4>
+<p>The router can make intelligent decisions based on:
+- <strong>Data validation</strong> - routing valid messages to processing endpoints, invalid to error handling
+- <strong>Priority classification</strong> - high-priority messages to fast-track processing channels
+- <strong>Geographic routing</strong> - directing messages based on location data or regional requirements
+- <strong>Customer segmentation</strong> - routing based on customer type, subscription level, or business rules</p>
+<h4 id="4-integration-pattern-composition">4. <strong>Integration Pattern Composition</strong></h4>
+<p>Message Router serves as a foundation for complex integration patterns:
+- <strong>Scatter-Gather</strong> - routing requests to multiple processors and collecting responses
+- <strong>Recipient List</strong> - sending messages to multiple destinations based on recipient lists
+- <strong>Content-Based Filtering</strong> - combining routing with filtering logic
+- <strong>Workflow Orchestration</strong> - routing messages through multi-step business processes</p>
+<h3 id="why-message-routers-are-essential-in-integration-architecture">Why Message Routers are Essential in Integration Architecture</h3>
+<h4 id="1-microservices-architecture-support">1. <strong>Microservices Architecture Support</strong></h4>
+<p>In microservices environments, Message Routers address:
+- <strong>Service discovery</strong> - dynamic routing to available service instances
+- <strong>Version management</strong> - routing to appropriate service versions based on compatibility
+- <strong>Canary deployments</strong> - gradual traffic shifting to new service versions
+- <strong>A/B testing</strong> - routing subsets of traffic to different service implementations</p>
+<h4 id="2-multi-tenant-and-multi-environment-support">2. <strong>Multi-Tenant and Multi-Environment Support</strong></h4>
+<p>Modern integration architectures require:
+- <strong>Tenant isolation</strong> - routing messages to tenant-specific processing pipelines
+- <strong>Environment routing</strong> - directing messages to development, test, or production environments
+- <strong>Regional compliance</strong> - routing based on data residency requirements
+- <strong>SLA-based routing</strong> - directing messages based on service level agreements</p>
+<h4 id="3-business-process-flexibility">3. <strong>Business Process Flexibility</strong></h4>
+<p>Integration routers enable business agility through:
+- <strong>Dynamic workflow adaptation</strong> - changing process flows without code deployment
+- <strong>Exception handling</strong> - routing error conditions to specialized handlers
+- <strong>Escalation management</strong> - routing based on time thresholds or business priorities
+- <strong>Approval workflows</strong> - routing based on approval requirements or authorization levels</p>
+<h4 id="4-system-evolution-and-migration">4. <strong>System Evolution and Migration</strong></h4>
+<p>During system transitions:
+- <strong>Gradual migration</strong> - routing subsets of traffic to new systems
+- <strong>Legacy integration</strong> - maintaining routing to legacy systems during transitions
+- <strong>Blue-green deployments</strong> - instant traffic switching between system versions
+- <strong>Rollback capabilities</strong> - quick routing changes for system rollbacks</p>
+<h3 id="benefits-in-integration-contexts">Benefits in Integration Contexts</h3>
+<h4 id="1-operational-flexibility">1. <strong>Operational Flexibility</strong></h4>
+<ul>
+<li><strong>Runtime reconfiguration</strong> - routing rules can be changed without system restart</li>
+<li><strong>Dynamic load balancing</strong> - traffic distribution based on real-time system metrics</li>
+<li><strong>Failover automation</strong> - automatic rerouting when destinations become unavailable</li>
+<li><strong>Maintenance windows</strong> - routing traffic away from systems under maintenance</li>
+</ul>
+<h4 id="2-business-agility">2. <strong>Business Agility</strong></h4>
+<ul>
+<li><strong>Rapid business rule changes</strong> - updating routing logic to reflect business requirements</li>
+<li><strong>Market responsiveness</strong> - quickly adapting message flows for new business scenarios</li>
+<li><strong>Partner integration</strong> - dynamic routing for new partner onboarding</li>
+<li><strong>Regulatory compliance</strong> - routing adjustments for regulatory requirement changes</li>
+</ul>
+<h4 id="3-system-scalability">3. <strong>System Scalability</strong></h4>
+<ul>
+<li><strong>Horizontal scaling</strong> - distributing load across multiple processing instances</li>
+<li><strong>Resource optimization</strong> - routing to least-loaded or most-capable destinations</li>
+<li><strong>Geographic distribution</strong> - routing to nearest or most appropriate regional systems</li>
+<li><strong>Performance optimization</strong> - routing based on processing time or resource availability</li>
+</ul>
+<h4 id="4-integration-simplification">4. <strong>Integration Simplification</strong></h4>
+<ul>
+<li><strong>Centralized routing logic</strong> - single location for managing message distribution rules</li>
+<li><strong>Reduced coupling</strong> - sources and destinations don't need direct knowledge of each other</li>
+<li><strong>Easier testing</strong> - routing logic can be tested independently of business logic</li>
+<li><strong>Configuration management</strong> - externalized routing rules for easier maintenance</li>
+</ul>
+<h3 id="integration-architecture-applications">Integration Architecture Applications</h3>
+<h4 id="1-api-gateway-pattern">1. <strong>API Gateway Pattern</strong></h4>
+<p>Message Routers in API gateways provide:
+- <strong>Backend service routing</strong> - directing API calls to appropriate microservices
+- <strong>Version-based routing</strong> - routing based on API version requirements
+- <strong>Authentication-based routing</strong> - different routing for authenticated vs. anonymous requests
+- <strong>Rate limiting routing</strong> - directing traffic based on quota consumption</p>
+<h4 id="2-event-driven-architecture">2. <strong>Event-Driven Architecture</strong></h4>
+<p>In event streaming systems:
+- <strong>Topic-based routing</strong> - distributing events to appropriate topic partitions
+- <strong>Consumer group routing</strong> - directing events to specific consumer groups
+- <strong>Event type routing</strong> - routing different event types to specialized processors
+- <strong>Geographic event routing</strong> - routing events based on geographic origin or requirements</p>
+<h4 id="3-enterprise-service-bus-esb">3. <strong>Enterprise Service Bus (ESB)</strong></h4>
+<p>In ESB architectures:
+- <strong>Service endpoint routing</strong> - dynamic selection of service implementations
+- <strong>Protocol mediation</strong> - routing to services supporting specific protocols
+- <strong>Message format routing</strong> - directing messages based on format requirements
+- <strong>Quality of service routing</strong> - routing based on transaction, security, or reliability requirements</p>
+<h4 id="4-data-pipeline-and-etl">4. <strong>Data Pipeline and ETL</strong></h4>
+<p>In data processing workflows:
+- <strong>Data source routing</strong> - directing data based on source system characteristics
+- <strong>Processing pipeline selection</strong> - routing to appropriate transformation pipelines
+- <strong>Data quality routing</strong> - directing data based on quality assessment
+- <strong>Archive and retention routing</strong> - routing based on data lifecycle policies</p>
+<h2 id="implementation-patterns">Implementation Patterns</h2>
+<h3 id="1-content-based-routing">1. <strong>Content-Based Routing</strong></h3>
+<pre><code class="language-java">// Route based on message content analysis
+public class ContentBasedRouter {
+
+    public String determineDestination(MessageDto message) {
+        // Route based on message type
+        if (message.getType() == MessageType.PAYMENT) {
+            return &quot;payment-processor&quot;;
+        } else if (message.getType() == MessageType.NOTIFICATION) {
+            return determineNotificationRoute(message);
+        } else if (message.getType() == MessageType.AUDIT) {
+            return &quot;audit-service&quot;;
+        }
+
+        // Route based on content characteristics
+        if (message.getPayloadSize() &gt; MAX_SYNC_SIZE) {
+            return &quot;async-processor&quot;;
+        }
+
+        return &quot;default-processor&quot;;
+    }
+
+    private String determineNotificationRoute(MessageDto message) {
+        NotificationDto notification = message.getPayload(NotificationDto.class);
+
+        // Route based on urgency
+        if (notification.getUrgency() == Urgency.HIGH) {
+            return &quot;urgent-notification-service&quot;;
+        }
+
+        // Route based on channel preference
+        return switch (notification.getChannel()) {
+            case EMAIL -&gt; &quot;email-service&quot;;
+            case SMS -&gt; &quot;sms-service&quot;;
+            case PUSH -&gt; &quot;push-notification-service&quot;;
+            default -&gt; &quot;default-notification-service&quot;;
+        };
+    }
+}
+</code></pre>
+<h3 id="2-header-based-routing">2. <strong>Header-Based Routing</strong></h3>
+<pre><code class="language-java">// Route based on message headers and metadata
+public class HeaderBasedRouter {
+
+    public String routeByHeaders(Map&lt;String, Object&gt; headers, Object payload) {
+        // Route based on tenant information
+        String tenantId = (String) headers.get(&quot;tenant-id&quot;);
+        if (tenantId != null) {
+            return &quot;tenant-&quot; + tenantId + &quot;-processor&quot;;
+        }
+
+        // Route based on API version
+        String apiVersion = (String) headers.get(&quot;api-version&quot;);
+        if (&quot;v2&quot;.equals(apiVersion)) {
+            return &quot;v2-api-processor&quot;;
+        }
+
+        // Route based on priority
+        Integer priority = (Integer) headers.get(&quot;priority&quot;);
+        if (priority != null &amp;&amp; priority &gt; 5) {
+            return &quot;high-priority-processor&quot;;
+        }
+
+        // Route based on source system
+        String source = (String) headers.get(&quot;source-system&quot;);
+        return &quot;processor-&quot; + source;
+    }
+}
+</code></pre>
+<h3 id="3-rule-based-dynamic-routing">3. <strong>Rule-Based Dynamic Routing</strong></h3>
+<pre><code class="language-java">// Route based on configurable business rules
+@Component
+public class RuleBasedRouter {
+
+    @Autowired
+    private RoutingRuleService ruleService;
+
+    public String applyRoutingRules(MessageContext context) {
+        List&lt;RoutingRule&gt; rules = ruleService.getActiveRules();
+
+        for (RoutingRule rule : rules) {
+            if (rule.matches(context)) {
+                return rule.getDestination();
+            }
+        }
+
+        return getDefaultDestination(context);
+    }
+}
+
+public class RoutingRule {
+    private String ruleId;
+    private Predicate&lt;MessageContext&gt; condition;
+    private String destination;
+    private int priority;
+
+    public boolean matches(MessageContext context) {
+        return condition.test(context);
+    }
+}
+</code></pre>
+<h3 id="4-load-based-smart-routing">4. <strong>Load-Based Smart Routing</strong></h3>
+<pre><code class="language-java">// Route based on destination load and performance
+@Component
+public class LoadBasedRouter {
+
+    @Autowired
+    private LoadBalancerService loadBalancer;
+
+    @Autowired
+    private HealthCheckService healthService;
+
+    public String selectOptimalDestination(List&lt;String&gt; candidates) {
+        // Filter healthy destinations
+        List&lt;String&gt; healthyDestinations = candidates.stream()
+            .filter(dest -&gt; healthService.isHealthy(dest))
+            .collect(Collectors.toList());
+
+        if (healthyDestinations.isEmpty()) {
+            throw new NoAvailableDestinationException(&quot;No healthy destinations available&quot;);
+        }
+
+        // Select based on current load
+        return healthyDestinations.stream()
+            .min(Comparator.comparing(dest -&gt; loadBalancer.getCurrentLoad(dest)))
+            .orElse(healthyDestinations.get(0));
+    }
+}
+</code></pre>
+<h2 id="apache-camel-implementation">Apache Camel Implementation</h2>
+<h3 id="1-simple-content-based-router">1. <strong>Simple Content-Based Router</strong></h3>
+<pre><code class="language-java">@Component
+public class ContentBasedRouterRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from(&quot;direct:routeMessage&quot;)
+            .routeId(&quot;content-based-router&quot;)
+            .log(&quot;Routing message: ${body}&quot;)
+            .choice()
+                .when(jsonpath(&quot;$.messageType == 'PAYMENT'&quot;))
+                    .log(&quot;Routing to payment processor&quot;)
+                    .to(&quot;direct:paymentProcessor&quot;)
+                .when(jsonpath(&quot;$.messageType == 'NOTIFICATION'&quot;))
+                    .log(&quot;Routing to notification service&quot;)
+                    .to(&quot;direct:notificationService&quot;)
+                .when(jsonpath(&quot;$.priority &gt; 5&quot;))
+                    .log(&quot;Routing to high-priority processor&quot;)
+                    .to(&quot;direct:highPriorityProcessor&quot;)
+                .otherwise()
+                    .log(&quot;Routing to default processor&quot;)
+                    .to(&quot;direct:defaultProcessor&quot;)
+            .end();
+    }
+}
+</code></pre>
+<h3 id="2-header-based-router">2. <strong>Header-Based Router</strong></h3>
+<pre><code class="language-java">@Component
+public class HeaderBasedRouterRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from(&quot;direct:headerBasedRoute&quot;)
+            .routeId(&quot;header-based-router&quot;)
+            .choice()
+                .when(header(&quot;tenant-id&quot;).isNotNull())
+                    .setHeader(&quot;destination&quot;).simple(&quot;tenant-${header.tenant-id}-processor&quot;)
+                .when(header(&quot;api-version&quot;).isEqualTo(&quot;v2&quot;))
+                    .setHeader(&quot;destination&quot;).constant(&quot;v2-api-processor&quot;)
+                .when(header(&quot;priority&quot;).isGreaterThan(5))
+                    .setHeader(&quot;destination&quot;).constant(&quot;high-priority-processor&quot;)
+                .otherwise()
+                    .setHeader(&quot;destination&quot;).simple(&quot;processor-${header.source-system}&quot;)
+            .end()
+            .log(&quot;Routing to: ${header.destination}&quot;)
+            .recipientList(header(&quot;destination&quot;));
+    }
+}
+</code></pre>
+<h3 id="3-dynamic-recipient-list-router">3. <strong>Dynamic Recipient List Router</strong></h3>
+<pre><code class="language-java">@Component
+public class DynamicRecipientRouter extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from(&quot;direct:dynamicRoute&quot;)
+            .routeId(&quot;dynamic-recipient-router&quot;)
+            .process(exchange -&gt; {
+                MessageDto message = exchange.getIn().getBody(MessageDto.class);
+                List&lt;String&gt; destinations = determineDestinations(message);
+                exchange.getIn().setHeader(&quot;recipients&quot;, String.join(&quot;,&quot;, destinations));
+            })
+            .log(&quot;Sending to destinations: ${header.recipients}&quot;)
+            .recipientList(header(&quot;recipients&quot;))
+            .parallelProcessing()
+            .stopOnException();
+    }
+
+    private List&lt;String&gt; determineDestinations(MessageDto message) {
+        List&lt;String&gt; destinations = new ArrayList&lt;&gt;();
+
+        // Always send audit messages to audit service
+        if (message.getType() == MessageType.AUDIT) {
+            destinations.add(&quot;direct:auditService&quot;);
+        }
+
+        // Send notifications based on recipient preferences
+        if (message.getType() == MessageType.NOTIFICATION) {
+            NotificationDto notification = message.getPayload(NotificationDto.class);
+            for (String recipient : notification.getRecipients()) {
+                String preferredChannel = getPreferredChannel(recipient);
+                destinations.add(&quot;direct:&quot; + preferredChannel + &quot;Service&quot;);
+            }
+        }
+
+        // Send to primary processor
+        destinations.add(&quot;direct:primaryProcessor&quot;);
+
+        return destinations;
+    }
+}
+</code></pre>
+<h3 id="4-failover-and-circuit-breaker-router">4. <strong>Failover and Circuit Breaker Router</strong></h3>
+<pre><code class="language-java">@Component
+public class ResilientRouterRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from(&quot;direct:resilientRoute&quot;)
+            .routeId(&quot;resilient-router&quot;)
+            .loadBalance()
+            .failover(2, false, true) // 2 attempts, no round-robin, sticky on failure
+            .to(&quot;direct:primaryService&quot;)
+            .to(&quot;direct:secondaryService&quot;)
+            .to(&quot;direct:fallbackService&quot;)
+            .end();
+
+        // Primary service route with circuit breaker
+        from(&quot;direct:primaryService&quot;)
+            .circuitBreaker()
+                .resilience4jConfiguration()
+                    .circuitBreakerRef(&quot;primaryServiceCircuitBreaker&quot;)
+                .end()
+                .log(&quot;Routing to primary service&quot;)
+                .to(&quot;{{primary.service.endpoint}}&quot;)
+            .onFallback()
+                .log(&quot;Primary service circuit breaker open, using fallback&quot;)
+                .setBody(constant(&quot;Primary service temporarily unavailable&quot;))
+            .end();
+
+        // Secondary service with timeout
+        from(&quot;direct:secondaryService&quot;)
+            .log(&quot;Routing to secondary service&quot;)
+            .to(&quot;{{secondary.service.endpoint}}?timeout=5000&quot;);
+
+        // Fallback service
+        from(&quot;direct:fallbackService&quot;)
+            .log(&quot;Using fallback service&quot;)
+            .to(&quot;direct:fallbackProcessor&quot;);
+    }
+}
+</code></pre>
+<h3 id="5-rule-engine-integration-router">5. <strong>Rule-Engine Integration Router</strong></h3>
+<pre><code class="language-java">@Component
+public class RuleEngineRouterRoute extends RouteBuilder {
+
+    @Autowired
+    private RoutingRuleEngine ruleEngine;
+
+    @Override
+    public void configure() throws Exception {
+        from(&quot;direct:ruleBasedRoute&quot;)
+            .routeId(&quot;rule-engine-router&quot;)
+            .process(exchange -&gt; {
+                Object message = exchange.getIn().getBody();
+                Map&lt;String, Object&gt; headers = exchange.getIn().getHeaders();
+
+                MessageContext context = new MessageContext(message, headers);
+                String destination = ruleEngine.evaluateRouting(context);
+
+                exchange.getIn().setHeader(&quot;computedDestination&quot;, destination);
+            })
+            .log(&quot;Rule engine determined destination: ${header.computedDestination}&quot;)
+            .recipientList(header(&quot;computedDestination&quot;));
+    }
+}
+
+@Service
+public class RoutingRuleEngine {
+
+    private final List&lt;RoutingRule&gt; rules;
+
+    public String evaluateRouting(MessageContext context) {
+        return rules.stream()
+            .filter(rule -&gt; rule.matches(context))
+            .findFirst()
+            .map(RoutingRule::getDestination)
+            .orElse(&quot;direct:defaultProcessor&quot;);
+    }
+}
+</code></pre>
+<h2 id="best-practices">Best Practices</h2>
+<h3 id="1-routing-logic-management">1. <strong>Routing Logic Management</strong></h3>
+<ul>
+<li>Keep routing logic externalized and configurable when possible</li>
+<li>Use rule engines for complex routing decisions</li>
+<li>Implement routing rule validation and testing</li>
+<li>Maintain routing rule versioning and change history</li>
+<li>Document routing logic clearly with business justification</li>
+</ul>
+<h3 id="2-performance-optimization">2. <strong>Performance Optimization</strong></h3>
+<ul>
+<li>Cache routing decisions when message characteristics don't change</li>
+<li>Use efficient content analysis (avoid deep payload inspection when possible)</li>
+<li>Implement routing rule short-circuiting for performance</li>
+<li>Monitor routing decision time and optimize slow rules</li>
+<li>Consider pre-computed routing for predictable patterns</li>
+</ul>
+<h3 id="3-error-handling-and-resilience">3. <strong>Error Handling and Resilience</strong></h3>
+<ul>
+<li>Implement fallback routing for unavailable destinations</li>
+<li>Use circuit breakers for unreliable destinations</li>
+<li>Provide dead letter queues for unroutable messages</li>
+<li>Log routing decisions for debugging and audit purposes</li>
+<li>Implement health checks for dynamic destination management</li>
+</ul>
+<h3 id="4-security-considerations">4. <strong>Security Considerations</strong></h3>
+<ul>
+<li>Validate routing parameters to prevent injection attacks</li>
+<li>Implement authorization checks for routing destinations</li>
+<li>Audit routing decisions for security-sensitive messages</li>
+<li>Ensure routing logic doesn't expose sensitive information</li>
+<li>Use secure channels for routing configuration management</li>
+</ul>
+<h3 id="5-monitoring-and-observability">5. <strong>Monitoring and Observability</strong></h3>
+<ul>
+<li>Track routing decision metrics and patterns</li>
+<li>Monitor destination health and performance</li>
+<li>Implement distributed tracing through routing decisions</li>
+<li>Alert on routing failures or unexpected patterns</li>
+<li>Provide visibility into routing rule effectiveness</li>
+</ul>
+<p>The Message Router pattern is fundamental for building flexible, scalable integration architectures that can adapt to changing business requirements and system conditions while maintaining performance and reliability.</p>
+
+      <a href="../index.html" class="back-to-top">← Back to All Patterns</a>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <p>©2026 <a href="https://dataintegrationmastery.com/">Data Integration Mastery™</a> — All Rights Reserved</p>
+  </footer>
+</body>
+</html>

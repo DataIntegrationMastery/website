@@ -1,0 +1,1688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Message Queue Pattern — Integration Architecture Patterns | Data Integration Mastery™</title>
+  <meta name="description" content="The Message Queue pattern is a fundamental asynchronous communication mechanism that enables reliable point-to-point message delivery between distributed com...">
+  <meta name="keywords" content="message queue pattern, integration pattern, messaging patterns, integration architecture, EAI patterns, data integration">
+  <link rel="canonical" href="https://dataintegrationmastery.com/patterns/messaging-patterns/message-queue.html">
+
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://dataintegrationmastery.com/patterns/messaging-patterns/message-queue.html">
+  <meta property="og:title" content="Message Queue Pattern — Integration Architecture Patterns">
+  <meta property="og:description" content="The Message Queue pattern is a fundamental asynchronous communication mechanism that enables reliable point-to-point message delivery between distributed com...">
+  <meta property="og:image" content="https://dataintegrationmastery.com/assets/images/logo.png">
+  <meta property="og:site_name" content="Data Integration Mastery">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Message Queue Pattern — Integration Architecture Patterns">
+  <meta name="twitter:description" content="The Message Queue pattern is a fundamental asynchronous communication mechanism that enables reliable point-to-point message delivery between distributed com...">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/docs.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Message Queue Pattern",
+    "description": "The Message Queue pattern is a fundamental asynchronous communication mechanism that enables reliable point-to-point message delivery between distributed com...",
+    "url": "https://dataintegrationmastery.com/patterns/messaging-patterns/message-queue.html",
+    "author": {
+      "@type": "Person",
+      "name": "Ari Vilkman",
+      "jobTitle": "Integration Architect"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Data Integration Mastery",
+      "url": "https://dataintegrationmastery.com"
+    },
+    "isPartOf": {
+      "@type": "CollectionPage",
+      "name": "Integration Architecture Patterns",
+      "url": "https://dataintegrationmastery.com/patterns/"
+    },
+    "about": {
+      "@type": "Thing",
+      "name": "Message Queue Pattern"
+    },
+    "inLanguage": "en",
+    "isAccessibleForFree": true
+  }
+  </script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="https://dataintegrationmastery.com/" class="header-brand">
+        <img src="../../assets/images/dim-icon.png" alt="DIM" width="36" height="36">
+        <span class="header-title">Data Integration Mastery™</span>
+      </a>
+      <nav class="header-nav" aria-label="Main navigation">
+        <a href="https://dataintegrationmastery.com/">Home</a>
+        <a href="../index.html">All Patterns</a>
+        <a href="https://dataintegrationmastery.com/#free-course">Free Course</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="docs-layout">
+    <aside class="docs-sidebar" aria-label="Pattern categories">
+      <div class="sidebar-title">Pattern Categories</div>
+<div class="sidebar-section">
+  <a href="../index.html#resilience" class="sidebar-section-title">🛡️ Resilience Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../resilience-patterns/circuit-breaker.html">Circuit Breaker</a></li>
+    <li><a href="../resilience-patterns/retry-mechanism.html">Retry Mechanism</a></li>
+    <li><a href="../resilience-patterns/timeout.html">Timeout</a></li>
+    <li><a href="../resilience-patterns/dead-letter-queue.html">Dead Letter Queue</a></li>
+    <li><a href="../resilience-patterns/bulkhead.html">Bulkhead</a></li>
+    <li><a href="../resilience-patterns/fallback-graceful-degradation.html">Fallback / Graceful Degradation</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#messaging" class="sidebar-section-title">📨 Messaging Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="request-reply.html">Request-Reply</a></li>
+    <li><a href="publish-subscribe.html">Publish-Subscribe</a></li>
+    <li><a href="message-queue.html" class="active">Message Queue</a></li>
+    <li><a href="event-streaming.html">Event Streaming</a></li>
+    <li><a href="correlation-id.html">Correlation ID</a></li>
+    <li><a href="message-routing.html">Message Routing</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#data-transformation" class="sidebar-section-title">🔄 Data Transformation Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../data-transformation-patterns/message-translator.html">Message Translator</a></li>
+    <li><a href="../data-transformation-patterns/content-filter.html">Content Filter</a></li>
+    <li><a href="../data-transformation-patterns/message-router.html">Message Router</a></li>
+    <li><a href="../data-transformation-patterns/aggregator.html">Aggregator</a></li>
+    <li><a href="../data-transformation-patterns/splitter.html">Splitter</a></li>
+    <li><a href="../data-transformation-patterns/data-mapper.html">Data Mapper</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#routing" class="sidebar-section-title">🔀 Routing Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../routing-patterns/content-based-router.html">Content-Based Router</a></li>
+    <li><a href="../routing-patterns/recipient-list.html">Recipient List</a></li>
+    <li><a href="../routing-patterns/load-balancer.html">Load Balancer</a></li>
+    <li><a href="../routing-patterns/message-filter.html">Message Filter</a></li>
+    <li><a href="../routing-patterns/dynamic-router.html">Dynamic Router</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#security" class="sidebar-section-title">🔐 Security Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../security-patterns/authentication.html">Authentication</a></li>
+    <li><a href="../security-patterns/authorization.html">Authorization</a></li>
+    <li><a href="../security-patterns/encryption.html">Encryption</a></li>
+    <li><a href="../security-patterns/token-management.html">Token Management</a></li>
+    <li><a href="../security-patterns/api-security.html">API Security</a></li>
+    <li><a href="../security-patterns/secret-management.html">Secret Management</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#orchestration" class="sidebar-section-title">🎭 Orchestration Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../orchestration-patterns/saga-pattern.html">Saga Pattern</a></li>
+    <li><a href="../orchestration-patterns/process-manager.html">Process Manager</a></li>
+    <li><a href="../orchestration-patterns/workflow-engine.html">Workflow Engine</a></li>
+    <li><a href="../orchestration-patterns/choreography.html">Choreography</a></li>
+    <li><a href="../orchestration-patterns/compensation-transactions.html">Compensation Transactions</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#observability" class="sidebar-section-title">📊 Monitoring & Observability Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../monitoring-observability-patterns/distributed-tracing.html">Distributed Tracing</a></li>
+    <li><a href="../monitoring-observability-patterns/metrics-collection.html">Metrics Collection</a></li>
+    <li><a href="../monitoring-observability-patterns/health-checks.html">Health Checks</a></li>
+    <li><a href="../monitoring-observability-patterns/logging-strategies.html">Logging Strategies</a></li>
+    <li><a href="../monitoring-observability-patterns/performance-monitoring.html">Performance Monitoring</a></li>
+    <li><a href="../monitoring-observability-patterns/error-tracking.html">Error Tracking</a></li>
+  </ul>
+</div>
+
+    </aside>
+
+    <main id="main-content" class="docs-content">
+      <div class="breadcrumb">
+        <a href="https://dataintegrationmastery.com/">Home</a>
+        <span class="sep">›</span>
+        <a href="../index.html">Patterns</a>
+        <span class="sep">›</span>
+        <a href="../index.html#messaging">Messaging Patterns</a>
+        <span class="sep">›</span>
+        <strong>Message Queue Pattern</strong>
+      </div>
+
+      <h1>Message Queue Pattern</h1>
+
+      <h2 id="overview">Overview</h2>
+<p>The Message Queue pattern is a fundamental asynchronous communication mechanism that enables <strong>reliable point-to-point message delivery</strong> between distributed components. It implements a <strong>producer-consumer architecture</strong> where message producers send messages to queues, and message consumers retrieve and process messages from those queues. This pattern provides temporal decoupling, load leveling, and fault tolerance by persisting messages in intermediate storage until they can be processed.</p>
+<h3 id="theoretical-foundation">Theoretical Foundation</h3>
+<p>The Message Queue pattern is based on <strong>store-and-forward messaging principles</strong> and <strong>queue data structure theory</strong>. It implements <strong>First-In-First-Out (FIFO) semantics</strong> for message processing while providing additional features like priority queuing, message persistence, and delivery guarantees. The pattern embodies <strong>"fire-and-forget" communication semantics</strong> where producers can send messages without waiting for immediate processing.</p>
+<h3 id="core-principles">Core Principles</h3>
+<h4 id="1-asynchronous-message-processing">1. <strong>Asynchronous Message Processing</strong></h4>
+<p>Messages are placed in queues for later processing, enabling producers and consumers to operate at different speeds and availability windows without blocking each other.</p>
+<h4 id="2-message-persistence-and-durability">2. <strong>Message Persistence and Durability</strong></h4>
+<p>Queues provide persistent storage for messages, ensuring that messages survive system failures and can be processed even if consumers are temporarily unavailable.</p>
+<h4 id="3-load-leveling-and-buffering">3. <strong>Load Leveling and Buffering</strong></h4>
+<p>Queues act as buffers between fast producers and slow consumers, smoothing out traffic spikes and enabling consistent system performance under varying load conditions.</p>
+<h4 id="4-reliable-delivery-semantics">4. <strong>Reliable Delivery Semantics</strong></h4>
+<p>Message queues provide various delivery guarantees (at-least-once, exactly-once, at-most-once) and acknowledgment mechanisms to ensure reliable message processing.</p>
+<h3 id="why-message-queues-are-essential-in-integration-architecture">Why Message Queues are Essential in Integration Architecture</h3>
+<h4 id="1-system-decoupling-and-resilience">1. <strong>System Decoupling and Resilience</strong></h4>
+<p>Message queues enable loose coupling between system components:
+- <strong>Temporal independence</strong> allowing systems to operate on different schedules
+- <strong>Failure isolation</strong> preventing cascading failures between connected systems
+- <strong>Service autonomy</strong> enabling independent deployment and scaling
+- <strong>Technology heterogeneity</strong> supporting different programming languages and platforms</p>
+<h4 id="2-scalability-and-performance-optimization">2. <strong>Scalability and Performance Optimization</strong></h4>
+<p>Queues provide crucial scalability benefits:
+- <strong>Horizontal scaling</strong> by distributing messages across multiple consumers
+- <strong>Load balancing</strong> through work distribution among consumer instances
+- <strong>Peak load handling</strong> by buffering messages during traffic spikes
+- <strong>Resource optimization</strong> by enabling batch processing and optimal resource utilization</p>
+<h4 id="3-enterprise-integration-requirements">3. <strong>Enterprise Integration Requirements</strong></h4>
+<p>Modern enterprises require reliable integration capabilities:
+- <strong>B2B communication</strong> with external partners requiring guaranteed delivery
+- <strong>Batch processing workflows</strong> for large-scale data processing operations
+- <strong>Event-driven architectures</strong> supporting real-time business process automation
+- <strong>Legacy system integration</strong> enabling gradual modernization without disruption</p>
+<h4 id="4-operational-excellence">4. <strong>Operational Excellence</strong></h4>
+<p>Message queues enhance operational capabilities:
+- <strong>Monitoring and observability</strong> through queue depth metrics and processing statistics
+- <strong>Error handling</strong> via dead letter queues and retry mechanisms
+- <strong>Capacity planning</strong> based on queue metrics and consumption patterns
+- <strong>Maintenance flexibility</strong> enabling system updates without message loss</p>
+<h3 id="benefits-in-integration-contexts">Benefits in Integration Contexts</h3>
+<h4 id="1-reliability-and-fault-tolerance">1. <strong>Reliability and Fault Tolerance</strong></h4>
+<ul>
+<li><strong>Guaranteed delivery</strong> ensuring messages reach their destination despite failures</li>
+<li><strong>Message durability</strong> through persistent storage mechanisms</li>
+<li><strong>Automatic retry</strong> capabilities for transient failures</li>
+<li><strong>Dead letter handling</strong> for messages that cannot be processed</li>
+</ul>
+<h4 id="2-performance-and-scalability">2. <strong>Performance and Scalability</strong></h4>
+<ul>
+<li><strong>Throughput optimization</strong> through efficient message batching and prefetching</li>
+<li><strong>Consumer scaling</strong> by adding more worker instances dynamically</li>
+<li><strong>Memory management</strong> through disk-based storage for large message backlogs</li>
+<li><strong>Priority processing</strong> for urgent messages requiring immediate attention</li>
+</ul>
+<h4 id="3-development-productivity">3. <strong>Development Productivity</strong></h4>
+<ul>
+<li><strong>Simplified architecture</strong> through standardized messaging interfaces</li>
+<li><strong>Testing isolation</strong> enabling independent component testing</li>
+<li><strong>Debugging capabilities</strong> through message tracing and replay functionality</li>
+<li><strong>Development velocity</strong> through reusable messaging patterns</li>
+</ul>
+<h4 id="4-business-agility">4. <strong>Business Agility</strong></h4>
+<ul>
+<li><strong>Process automation</strong> enabling automated business workflows</li>
+<li><strong>Integration flexibility</strong> supporting diverse system integration patterns</li>
+<li><strong>Rapid prototyping</strong> through message-driven development approaches</li>
+<li><strong>Change management</strong> via versioned message schemas</li>
+</ul>
+<h3 id="integration-architecture-applications">Integration Architecture Applications</h3>
+<h4 id="1-microservices-communication">1. <strong>Microservices Communication</strong></h4>
+<p>Message queues serve as the communication backbone for microservices:
+- <strong>Service coordination</strong> through event-driven choreography
+- <strong>Command processing</strong> for asynchronous business operations
+- <strong>Data pipeline</strong> implementation for streaming data processing
+- <strong>Service mesh integration</strong> providing reliable inter-service communication</p>
+<h4 id="2-enterprise-service-bus-esb-implementation">2. <strong>Enterprise Service Bus (ESB) Implementation</strong></h4>
+<p>ESB architectures leverage message queues for:
+- <strong>Message routing</strong> between heterogeneous enterprise systems
+- <strong>Protocol transformation</strong> enabling communication between different technologies
+- <strong>Message mediation</strong> with content transformation and enrichment
+- <strong>Enterprise integration patterns</strong> implementation</p>
+<h4 id="3-background-job-processing">3. <strong>Background Job Processing</strong></h4>
+<p>Message queues enable scalable background processing:
+- <strong>Task distribution</strong> across multiple worker processes
+- <strong>Scheduled job execution</strong> through delayed message delivery
+- <strong>Resource-intensive processing</strong> without blocking user interfaces
+- <strong>Batch operation</strong> coordination for large-scale data processing</p>
+<h4 id="4-event-driven-architecture-support">4. <strong>Event-Driven Architecture Support</strong></h4>
+<p>Queues provide infrastructure for event-driven systems:
+- <strong>Event sourcing</strong> implementation with persistent event storage
+- <strong>CQRS (Command Query Responsibility Segregation)</strong> supporting command processing
+- <strong>Saga pattern</strong> implementation for distributed transaction management
+- <strong>Event streaming</strong> for real-time data processing and analytics</p>
+<h2 id="how-message-queue-pattern-works">How Message Queue Pattern Works</h2>
+<p>Message queues operate through a producer-consumer model with intermediate message storage and delivery management:</p>
+<h3 id="basic-queue-flow">Basic Queue Flow</h3>
+<pre><code>Producer A ────┐                    ┌──→ Consumer X
+               │                    │
+Producer B ────┼─→ [Message Queue] ─┼──→ Consumer Y (Competing Consumers)
+               │                    │
+Producer C ────┘                    └──→ Consumer Z
+
+Message Flow:
+1. Producer sends message to queue
+2. Queue stores message persistently
+3. Consumer requests message from queue
+4. Queue delivers message to consumer
+5. Consumer processes message
+6. Consumer acknowledges message completion
+7. Queue removes acknowledged message
+</code></pre>
+<h3 id="queue-architecture-components">Queue Architecture Components</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────┐
+│                    Message Queue System                     │
+├─────────────────────────────────────────────────────────────┤
+│  Message Storage Engine                                     │
+│  ┌─────────────┐  ┌──────────────┐  ┌────────────────────┐ │
+│  │ Memory      │  │ Disk         │  │ Replication        │ │
+│  │ Buffer      │  │ Persistence  │  │ Manager            │ │
+│  └─────────────┘  └──────────────┘  └────────────────────┘ │
+├─────────────────────────────────────────────────────────────┤
+│  Message Management                                         │
+│  ┌─────────────┐  ┌──────────────┐  ┌────────────────────┐ │
+│  │ Priority    │  │ TTL          │  │ Dead Letter        │ │
+│  │ Handling    │  │ Management   │  │ Queue              │ │
+│  └─────────────┘  └──────────────┘  └────────────────────┘ │
+├─────────────────────────────────────────────────────────────┤
+│  Consumer Management                                        │
+│  ┌─────────────┐  ┌──────────────┐  ┌────────────────────┐ │
+│  │ Acknowledge │  │ Prefetch     │  │ Consumer           │ │
+│  │ Tracking    │  │ Control      │  │ Groups             │ │
+│  └─────────────┘  └──────────────┘  └────────────────────┘ │
+└─────────────────────────────────────────────────────────────┘
+</code></pre>
+<h3 id="message-lifecycle">Message Lifecycle</h3>
+<pre><code>┌─────────────────────────────────────────────────────────┐
+│ Message Lifecycle in Queue                              │
+├─────────────────────────────────────────────────────────┤
+│                                                         │
+│ 1. [Produced] ──→ 2. [Queued] ──→ 3. [In-Flight] ──→    │
+│                                        │               │
+│                                        ↓               │
+│ 6. [Acknowledged] ←── 5. [Processed] ←── 4. [Delivered] │
+│        │                                               │
+│        ↓                                               │
+│ 7. [Removed from Queue]                                │
+│                                                         │
+│ Alternative Paths:                                      │
+│ 4. [Delivered] ──→ [Failed] ──→ [Retry] ──→ [Queued]    │
+│                       │                               │
+│                       ↓                               │
+│                  [Dead Letter Queue]                  │
+└─────────────────────────────────────────────────────────┘
+</code></pre>
+<h3 id="delivery-guarantees">Delivery Guarantees</h3>
+<h4 id="1-at-most-once-delivery">1. <strong>At-Most-Once Delivery</strong></h4>
+<pre><code>Producer ──Message──→ [Queue] ──Message──→ Consumer
+                        │                    │
+                        ├─ (may lose)       ├─ Process
+                        └─ (no duplicates)  └─ No ACK required
+</code></pre>
+<h4 id="2-at-least-once-delivery">2. <strong>At-Least-Once Delivery</strong></h4>
+<pre><code>Producer ──Message──→ [Queue] ──Message──→ Consumer
+                        │                    │
+                        ├─ (persistent)     ├─ Process
+                        └─ (may duplicate)  └─ ACK ──→ [Remove]
+</code></pre>
+<h4 id="3-exactly-once-delivery">3. <strong>Exactly-Once Delivery</strong></h4>
+<pre><code>Producer ──Message──→ [Queue] ──Message──→ Consumer
+     │     (idempotent)   │                    │
+     └─ DeduplicationID  ├─ (persistent)     ├─ Process (idempotent)
+                         └─ (no duplicates) └─ ACK ──→ [Remove]
+</code></pre>
+<h2 id="key-components">Key Components</h2>
+<h3 id="1-queue-manager">1. Queue Manager</h3>
+<p>Manages queue lifecycle, configuration, and operations:</p>
+<pre><code class="language-java">@Component
+public class QueueManager {
+    private final Map&lt;String, MessageQueue&gt; queues = new ConcurrentHashMap&lt;&gt;();
+    private final QueueConfiguration queueConfiguration;
+    private final MessagePersistence messagePersistence;
+    private final MetricRegistry metricRegistry;
+
+    public MessageQueue createQueue(QueueDefinition definition) {
+        validateQueueDefinition(definition);
+
+        MessageQueue queue = MessageQueue.builder()
+            .name(definition.getName())
+            .maxSize(definition.getMaxSize())
+            .persistence(definition.isPersistent())
+            .priorityLevels(definition.getPriorityLevels())
+            .deadLetterQueue(definition.getDeadLetterQueue())
+            .messageRetention(definition.getMessageRetention())
+            .consumerAckTimeout(definition.getConsumerAckTimeout())
+            .build();
+
+        // Initialize storage backend
+        if (definition.isPersistent()) {
+            messagePersistence.initializeQueueStorage(definition.getName());
+        }
+
+        queues.put(definition.getName(), queue);
+
+        // Setup monitoring
+        setupQueueMetrics(queue);
+
+        log.info(&quot;Created queue: {} with max size: {} and persistence: {}&quot;, 
+                 definition.getName(), definition.getMaxSize(), definition.isPersistent());
+
+        return queue;
+    }
+
+    public Optional&lt;MessageQueue&gt; getQueue(String queueName) {
+        return Optional.ofNullable(queues.get(queueName));
+    }
+
+    public void deleteQueue(String queueName) {
+        MessageQueue queue = queues.remove(queueName);
+        if (queue != null) {
+            queue.shutdown();
+            messagePersistence.deleteQueueStorage(queueName);
+            log.info(&quot;Deleted queue: {}&quot;, queueName);
+        }
+    }
+
+    private void setupQueueMetrics(MessageQueue queue) {
+        String queueName = queue.getName();
+
+        metricRegistry.gauge(&quot;queue.size&quot;, &quot;queue&quot;, queueName, 
+                           () -&gt; queue.size());
+        metricRegistry.gauge(&quot;queue.consumers&quot;, &quot;queue&quot;, queueName, 
+                           () -&gt; queue.getConsumerCount());
+        metricRegistry.counter(&quot;queue.messages.sent&quot;, &quot;queue&quot;, queueName);
+        metricRegistry.counter(&quot;queue.messages.received&quot;, &quot;queue&quot;, queueName);
+        metricRegistry.counter(&quot;queue.messages.acknowledged&quot;, &quot;queue&quot;, queueName);
+        metricRegistry.counter(&quot;queue.messages.rejected&quot;, &quot;queue&quot;, queueName);
+    }
+
+    private void validateQueueDefinition(QueueDefinition definition) {
+        if (definition.getName() == null || definition.getName().trim().isEmpty()) {
+            throw new IllegalArgumentException(&quot;Queue name cannot be null or empty&quot;);
+        }
+
+        if (definition.getMaxSize() &lt;= 0) {
+            throw new IllegalArgumentException(&quot;Queue max size must be positive&quot;);
+        }
+
+        if (queues.containsKey(definition.getName())) {
+            throw new IllegalStateException(&quot;Queue already exists: &quot; + definition.getName());
+        }
+    }
+}
+</code></pre>
+<h3 id="2-message-producer">2. Message Producer</h3>
+<p>Handles message publishing to queues:</p>
+<pre><code class="language-java">@Component
+public class MessageProducer {
+    private final QueueManager queueManager;
+    private final MessageSerializer messageSerializer;
+    private final ProducerMetrics producerMetrics;
+
+    public SendResult send(String queueName, Object message) {
+        return send(queueName, message, SendOptions.defaultOptions());
+    }
+
+    public SendResult send(String queueName, Object message, SendOptions options) {
+        Optional&lt;MessageQueue&gt; queueOpt = queueManager.getQueue(queueName);
+        if (!queueOpt.isPresent()) {
+            throw new QueueNotFoundException(&quot;Queue not found: &quot; + queueName);
+        }
+
+        MessageQueue queue = queueOpt.get();
+
+        try {
+            // Serialize message
+            byte[] serializedMessage = messageSerializer.serialize(message);
+
+            // Create queue message
+            QueueMessage queueMessage = QueueMessage.builder()
+                .id(UUID.randomUUID().toString())
+                .payload(serializedMessage)
+                .priority(options.getPriority())
+                .timestamp(Instant.now())
+                .timeToLive(options.getTimeToLive())
+                .correlationId(options.getCorrelationId())
+                .replyTo(options.getReplyTo())
+                .properties(options.getProperties())
+                .build();
+
+            // Send to queue
+            SendResult result = queue.send(queueMessage);
+
+            // Record metrics
+            producerMetrics.recordMessageSent(queueName, serializedMessage.length);
+
+            log.debug(&quot;Sent message {} to queue {}&quot;, queueMessage.getId(), queueName);
+            return result;
+
+        } catch (Exception e) {
+            producerMetrics.recordSendError(queueName);
+            log.error(&quot;Failed to send message to queue {}: {}&quot;, queueName, e.getMessage(), e);
+            throw new MessageSendException(&quot;Failed to send message&quot;, e);
+        }
+    }
+
+    public CompletableFuture&lt;SendResult&gt; sendAsync(String queueName, 
+                                                 Object message, 
+                                                 SendOptions options) {
+        return CompletableFuture.supplyAsync(() -&gt; send(queueName, message, options));
+    }
+
+    public SendResult sendWithDelay(String queueName, Object message, Duration delay) {
+        SendOptions options = SendOptions.builder()
+            .deliveryDelay(delay)
+            .build();
+        return send(queueName, message, options);
+    }
+
+    public SendResult sendBatch(String queueName, List&lt;Object&gt; messages) {
+        return sendBatch(queueName, messages, SendOptions.defaultOptions());
+    }
+
+    public SendResult sendBatch(String queueName, List&lt;Object&gt; messages, SendOptions options) {
+        List&lt;QueueMessage&gt; queueMessages = messages.stream()
+            .map(message -&gt; {
+                try {
+                    byte[] serializedMessage = messageSerializer.serialize(message);
+                    return QueueMessage.builder()
+                        .id(UUID.randomUUID().toString())
+                        .payload(serializedMessage)
+                        .priority(options.getPriority())
+                        .timestamp(Instant.now())
+                        .timeToLive(options.getTimeToLive())
+                        .build();
+                } catch (Exception e) {
+                    throw new MessageSendException(&quot;Failed to serialize message&quot;, e);
+                }
+            })
+            .collect(Collectors.toList());
+
+        Optional&lt;MessageQueue&gt; queueOpt = queueManager.getQueue(queueName);
+        if (!queueOpt.isPresent()) {
+            throw new QueueNotFoundException(&quot;Queue not found: &quot; + queueName);
+        }
+
+        SendResult result = queueOpt.get().sendBatch(queueMessages);
+        producerMetrics.recordBatchSent(queueName, messages.size());
+
+        return result;
+    }
+}
+</code></pre>
+<h3 id="3-message-consumer">3. Message Consumer</h3>
+<p>Handles message consumption from queues:</p>
+<pre><code class="language-java">@Component
+public abstract class MessageConsumer {
+    private final QueueManager queueManager;
+    private final MessageDeserializer messageDeserializer;
+    private final ConsumerMetrics consumerMetrics;
+    private final ExecutorService consumerExecutor;
+
+    private volatile boolean running = false;
+    private MessageQueue queue;
+    private String queueName;
+
+    public void start(String queueName) {
+        this.queueName = queueName;
+        Optional&lt;MessageQueue&gt; queueOpt = queueManager.getQueue(queueName);
+        if (!queueOpt.isPresent()) {
+            throw new QueueNotFoundException(&quot;Queue not found: &quot; + queueName);
+        }
+
+        this.queue = queueOpt.get();
+        this.running = true;
+
+        // Start consumer threads based on configuration
+        int concurrency = getConsumerConcurrency();
+        for (int i = 0; i &lt; concurrency; i++) {
+            consumerExecutor.submit(this::consumeMessages);
+        }
+
+        log.info(&quot;Started consumer for queue {} with {} threads&quot;, queueName, concurrency);
+    }
+
+    public void stop() {
+        running = false;
+        log.info(&quot;Stopping consumer for queue {}&quot;, queueName);
+    }
+
+    private void consumeMessages() {
+        while (running) {
+            try {
+                // Poll for messages
+                List&lt;QueueMessage&gt; messages = queue.poll(getPollBatchSize(), getPollTimeout());
+
+                if (messages.isEmpty()) {
+                    continue;
+                }
+
+                // Process messages
+                for (QueueMessage message : messages) {
+                    processMessage(message);
+                }
+
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                break;
+            } catch (Exception e) {
+                log.error(&quot;Error in consumer loop: {}&quot;, e.getMessage(), e);
+                handleConsumerError(e);
+            }
+        }
+    }
+
+    private void processMessage(QueueMessage queueMessage) {
+        String messageId = queueMessage.getId();
+
+        try {
+            // Deserialize message
+            Object message = messageDeserializer.deserialize(
+                queueMessage.getPayload(), getExpectedMessageType());
+
+            // Create message context
+            MessageContext context = MessageContext.builder()
+                .messageId(messageId)
+                .queueName(queueName)
+                .originalMessage(queueMessage)
+                .payload(message)
+                .receivedAt(Instant.now())
+                .build();
+
+            // Process message
+            ProcessResult result = handleMessage(context);
+
+            if (result.isSuccess()) {
+                // Acknowledge successful processing
+                queue.acknowledge(messageId);
+                consumerMetrics.recordMessageProcessed(queueName);
+                log.debug(&quot;Successfully processed message {}&quot;, messageId);
+            } else {
+                // Handle processing failure
+                handleProcessingFailure(queueMessage, result.getError());
+            }
+
+        } catch (Exception e) {
+            log.error(&quot;Error processing message {}: {}&quot;, messageId, e.getMessage(), e);
+            handleProcessingFailure(queueMessage, e);
+        }
+    }
+
+    private void handleProcessingFailure(QueueMessage message, Exception error) {
+        consumerMetrics.recordMessageError(queueName);
+
+        if (shouldRetry(message, error)) {
+            // Retry message
+            queue.retry(message.getId(), getRetryDelay(message));
+            log.warn(&quot;Retrying message {} after error: {}&quot;, message.getId(), error.getMessage());
+        } else {
+            // Send to dead letter queue
+            queue.sendToDeadLetter(message, error.getMessage());
+            log.error(&quot;Sent message {} to dead letter queue after error: {}&quot;, 
+                     message.getId(), error.getMessage());
+        }
+    }
+
+    protected abstract ProcessResult handleMessage(MessageContext context);
+    protected abstract Class&lt;?&gt; getExpectedMessageType();
+    protected abstract int getConsumerConcurrency();
+    protected abstract int getPollBatchSize();
+    protected abstract Duration getPollTimeout();
+    protected abstract Duration getRetryDelay(QueueMessage message);
+    protected abstract boolean shouldRetry(QueueMessage message, Exception error);
+
+    protected void handleConsumerError(Exception error) {
+        // Default implementation - can be overridden
+        try {
+            Thread.sleep(5000); // Back-off on consumer errors
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+}
+
+// Example concrete consumer implementation
+@Component
+public class ContactMessageConsumer extends MessageConsumer {
+    private final ContactService contactService;
+
+    @Override
+    protected ProcessResult handleMessage(MessageContext context) {
+        ContactMessage contactMessage = (ContactMessage) context.getPayload();
+
+        try {
+            switch (contactMessage.getType()) {
+                case CREATE:
+                    contactService.createContact(contactMessage.getContactData());
+                    break;
+                case UPDATE:
+                    contactService.updateContact(contactMessage.getContactData());
+                    break;
+                case DELETE:
+                    contactService.deleteContact(contactMessage.getContactId());
+                    break;
+                default:
+                    return ProcessResult.failure(&quot;Unknown message type: &quot; + contactMessage.getType());
+            }
+
+            return ProcessResult.success();
+
+        } catch (ContactValidationException e) {
+            return ProcessResult.failure(&quot;Validation error: &quot; + e.getMessage());
+        } catch (ContactNotFoundException e) {
+            return ProcessResult.failure(&quot;Contact not found: &quot; + e.getMessage());
+        }
+    }
+
+    @Override
+    protected Class&lt;?&gt; getExpectedMessageType() {
+        return ContactMessage.class;
+    }
+
+    @Override
+    protected int getConsumerConcurrency() {
+        return 5; // Process up to 5 messages concurrently
+    }
+
+    @Override
+    protected int getPollBatchSize() {
+        return 10; // Poll up to 10 messages at a time
+    }
+
+    @Override
+    protected Duration getPollTimeout() {
+        return Duration.ofSeconds(5); // Wait up to 5 seconds for messages
+    }
+
+    @Override
+    protected Duration getRetryDelay(QueueMessage message) {
+        int retryCount = message.getRetryCount();
+        return Duration.ofSeconds(Math.min(60, Math.pow(2, retryCount))); // Exponential backoff
+    }
+
+    @Override
+    protected boolean shouldRetry(QueueMessage message, Exception error) {
+        return message.getRetryCount() &lt; 3 &amp;&amp; !(error instanceof ContactValidationException);
+    }
+}
+</code></pre>
+<h3 id="4-dead-letter-queue-handler">4. Dead Letter Queue Handler</h3>
+<p>Manages failed message processing and recovery:</p>
+<pre><code class="language-java">@Component
+public class DeadLetterQueueHandler {
+    private final QueueManager queueManager;
+    private final MessageAnalyzer messageAnalyzer;
+    private final RecoveryService recoveryService;
+
+    public void setupDeadLetterQueue(String originalQueueName) {
+        String dlqName = originalQueueName + &quot;.dlq&quot;;
+
+        QueueDefinition dlqDefinition = QueueDefinition.builder()
+            .name(dlqName)
+            .maxSize(1000000) // Large capacity for failed messages
+            .persistent(true) // Always persistent for DLQ
+            .messageRetention(Duration.ofDays(30)) // Keep for 30 days
+            .build();
+
+        queueManager.createQueue(dlqDefinition);
+
+        // Schedule periodic DLQ analysis
+        scheduleDlqAnalysis(dlqName);
+    }
+
+    public void handleDeadLetterMessage(String dlqName, QueueMessage message, String errorReason) {
+        try {
+            // Enrich message with error information
+            DeadLetterMessage dlMessage = DeadLetterMessage.builder()
+                .originalMessage(message)
+                .errorReason(errorReason)
+                .failedAt(Instant.now())
+                .originalQueue(dlqName.replace(&quot;.dlq&quot;, &quot;&quot;))
+                .retryCount(message.getRetryCount())
+                .build();
+
+            // Analyze failure pattern
+            FailureAnalysis analysis = messageAnalyzer.analyzeFailure(dlMessage);
+
+            // Store in DLQ with analysis
+            Optional&lt;MessageQueue&gt; dlq = queueManager.getQueue(dlqName);
+            if (dlq.isPresent()) {
+                dlq.get().send(createDlqMessage(dlMessage, analysis));
+
+                // Trigger alerts for critical patterns
+                if (analysis.isCriticalPattern()) {
+                    alertingService.sendCriticalFailureAlert(dlMessage, analysis);
+                }
+            }
+
+            log.warn(&quot;Message {} sent to DLQ {} due to: {}&quot;, 
+                     message.getId(), dlqName, errorReason);
+
+        } catch (Exception e) {
+            log.error(&quot;Failed to handle dead letter message: {}&quot;, e.getMessage(), e);
+        }
+    }
+
+    @Scheduled(fixedRate = 300000) // Every 5 minutes
+    public void analyzeDlqPattern() {
+        queueManager.getQueues().stream()
+            .filter(queue -&gt; queue.getName().endsWith(&quot;.dlq&quot;))
+            .forEach(this::analyzeDlqMessages);
+    }
+
+    private void analyzeDlqMessages(MessageQueue dlq) {
+        try {
+            List&lt;QueueMessage&gt; recentMessages = dlq.peek(100); // Analyze last 100 messages
+
+            Map&lt;String, Long&gt; errorPatterns = recentMessages.stream()
+                .collect(Collectors.groupingBy(
+                    msg -&gt; extractErrorPattern(msg),
+                    Collectors.counting()
+                ));
+
+            // Identify systematic failures
+            errorPatterns.entrySet().stream()
+                .filter(entry -&gt; entry.getValue() &gt; 10) // More than 10 similar failures
+                .forEach(entry -&gt; {
+                    log.warn(&quot;Systematic failure pattern detected in {}: {} (count: {})&quot;, 
+                             dlq.getName(), entry.getKey(), entry.getValue());
+
+                    // Trigger automated recovery if possible
+                    attemptAutomatedRecovery(dlq, entry.getKey());
+                });
+
+        } catch (Exception e) {
+            log.error(&quot;Error analyzing DLQ {}: {}&quot;, dlq.getName(), e.getMessage(), e);
+        }
+    }
+
+    public RecoveryResult attemptMessageRecovery(String dlqName, String messageId) {
+        Optional&lt;MessageQueue&gt; dlq = queueManager.getQueue(dlqName);
+        if (!dlq.isPresent()) {
+            return RecoveryResult.failure(&quot;DLQ not found: &quot; + dlqName);
+        }
+
+        Optional&lt;QueueMessage&gt; messageOpt = dlq.get().getMessage(messageId);
+        if (!messageOpt.isPresent()) {
+            return RecoveryResult.failure(&quot;Message not found in DLQ: &quot; + messageId);
+        }
+
+        QueueMessage message = messageOpt.get();
+        DeadLetterMessage dlMessage = extractDeadLetterMessage(message);
+
+        try {
+            // Attempt recovery based on failure analysis
+            RecoveryStrategy strategy = determineRecoveryStrategy(dlMessage);
+
+            switch (strategy) {
+                case RETRY_ORIGINAL:
+                    return retryOriginalQueue(dlMessage);
+                case FIX_AND_RETRY:
+                    return fixMessageAndRetry(dlMessage);
+                case MANUAL_INTERVENTION:
+                    return RecoveryResult.requiresManualIntervention(dlMessage);
+                default:
+                    return RecoveryResult.failure(&quot;No recovery strategy available&quot;);
+            }
+
+        } catch (Exception e) {
+            log.error(&quot;Error attempting recovery for message {}: {}&quot;, messageId, e.getMessage(), e);
+            return RecoveryResult.failure(&quot;Recovery attempt failed: &quot; + e.getMessage());
+        }
+    }
+
+    private RecoveryResult retryOriginalQueue(DeadLetterMessage dlMessage) {
+        String originalQueue = dlMessage.getOriginalQueue();
+        QueueMessage originalMessage = dlMessage.getOriginalMessage();
+
+        // Reset retry count and update timestamp
+        QueueMessage retryMessage = originalMessage.toBuilder()
+            .retryCount(0)
+            .timestamp(Instant.now())
+            .build();
+
+        Optional&lt;MessageQueue&gt; queue = queueManager.getQueue(originalQueue);
+        if (queue.isPresent()) {
+            SendResult result = queue.get().send(retryMessage);
+            if (result.isSuccess()) {
+                return RecoveryResult.success(&quot;Message requeued to original queue&quot;);
+            } else {
+                return RecoveryResult.failure(&quot;Failed to requeue message&quot;);
+            }
+        } else {
+            return RecoveryResult.failure(&quot;Original queue not found: &quot; + originalQueue);
+        }
+    }
+}
+</code></pre>
+<h2 id="configuration-parameters">Configuration Parameters</h2>
+<h3 id="essential-settings">Essential Settings</h3>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Typical Values</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Queue Size</strong></td>
+<td>Maximum number of messages in queue</td>
+<td>1000-1000000</td>
+</tr>
+<tr>
+<td><strong>Message TTL</strong></td>
+<td>Time-to-live for messages</td>
+<td>1h-7d</td>
+</tr>
+<tr>
+<td><strong>Consumer Timeout</strong></td>
+<td>Max time for message processing</td>
+<td>30s-300s</td>
+</tr>
+<tr>
+<td><strong>Prefetch Count</strong></td>
+<td>Messages fetched per consumer request</td>
+<td>1-100</td>
+</tr>
+<tr>
+<td><strong>Acknowledgment Mode</strong></td>
+<td>Manual vs automatic acknowledgment</td>
+<td>manual/auto</td>
+</tr>
+<tr>
+<td><strong>Dead Letter TTL</strong></td>
+<td>Retention time for failed messages</td>
+<td>7d-30d</td>
+</tr>
+</tbody>
+</table>
+<h3 id="example-configuration">Example Configuration</h3>
+<pre><code class="language-properties"># Queue Configuration
+queue.default-size=10000
+queue.default-ttl=24h
+queue.persistence-enabled=true
+queue.auto-create=false
+
+# Consumer Configuration
+queue.consumer.prefetch-count=10
+queue.consumer.acknowledge-timeout=30s
+queue.consumer.max-retries=3
+queue.consumer.retry-delay=5s
+
+# Dead Letter Queue Configuration
+queue.dlq.enabled=true
+queue.dlq.max-size=100000
+queue.dlq.ttl=30d
+queue.dlq.analysis-interval=5m
+
+# Performance Tuning
+queue.memory-limit=512MB
+queue.disk-limit=10GB
+queue.compression-enabled=true
+queue.batch-size=50
+</code></pre>
+<h2 id="implementation-examples">Implementation Examples</h2>
+<h3 id="1-rabbitmq-implementation">1. RabbitMQ Implementation</h3>
+<pre><code class="language-java">@Configuration
+public class RabbitMQConfiguration {
+
+    @Bean
+    public ConnectionFactory connectionFactory() {
+        CachingConnectionFactory factory = new CachingConnectionFactory();
+        factory.setHost(&quot;localhost&quot;);
+        factory.setPort(5672);
+        factory.setUsername(&quot;guest&quot;);
+        factory.setPassword(&quot;guest&quot;);
+        factory.setChannelCacheSize(100);
+        return factory;
+    }
+
+    @Bean
+    public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
+        RabbitTemplate template = new RabbitTemplate(connectionFactory);
+        template.setMessageConverter(new Jackson2JsonMessageConverter());
+        template.setMandatory(true); // Ensure message delivery
+        template.setRetryTemplate(retryTemplate());
+        return template;
+    }
+
+    @Bean
+    public Queue contactProcessingQueue() {
+        return QueueBuilder.durable(&quot;contact.processing&quot;)
+            .maxLength(50000)
+            .ttl(86400000) // 24 hours
+            .deadLetterExchange(&quot;dlx&quot;)
+            .deadLetterRoutingKey(&quot;contact.processing.dlq&quot;)
+            .build();
+    }
+
+    @Bean
+    public Queue contactDeadLetterQueue() {
+        return QueueBuilder.durable(&quot;contact.processing.dlq&quot;)
+            .ttl(2592000000L) // 30 days
+            .build();
+    }
+
+    @Bean
+    public DirectExchange deadLetterExchange() {
+        return new DirectExchange(&quot;dlx&quot;);
+    }
+
+    @Bean
+    public Binding deadLetterBinding() {
+        return BindingBuilder.bind(contactDeadLetterQueue())
+                           .to(deadLetterExchange())
+                           .with(&quot;contact.processing.dlq&quot;);
+    }
+}
+
+@Service
+public class RabbitMQContactProducer {
+    private final RabbitTemplate rabbitTemplate;
+
+    public void sendContactMessage(ContactMessage message) {
+        try {
+            rabbitTemplate.convertAndSend(&quot;contact.processing&quot;, message, msg -&gt; {
+                msg.getMessageProperties().setDeliveryMode(MessageDeliveryMode.PERSISTENT);
+                msg.getMessageProperties().setPriority(message.getPriority());
+                msg.getMessageProperties().setExpiration(&quot;86400000&quot;); // 24h TTL
+                return msg;
+            });
+
+            log.info(&quot;Sent contact message: {}&quot;, message.getMessageId());
+        } catch (AmqpException e) {
+            log.error(&quot;Failed to send contact message: {}&quot;, e.getMessage(), e);
+            throw new MessageSendException(&quot;Failed to send message&quot;, e);
+        }
+    }
+
+    public void sendBatchContactMessages(List&lt;ContactMessage&gt; messages) {
+        List&lt;org.springframework.amqp.core.Message&gt; amqpMessages = messages.stream()
+            .map(contactMessage -&gt; {
+                try {
+                    return rabbitTemplate.getMessageConverter().toMessage(
+                        contactMessage, new MessageProperties());
+                } catch (Exception e) {
+                    throw new RuntimeException(&quot;Failed to convert message&quot;, e);
+                }
+            })
+            .collect(Collectors.toList());
+
+        // Send batch using publisher confirms
+        rabbitTemplate.execute(channel -&gt; {
+            channel.confirmSelect();
+
+            for (org.springframework.amqp.core.Message message : amqpMessages) {
+                channel.basicPublish(&quot;&quot;, &quot;contact.processing&quot;, null, message.getBody());
+            }
+
+            boolean allConfirmed = channel.waitForConfirms(5000);
+            if (!allConfirmed) {
+                throw new MessageSendException(&quot;Not all messages were confirmed&quot;);
+            }
+
+            return null;
+        });
+    }
+}
+
+@RabbitListener(queues = &quot;contact.processing&quot;,
+                concurrency = &quot;5-10&quot;, // Dynamic scaling
+                containerFactory = &quot;rabbitListenerContainerFactory&quot;)
+@Component
+public class RabbitMQContactConsumer {
+    private final ContactService contactService;
+
+    @RabbitHandler
+    public void handleContactMessage(ContactMessage message,
+                                   @Header Map&lt;String, Object&gt; headers,
+                                   Channel channel,
+                                   @Header(AmqpHeaders.DELIVERY_TAG) long deliveryTag) {
+
+        try {
+            log.info(&quot;Processing contact message: {}&quot;, message.getMessageId());
+
+            // Process message
+            contactService.processContactMessage(message);
+
+            // Manually acknowledge
+            channel.basicAck(deliveryTag, false);
+            log.info(&quot;Successfully processed contact message: {}&quot;, message.getMessageId());
+
+        } catch (ContactValidationException e) {
+            log.error(&quot;Validation error for message {}: {}&quot;, 
+                     message.getMessageId(), e.getMessage());
+
+            // Reject without requeue (send to DLQ)
+            try {
+                channel.basicReject(deliveryTag, false);
+            } catch (IOException ioException) {
+                log.error(&quot;Failed to reject message&quot;, ioException);
+            }
+
+        } catch (Exception e) {
+            log.error(&quot;Error processing message {}: {}&quot;, 
+                     message.getMessageId(), e.getMessage(), e);
+
+            // Reject with requeue (for transient errors)
+            try {
+                channel.basicReject(deliveryTag, true);
+            } catch (IOException ioException) {
+                log.error(&quot;Failed to requeue message&quot;, ioException);
+            }
+        }
+    }
+}
+</code></pre>
+<h3 id="2-amazon-sqs-implementation">2. Amazon SQS Implementation</h3>
+<pre><code class="language-java">@Configuration
+public class SQSConfiguration {
+
+    @Bean
+    public AmazonSQS amazonSQS() {
+        return AmazonSQSClientBuilder.standard()
+            .withRegion(Regions.EU_WEST_1)
+            .build();
+    }
+
+    @Bean
+    public QueueMessagingTemplate queueMessagingTemplate() {
+        return new QueueMessagingTemplate(amazonSQS());
+    }
+}
+
+@Service
+public class SQSContactProducer {
+    private final QueueMessagingTemplate messagingTemplate;
+    private final ObjectMapper objectMapper;
+
+    @Value(&quot;${aws.sqs.contact-queue}&quot;)
+    private String contactQueueName;
+
+    public void sendContactMessage(ContactMessage message) {
+        try {
+            Map&lt;String, Object&gt; headers = new HashMap&lt;&gt;();
+            headers.put(&quot;messageType&quot;, &quot;CONTACT_MESSAGE&quot;);
+            headers.put(&quot;priority&quot;, message.getPriority());
+            headers.put(&quot;timestamp&quot;, message.getTimestamp().toString());
+
+            messagingTemplate.convertAndSend(contactQueueName, message, headers);
+
+            log.info(&quot;Sent contact message to SQS: {}&quot;, message.getMessageId());
+        } catch (Exception e) {
+            log.error(&quot;Failed to send message to SQS: {}&quot;, e.getMessage(), e);
+            throw new MessageSendException(&quot;Failed to send SQS message&quot;, e);
+        }
+    }
+
+    public void sendDelayedMessage(ContactMessage message, Duration delay) {
+        try {
+            Map&lt;String, Object&gt; headers = new HashMap&lt;&gt;();
+            headers.put(SqsMessageHeaders.SQS_DELAY_HEADER, delay.getSeconds());
+
+            messagingTemplate.convertAndSend(contactQueueName, message, headers);
+
+            log.info(&quot;Sent delayed contact message to SQS: {} (delay: {})&quot;, 
+                     message.getMessageId(), delay);
+        } catch (Exception e) {
+            log.error(&quot;Failed to send delayed message to SQS: {}&quot;, e.getMessage(), e);
+            throw new MessageSendException(&quot;Failed to send delayed SQS message&quot;, e);
+        }
+    }
+}
+
+@SqsListener(&quot;${aws.sqs.contact-queue}&quot;)
+@Component
+public class SQSContactConsumer {
+    private final ContactService contactService;
+    private final DeadLetterService deadLetterService;
+
+    public void handleContactMessage(ContactMessage message,
+                                   @Header Map&lt;String, String&gt; headers,
+                                   Acknowledgment acknowledgment) {
+
+        String messageId = message.getMessageId();
+
+        try {
+            log.info(&quot;Processing SQS contact message: {}&quot;, messageId);
+
+            // Process message
+            contactService.processContactMessage(message);
+
+            // Acknowledge successful processing
+            acknowledgment.acknowledge();
+            log.info(&quot;Successfully processed SQS contact message: {}&quot;, messageId);
+
+        } catch (ContactValidationException e) {
+            log.error(&quot;Validation error for SQS message {}: {}&quot;, messageId, e.getMessage());
+
+            // Send to DLQ for manual review
+            deadLetterService.handleValidationFailure(message, e.getMessage());
+            acknowledgment.acknowledge(); // Remove from queue
+
+        } catch (Exception e) {
+            log.error(&quot;Error processing SQS message {}: {}&quot;, messageId, e.getMessage(), e);
+
+            // Don't acknowledge - message will be retried
+            // SQS will handle retry and eventual DLQ transfer
+        }
+    }
+
+    @SqsListener(&quot;${aws.sqs.contact-dlq}&quot;)
+    public void handleDeadLetterMessage(ContactMessage message,
+                                      @Header(&quot;ApproximateReceiveCount&quot;) String receiveCount) {
+
+        log.warn(&quot;Processing dead letter message: {} (receive count: {})&quot;, 
+                 message.getMessageId(), receiveCount);
+
+        // Analyze failure and attempt recovery
+        deadLetterService.analyzeAndRecover(message, Integer.parseInt(receiveCount));
+    }
+}
+</code></pre>
+<h3 id="3-apache-activemq-implementation">3. Apache ActiveMQ Implementation</h3>
+<pre><code class="language-java">@Configuration
+@EnableJms
+public class ActiveMQConfiguration {
+
+    @Bean
+    public ActiveMQConnectionFactory connectionFactory() {
+        ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory();
+        factory.setBrokerURL(&quot;tcp://localhost:61616&quot;);
+        factory.setUserName(&quot;admin&quot;);
+        factory.setPassword(&quot;admin&quot;);
+        factory.setRedeliveryPolicy(redeliveryPolicy());
+        return factory;
+    }
+
+    @Bean
+    public RedeliveryPolicy redeliveryPolicy() {
+        RedeliveryPolicy policy = new RedeliveryPolicy();
+        policy.setMaximumRedeliveries(3);
+        policy.setInitialRedeliveryDelay(5000);
+        policy.setRedeliveryDelay(10000);
+        policy.setUseExponentialBackOff(true);
+        policy.setBackOffMultiplier(2.0);
+        return policy;
+    }
+
+    @Bean
+    public JmsTemplate jmsTemplate() {
+        JmsTemplate template = new JmsTemplate();
+        template.setConnectionFactory(connectionFactory());
+        template.setMessageConverter(new MappingJackson2MessageConverter());
+        template.setDeliveryPersistent(true);
+        template.setExplicitQosEnabled(true);
+        return template;
+    }
+
+    @Bean
+    public DefaultJmsListenerContainerFactory jmsListenerContainerFactory() {
+        DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
+        factory.setConnectionFactory(connectionFactory());
+        factory.setConcurrency(&quot;3-10&quot;);
+        factory.setSessionAcknowledgeMode(Session.CLIENT_ACKNOWLEDGE);
+        return factory;
+    }
+}
+
+@Service
+public class ActiveMQContactProducer {
+    private final JmsTemplate jmsTemplate;
+
+    public void sendContactMessage(ContactMessage message) {
+        jmsTemplate.convertAndSend(&quot;contact.processing&quot;, message, msg -&gt; {
+            msg.setJMSPriority(message.getPriority());
+            msg.setJMSExpiration(System.currentTimeMillis() + 86400000); // 24h TTL
+            msg.setStringProperty(&quot;messageType&quot;, &quot;CONTACT_MESSAGE&quot;);
+            msg.setStringProperty(&quot;correlationId&quot;, message.getCorrelationId());
+            return msg;
+        });
+
+        log.info(&quot;Sent contact message to ActiveMQ: {}&quot;, message.getMessageId());
+    }
+
+    public void sendScheduledMessage(ContactMessage message, Instant scheduleTime) {
+        jmsTemplate.convertAndSend(&quot;contact.processing&quot;, message, msg -&gt; {
+            msg.setLongProperty(&quot;AMQ_SCHEDULED_DELAY&quot;, 
+                              scheduleTime.toEpochMilli() - System.currentTimeMillis());
+            return msg;
+        });
+    }
+}
+
+@JmsListener(destination = &quot;contact.processing&quot;,
+             containerFactory = &quot;jmsListenerContainerFactory&quot;)
+@Component
+public class ActiveMQContactConsumer {
+    private final ContactService contactService;
+
+    public void handleContactMessage(ContactMessage message, Session session, Message jmsMessage) {
+        try {
+            log.info(&quot;Processing ActiveMQ contact message: {}&quot;, message.getMessageId());
+
+            // Process message
+            contactService.processContactMessage(message);
+
+            // Acknowledge successful processing
+            jmsMessage.acknowledge();
+            log.info(&quot;Successfully processed ActiveMQ contact message: {}&quot;, message.getMessageId());
+
+        } catch (Exception e) {
+            log.error(&quot;Error processing ActiveMQ message {}: {}&quot;, 
+                     message.getMessageId(), e.getMessage(), e);
+
+            try {
+                // Rollback transaction to trigger redelivery
+                session.recover();
+            } catch (JMSException jmsException) {
+                log.error(&quot;Failed to recover session&quot;, jmsException);
+            }
+        }
+    }
+
+    @JmsListener(destination = &quot;ActiveMQ.DLQ&quot;)
+    public void handleDeadLetterMessage(Message jmsMessage) {
+        try {
+            if (jmsMessage instanceof TextMessage) {
+                TextMessage textMessage = (TextMessage) jmsMessage;
+                String originalDestination = textMessage.getStringProperty(&quot;dlqDeliveryFailureCause&quot;);
+
+                log.warn(&quot;Dead letter message received from {}: {}&quot;, 
+                         originalDestination, textMessage.getText());
+
+                // Handle dead letter processing
+                deadLetterService.processDLQMessage(textMessage);
+            }
+        } catch (JMSException e) {
+            log.error(&quot;Error processing dead letter message: {}&quot;, e.getMessage(), e);
+        }
+    }
+}
+</code></pre>
+<h3 id="4-in-memory-queue-for-testing">4. In-Memory Queue for Testing</h3>
+<pre><code class="language-java">@Component
+@Profile(&quot;test&quot;)
+public class InMemoryMessageQueue implements MessageQueue {
+    private final PriorityBlockingQueue&lt;QueueMessage&gt; queue;
+    private final Map&lt;String, QueueMessage&gt; unacknowledgedMessages = new ConcurrentHashMap&lt;&gt;();
+    private final AtomicLong messageCounter = new AtomicLong(0);
+
+    public InMemoryMessageQueue() {
+        this.queue = new PriorityBlockingQueue&lt;&gt;(1000, 
+            Comparator.comparing(QueueMessage::getPriority).reversed()
+                     .thenComparing(QueueMessage::getTimestamp));
+    }
+
+    @Override
+    public SendResult send(QueueMessage message) {
+        if (queue.size() &gt;= maxSize) {
+            return SendResult.failure(&quot;Queue is full&quot;);
+        }
+
+        QueueMessage queuedMessage = message.toBuilder()
+            .queuedAt(Instant.now())
+            .sequenceNumber(messageCounter.incrementAndGet())
+            .build();
+
+        queue.offer(queuedMessage);
+
+        return SendResult.success(queuedMessage.getId());
+    }
+
+    @Override
+    public List&lt;QueueMessage&gt; poll(int maxMessages, Duration timeout) {
+        List&lt;QueueMessage&gt; messages = new ArrayList&lt;&gt;();
+        long timeoutMillis = timeout.toMillis();
+        long startTime = System.currentTimeMillis();
+
+        while (messages.size() &lt; maxMessages &amp;&amp; 
+               (System.currentTimeMillis() - startTime) &lt; timeoutMillis) {
+
+            try {
+                QueueMessage message = queue.poll(1, TimeUnit.SECONDS);
+                if (message != null) {
+                    // Mark as unacknowledged
+                    unacknowledgedMessages.put(message.getId(), message);
+                    messages.add(message);
+                } else if (messages.isEmpty()) {
+                    // Continue polling if no messages yet
+                    continue;
+                } else {
+                    // Return what we have
+                    break;
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                break;
+            }
+        }
+
+        return messages;
+    }
+
+    @Override
+    public void acknowledge(String messageId) {
+        QueueMessage message = unacknowledgedMessages.remove(messageId);
+        if (message == null) {
+            throw new IllegalArgumentException(&quot;Message not found or already acknowledged: &quot; + messageId);
+        }
+    }
+
+    @Override
+    public void reject(String messageId, boolean requeue) {
+        QueueMessage message = unacknowledgedMessages.remove(messageId);
+        if (message == null) {
+            throw new IllegalArgumentException(&quot;Message not found: &quot; + messageId);
+        }
+
+        if (requeue) {
+            QueueMessage requeuedMessage = message.toBuilder()
+                .retryCount(message.getRetryCount() + 1)
+                .timestamp(Instant.now())
+                .build();
+
+            queue.offer(requeuedMessage);
+        }
+    }
+
+    @Override
+    public int size() {
+        return queue.size();
+    }
+
+    @Override
+    public void purge() {
+        queue.clear();
+        unacknowledgedMessages.clear();
+    }
+}
+</code></pre>
+<h2 id="best-practices">Best Practices</h2>
+<h3 id="1-message-design-and-serialization">1. Message Design and Serialization</h3>
+<pre><code class="language-java">public class MessageDesignBestPractices {
+
+    // Use schema evolution for backward compatibility
+    public class ContactMessageV2 {
+        private String messageId;
+        private String version = &quot;2.0&quot;;
+        private Instant timestamp;
+        private ContactData contactData;
+        private Map&lt;String, String&gt; metadata;
+
+        // Include previous version support
+        public static ContactMessageV2 fromV1(ContactMessageV1 v1) {
+            return ContactMessageV2.builder()
+                .messageId(v1.getMessageId())
+                .version(&quot;2.0&quot;)
+                .timestamp(v1.getTimestamp())
+                .contactData(ContactData.fromV1(v1.getContactData()))
+                .metadata(new HashMap&lt;&gt;())
+                .build();
+        }
+    }
+
+    // Use compression for large messages
+    @Component
+    public class CompressingMessageSerializer {
+        private final ObjectMapper objectMapper;
+
+        public byte[] serialize(Object message) throws SerializationException {
+            try {
+                byte[] jsonBytes = objectMapper.writeValueAsBytes(message);
+
+                if (jsonBytes.length &gt; 1024) { // Compress messages &gt; 1KB
+                    return compress(jsonBytes);
+                } else {
+                    return jsonBytes;
+                }
+            } catch (Exception e) {
+                throw new SerializationException(&quot;Failed to serialize message&quot;, e);
+            }
+        }
+
+        private byte[] compress(byte[] data) throws IOException {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            try (GZIPOutputStream gzip = new GZIPOutputStream(baos)) {
+                gzip.write(data);
+            }
+            return baos.toByteArray();
+        }
+    }
+
+    // Include correlation IDs for tracing
+    public void addCorrelationHeaders(QueueMessage.Builder builder, String operationId) {
+        builder.correlationId(operationId)
+               .property(&quot;traceId&quot;, getCurrentTraceId())
+               .property(&quot;spanId&quot;, getCurrentSpanId())
+               .property(&quot;operationId&quot;, operationId);
+    }
+}
+</code></pre>
+<h3 id="2-error-handling-and-retry-strategies">2. Error Handling and Retry Strategies</h3>
+<pre><code class="language-java">@Component
+public class QueueErrorHandling {
+
+    // Implement exponential backoff with jitter
+    public Duration calculateRetryDelay(int retryCount, Duration baseDelay) {
+        long baseDelayMs = baseDelay.toMillis();
+        long exponentialDelay = baseDelayMs * (long) Math.pow(2, retryCount);
+        long maxDelay = TimeUnit.HOURS.toMillis(1); // Cap at 1 hour
+
+        long delayWithCap = Math.min(exponentialDelay, maxDelay);
+
+        // Add jitter to prevent thundering herd
+        long jitter = ThreadLocalRandom.current().nextLong(0, delayWithCap / 10);
+
+        return Duration.ofMillis(delayWithCap + jitter);
+    }
+
+    // Categorize exceptions for retry decisions
+    public boolean shouldRetry(Exception exception, int retryCount, int maxRetries) {
+        if (retryCount &gt;= maxRetries) {
+            return false;
+        }
+
+        // Don't retry validation errors
+        if (exception instanceof ValidationException || 
+            exception instanceof IllegalArgumentException) {
+            return false;
+        }
+
+        // Don't retry authentication errors
+        if (exception instanceof AuthenticationException) {
+            return false;
+        }
+
+        // Retry transient errors
+        if (exception instanceof ConnectException || 
+            exception instanceof SocketTimeoutException ||
+            exception instanceof SQLTransientException) {
+            return true;
+        }
+
+        // Default: retry for unknown errors
+        return true;
+    }
+
+    // Implement circuit breaker for downstream dependencies
+    @Component
+    public class QueueCircuitBreaker {
+
+        @CircuitBreaker(name = &quot;contact-service&quot;)
+        @TimeLimiter(name = &quot;contact-service&quot;)
+        @Retry(name = &quot;contact-service&quot;)
+        public void processContactMessage(ContactMessage message) {
+            contactService.processContact(message.getContactData());
+        }
+
+        @Recover
+        public void recover(ContactMessage message, Exception exception) {
+            log.error(&quot;Circuit breaker recovery for message {}: {}&quot;, 
+                     message.getMessageId(), exception.getMessage());
+
+            deadLetterService.handleCircuitBreakerFailure(message, exception);
+        }
+    }
+}
+</code></pre>
+<h3 id="3-queue-monitoring-and-alerting">3. Queue Monitoring and Alerting</h3>
+<pre><code class="language-java">@Component
+public class QueueMonitoring {
+    private final MeterRegistry meterRegistry;
+    private final AlertingService alertingService;
+
+    @EventListener
+    public void handleQueueEvent(QueueEvent event) {
+        recordQueueMetrics(event);
+        checkAlertConditions(event);
+    }
+
+    private void recordQueueMetrics(QueueEvent event) {
+        String queueName = event.getQueueName();
+
+        switch (event.getEventType()) {
+            case MESSAGE_SENT:
+                meterRegistry.counter(&quot;queue.messages.sent&quot;, &quot;queue&quot;, queueName).increment();
+                break;
+            case MESSAGE_RECEIVED:
+                meterRegistry.counter(&quot;queue.messages.received&quot;, &quot;queue&quot;, queueName).increment();
+                break;
+            case MESSAGE_ACKNOWLEDGED:
+                meterRegistry.counter(&quot;queue.messages.ack&quot;, &quot;queue&quot;, queueName).increment();
+                break;
+            case MESSAGE_REJECTED:
+                meterRegistry.counter(&quot;queue.messages.rejected&quot;, &quot;queue&quot;, queueName).increment();
+                break;
+            case DEAD_LETTER:
+                meterRegistry.counter(&quot;queue.messages.dead&quot;, &quot;queue&quot;, queueName).increment();
+                break;
+        }
+
+        // Record processing time
+        if (event.getProcessingDuration() != null) {
+            meterRegistry.timer(&quot;queue.processing.duration&quot;, &quot;queue&quot;, queueName)
+                        .record(event.getProcessingDuration());
+        }
+    }
+
+    private void checkAlertConditions(QueueEvent event) {
+        String queueName = event.getQueueName();
+
+        // Alert on high dead letter rate
+        double deadLetterRate = calculateDeadLetterRate(queueName);
+        if (deadLetterRate &gt; 0.1) { // 10% dead letter rate
+            alertingService.sendAlert(AlertLevel.WARNING, 
+                &quot;High dead letter rate for queue &quot; + queueName + &quot;: &quot; + deadLetterRate);
+        }
+
+        // Alert on queue depth
+        int queueDepth = getQueueDepth(queueName);
+        if (queueDepth &gt; 1000) {
+            alertingService.sendAlert(AlertLevel.CRITICAL, 
+                &quot;Queue depth critical for &quot; + queueName + &quot;: &quot; + queueDepth);
+        }
+
+        // Alert on slow processing
+        Duration avgProcessingTime = getAverageProcessingTime(queueName);
+        if (avgProcessingTime.compareTo(Duration.ofSeconds(30)) &gt; 0) {
+            alertingService.sendAlert(AlertLevel.WARNING, 
+                &quot;Slow message processing for &quot; + queueName + &quot;: &quot; + avgProcessingTime);
+        }
+    }
+
+    @Scheduled(fixedRate = 60000) // Every minute
+    public void collectQueueMetrics() {
+        queueManager.getQueues().forEach(queue -&gt; {
+            String queueName = queue.getName();
+
+            meterRegistry.gauge(&quot;queue.size&quot;, &quot;queue&quot;, queueName, 
+                              () -&gt; queue.size());
+            meterRegistry.gauge(&quot;queue.consumers&quot;, &quot;queue&quot;, queueName, 
+                              () -&gt; queue.getConsumerCount());
+            meterRegistry.gauge(&quot;queue.unacknowledged&quot;, &quot;queue&quot;, queueName, 
+                              () -&gt; queue.getUnacknowledgedCount());
+        });
+    }
+}
+</code></pre>
+<h2 id="common-pitfalls">Common Pitfalls</h2>
+<h3 id="1-memory-leaks-from-unacknowledged-messages">1. <strong>Memory Leaks from Unacknowledged Messages</strong></h3>
+<p><strong>Problem</strong>: Messages not properly acknowledged leading to memory consumption<br />
+<strong>Solution</strong>: Implement acknowledgment timeouts and monitoring</p>
+<h3 id="2-queue-size-explosion">2. <strong>Queue Size Explosion</strong></h3>
+<p><strong>Problem</strong>: Producers overwhelming consumers causing unbounded queue growth<br />
+<strong>Solution</strong>: Implement backpressure, flow control, and alerting</p>
+<h3 id="3-message-ordering-issues">3. <strong>Message Ordering Issues</strong></h3>
+<p><strong>Problem</strong>: Expecting FIFO behavior in multi-consumer scenarios<br />
+<strong>Solution</strong>: Use single consumer or partitioned queues for ordering requirements</p>
+<h3 id="4-poison-message-loops">4. <strong>Poison Message Loops</strong></h3>
+<p><strong>Problem</strong>: Malformed messages causing infinite retry loops<br />
+<strong>Solution</strong>: Implement dead letter queues and retry limits</p>
+<h3 id="5-resource-leaks">5. <strong>Resource Leaks</strong></h3>
+<p><strong>Problem</strong>: Not properly closing connections and sessions<br />
+<strong>Solution</strong>: Use connection pooling and proper resource management</p>
+<h2 id="integration-in-distributed-systems">Integration in Distributed Systems</h2>
+<h3 id="microservices-background-processing">Microservices Background Processing</h3>
+<pre><code class="language-java">@Service
+public class MicroservicesTaskQueue {
+
+    public void processLongRunningTask(TaskRequest request) {
+        TaskMessage message = TaskMessage.builder()
+            .taskId(request.getTaskId())
+            .taskType(request.getTaskType())
+            .parameters(request.getParameters())
+            .priority(request.getPriority())
+            .build();
+
+        messageProducer.send(&quot;background.tasks&quot;, message);
+    }
+}
+</code></pre>
+<h3 id="enterprise-integration-workflows">Enterprise Integration Workflows</h3>
+<pre><code class="language-java">@Service
+public class WorkflowOrchestration {
+
+    public void startOrderWorkflow(OrderCreatedEvent event) {
+        // Send tasks to different queues for parallel processing
+        messageProducer.send(&quot;inventory.tasks&quot;, new ReserveInventoryTask(event));
+        messageProducer.send(&quot;payment.tasks&quot;, new ProcessPaymentTask(event));
+        messageProducer.send(&quot;shipping.tasks&quot;, new CalculateShippingTask(event));
+    }
+}
+</code></pre>
+<h2 id="conclusion">Conclusion</h2>
+<p>The Message Queue pattern is essential for building robust, scalable distributed systems. It provides:</p>
+<ul>
+<li><strong>Reliable Communication</strong>: Guaranteed message delivery with persistence and acknowledgments</li>
+<li><strong>Temporal Decoupling</strong>: Independent operation of producers and consumers</li>
+<li><strong>Load Leveling</strong>: Smooth traffic handling through buffering and batch processing</li>
+<li><strong>Fault Tolerance</strong>: Resilient message processing with retry and dead letter handling</li>
+</ul>
+<p>When properly implemented with appropriate monitoring, error handling, and scaling strategies, message queues enable robust asynchronous processing that can handle varying loads and maintain system reliability even in the face of component failures.</p>
+<h2 id="references">References</h2>
+<ul>
+<li><a href="https://www.enterpriseintegrationpatterns.com/patterns/messaging/MessageQueue.html">Enterprise Integration Patterns - Message Queue</a></li>
+<li><a href="https://www.rabbitmq.com/getstarted.html">RabbitMQ Tutorials</a></li>
+<li><a href="https://activemq.apache.org/documentation">Apache ActiveMQ Documentation</a></li>
+<li><a href="https://docs.aws.amazon.com/sqs/latest/dg/welcome.html">AWS SQS Developer Guide</a></li>
+</ul>
+
+      <a href="../index.html" class="back-to-top">← Back to All Patterns</a>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <p>©2026 <a href="https://dataintegrationmastery.com/">Data Integration Mastery™</a> — All Rights Reserved</p>
+  </footer>
+</body>
+</html>

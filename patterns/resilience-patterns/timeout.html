@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Timeout Pattern — Integration Architecture Patterns | Data Integration Mastery™</title>
+  <meta name="description" content="The Timeout pattern is a critical defensive mechanism in distributed systems that prevents operations from hanging indefinitely by setting maximum execution ...">
+  <meta name="keywords" content="timeout pattern, integration pattern, resilience patterns, integration architecture, EAI patterns, data integration">
+  <link rel="canonical" href="https://dataintegrationmastery.com/patterns/resilience-patterns/timeout.html">
+
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://dataintegrationmastery.com/patterns/resilience-patterns/timeout.html">
+  <meta property="og:title" content="Timeout Pattern — Integration Architecture Patterns">
+  <meta property="og:description" content="The Timeout pattern is a critical defensive mechanism in distributed systems that prevents operations from hanging indefinitely by setting maximum execution ...">
+  <meta property="og:image" content="https://dataintegrationmastery.com/assets/images/logo.png">
+  <meta property="og:site_name" content="Data Integration Mastery">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Timeout Pattern — Integration Architecture Patterns">
+  <meta name="twitter:description" content="The Timeout pattern is a critical defensive mechanism in distributed systems that prevents operations from hanging indefinitely by setting maximum execution ...">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/docs.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Timeout Pattern",
+    "description": "The Timeout pattern is a critical defensive mechanism in distributed systems that prevents operations from hanging indefinitely by setting maximum execution ...",
+    "url": "https://dataintegrationmastery.com/patterns/resilience-patterns/timeout.html",
+    "author": {
+      "@type": "Person",
+      "name": "Ari Vilkman",
+      "jobTitle": "Integration Architect"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Data Integration Mastery",
+      "url": "https://dataintegrationmastery.com"
+    },
+    "isPartOf": {
+      "@type": "CollectionPage",
+      "name": "Integration Architecture Patterns",
+      "url": "https://dataintegrationmastery.com/patterns/"
+    },
+    "about": {
+      "@type": "Thing",
+      "name": "Timeout Pattern"
+    },
+    "inLanguage": "en",
+    "isAccessibleForFree": true
+  }
+  </script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="https://dataintegrationmastery.com/" class="header-brand">
+        <img src="../../assets/images/dim-icon.png" alt="DIM" width="36" height="36">
+        <span class="header-title">Data Integration Mastery™</span>
+      </a>
+      <nav class="header-nav" aria-label="Main navigation">
+        <a href="https://dataintegrationmastery.com/">Home</a>
+        <a href="../index.html">All Patterns</a>
+        <a href="https://dataintegrationmastery.com/#free-course">Free Course</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="docs-layout">
+    <aside class="docs-sidebar" aria-label="Pattern categories">
+      <div class="sidebar-title">Pattern Categories</div>
+<div class="sidebar-section">
+  <a href="../index.html#resilience" class="sidebar-section-title">🛡️ Resilience Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="circuit-breaker.html">Circuit Breaker</a></li>
+    <li><a href="retry-mechanism.html">Retry Mechanism</a></li>
+    <li><a href="timeout.html" class="active">Timeout</a></li>
+    <li><a href="dead-letter-queue.html">Dead Letter Queue</a></li>
+    <li><a href="bulkhead.html">Bulkhead</a></li>
+    <li><a href="fallback-graceful-degradation.html">Fallback / Graceful Degradation</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#messaging" class="sidebar-section-title">📨 Messaging Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../messaging-patterns/request-reply.html">Request-Reply</a></li>
+    <li><a href="../messaging-patterns/publish-subscribe.html">Publish-Subscribe</a></li>
+    <li><a href="../messaging-patterns/message-queue.html">Message Queue</a></li>
+    <li><a href="../messaging-patterns/event-streaming.html">Event Streaming</a></li>
+    <li><a href="../messaging-patterns/correlation-id.html">Correlation ID</a></li>
+    <li><a href="../messaging-patterns/message-routing.html">Message Routing</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#data-transformation" class="sidebar-section-title">🔄 Data Transformation Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../data-transformation-patterns/message-translator.html">Message Translator</a></li>
+    <li><a href="../data-transformation-patterns/content-filter.html">Content Filter</a></li>
+    <li><a href="../data-transformation-patterns/message-router.html">Message Router</a></li>
+    <li><a href="../data-transformation-patterns/aggregator.html">Aggregator</a></li>
+    <li><a href="../data-transformation-patterns/splitter.html">Splitter</a></li>
+    <li><a href="../data-transformation-patterns/data-mapper.html">Data Mapper</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#routing" class="sidebar-section-title">🔀 Routing Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../routing-patterns/content-based-router.html">Content-Based Router</a></li>
+    <li><a href="../routing-patterns/recipient-list.html">Recipient List</a></li>
+    <li><a href="../routing-patterns/load-balancer.html">Load Balancer</a></li>
+    <li><a href="../routing-patterns/message-filter.html">Message Filter</a></li>
+    <li><a href="../routing-patterns/dynamic-router.html">Dynamic Router</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#security" class="sidebar-section-title">🔐 Security Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../security-patterns/authentication.html">Authentication</a></li>
+    <li><a href="../security-patterns/authorization.html">Authorization</a></li>
+    <li><a href="../security-patterns/encryption.html">Encryption</a></li>
+    <li><a href="../security-patterns/token-management.html">Token Management</a></li>
+    <li><a href="../security-patterns/api-security.html">API Security</a></li>
+    <li><a href="../security-patterns/secret-management.html">Secret Management</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#orchestration" class="sidebar-section-title">🎭 Orchestration Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../orchestration-patterns/saga-pattern.html">Saga Pattern</a></li>
+    <li><a href="../orchestration-patterns/process-manager.html">Process Manager</a></li>
+    <li><a href="../orchestration-patterns/workflow-engine.html">Workflow Engine</a></li>
+    <li><a href="../orchestration-patterns/choreography.html">Choreography</a></li>
+    <li><a href="../orchestration-patterns/compensation-transactions.html">Compensation Transactions</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#observability" class="sidebar-section-title">📊 Monitoring & Observability Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../monitoring-observability-patterns/distributed-tracing.html">Distributed Tracing</a></li>
+    <li><a href="../monitoring-observability-patterns/metrics-collection.html">Metrics Collection</a></li>
+    <li><a href="../monitoring-observability-patterns/health-checks.html">Health Checks</a></li>
+    <li><a href="../monitoring-observability-patterns/logging-strategies.html">Logging Strategies</a></li>
+    <li><a href="../monitoring-observability-patterns/performance-monitoring.html">Performance Monitoring</a></li>
+    <li><a href="../monitoring-observability-patterns/error-tracking.html">Error Tracking</a></li>
+  </ul>
+</div>
+
+    </aside>
+
+    <main id="main-content" class="docs-content">
+      <div class="breadcrumb">
+        <a href="https://dataintegrationmastery.com/">Home</a>
+        <span class="sep">›</span>
+        <a href="../index.html">Patterns</a>
+        <span class="sep">›</span>
+        <a href="../index.html#resilience">Resilience Patterns</a>
+        <span class="sep">›</span>
+        <strong>Timeout Pattern</strong>
+      </div>
+
+      <h1>Timeout Pattern</h1>
+
+      <h2 id="overview">Overview</h2>
+<p>The Timeout pattern is a critical defensive mechanism in distributed systems that prevents operations from hanging indefinitely by setting maximum execution time limits. It serves as a fundamental building block for system reliability, ensuring that failed or slow operations are terminated within acceptable time bounds, thereby protecting system resources and maintaining acceptable response times.</p>
+<h3 id="theoretical-foundation">Theoretical Foundation</h3>
+<p>The Timeout pattern is rooted in <strong>real-time systems theory</strong> and <strong>quality of service (QoS) management</strong>. It addresses the fundamental challenge that in distributed systems, operations may not complete due to network failures, service unavailability, or resource contention. The pattern embodies the principle of <strong>"bounded waiting"</strong> - ensuring that no operation consumes resources indefinitely.</p>
+<h3 id="core-principles">Core Principles</h3>
+<h4 id="1-bounded-execution-time">1. <strong>Bounded Execution Time</strong></h4>
+<p>The Timeout pattern establishes clear time boundaries for operations, preventing resource exhaustion and ensuring predictable system behavior under all conditions.</p>
+<h4 id="2-resource-protection">2. <strong>Resource Protection</strong></h4>
+<p>By limiting operation duration, timeouts protect valuable system resources:
+- Thread pools from being exhausted by hanging operations
+- Connection pools from being depleted by stuck connections
+- Memory from accumulating blocked operations</p>
+<h4 id="3-fail-fast-philosophy">3. <strong>Fail-Fast Philosophy</strong></h4>
+<p>Rather than waiting indefinitely for responses, timeouts enable systems to fail quickly and take alternative actions, improving overall system responsiveness.</p>
+<h4 id="4-layered-timeout-strategy">4. <strong>Layered Timeout Strategy</strong></h4>
+<p>Effective timeout implementation involves multiple layers - connection timeouts, read timeouts, and overall operation timeouts - each serving specific purposes.</p>
+<h3 id="why-timeouts-are-essential-in-integration-architecture">Why Timeouts are Essential in Integration Architecture</h3>
+<h4 id="1-network-uncertainty">1. <strong>Network Uncertainty</strong></h4>
+<p>Network communication introduces inherent unpredictability:
+- <strong>Variable latency</strong> based on network conditions and geographic distance
+- <strong>Packet loss</strong> requiring retransmission and increased response times
+- <strong>Network congestion</strong> causing unpredictable delays
+- <strong>Infrastructure failures</strong> resulting in black hole scenarios</p>
+<h4 id="2-service-dependency-management">2. <strong>Service Dependency Management</strong></h4>
+<p>In distributed architectures, service dependencies create complex timeout scenarios:
+- <strong>Upstream service failures</strong> causing downstream timeouts
+- <strong>Cascading timeout effects</strong> where one slow service affects entire request chains
+- <strong>Third-party service variability</strong> with unpredictable response times
+- <strong>Database query performance</strong> varying with load and data volume</p>
+<h4 id="3-resource-allocation-control">3. <strong>Resource Allocation Control</strong></h4>
+<p>Timeouts provide essential resource management capabilities:
+- <strong>Connection pool management</strong> preventing exhaustion from stuck connections
+- <strong>Thread pool protection</strong> ensuring available threads for new requests
+- <strong>Memory usage control</strong> preventing accumulation of blocked operations
+- <strong>CPU utilization</strong> avoiding waste on operations that will never complete</p>
+<h4 id="4-user-experience-guarantees">4. <strong>User Experience Guarantees</strong></h4>
+<p>Timeouts enable consistent user experience by:
+- <strong>Predictable response times</strong> even during system stress
+- <strong>Graceful degradation</strong> when services are slow or unavailable
+- <strong>Progressive feedback</strong> allowing systems to provide status updates
+- <strong>Alternative action triggers</strong> enabling fallback mechanisms</p>
+<h3 id="benefits-in-integration-contexts">Benefits in Integration Contexts</h3>
+<h4 id="1-system-stability">1. <strong>System Stability</strong></h4>
+<ul>
+<li><strong>Prevents resource starvation</strong> by limiting operation duration</li>
+<li><strong>Maintains thread pool health</strong> through bounded waiting times</li>
+<li><strong>Protects against memory leaks</strong> from accumulating blocked operations</li>
+<li><strong>Ensures connection pool availability</strong> through timeout-based cleanup</li>
+</ul>
+<h4 id="2-performance-predictability">2. <strong>Performance Predictability</strong></h4>
+<ul>
+<li><strong>Service Level Agreement (SLA) compliance</strong> through guaranteed response times</li>
+<li><strong>Consistent latency profiles</strong> even during downstream service issues</li>
+<li><strong>Resource utilization optimization</strong> by preventing waste on failed operations</li>
+<li><strong>Capacity planning reliability</strong> with predictable resource consumption patterns</li>
+</ul>
+<h4 id="3-operational-excellence">3. <strong>Operational Excellence</strong></h4>
+<ul>
+<li><strong>Clear error boundaries</strong> making system behavior predictable</li>
+<li><strong>Simplified troubleshooting</strong> with timeout-based error patterns</li>
+<li><strong>Monitoring and alerting</strong> based on timeout frequency and duration</li>
+<li><strong>Automated recovery</strong> triggered by timeout events</li>
+</ul>
+<h4 id="4-integration-resilience">4. <strong>Integration Resilience</strong></h4>
+<ul>
+<li><strong>Third-party service protection</strong> against unpredictable external dependencies</li>
+<li><strong>Event processing reliability</strong> in message-driven architectures</li>
+<li><strong>Database operation safety</strong> preventing long-running query impacts</li>
+<li><strong>API gateway stability</strong> through request timeout enforcement</li>
+</ul>
+<h3 id="integration-architecture-applications">Integration Architecture Applications</h3>
+<h4 id="1-http-client-integration">1. <strong>HTTP Client Integration</strong></h4>
+<p>Timeouts in HTTP communications handle:
+- <strong>Connection establishment timeouts</strong> for unreachable services
+- <strong>Socket read timeouts</strong> for slow response scenarios
+- <strong>Overall request timeouts</strong> for complex operation time limits</p>
+<h4 id="2-database-access-patterns">2. <strong>Database Access Patterns</strong></h4>
+<p>Database timeout strategies manage:
+- <strong>Query execution timeouts</strong> preventing runaway queries
+- <strong>Connection acquisition timeouts</strong> from connection pools
+- <strong>Transaction timeouts</strong> ensuring data consistency boundaries</p>
+<h4 id="3-message-queue-processing">3. <strong>Message Queue Processing</strong></h4>
+<p>In asynchronous processing, timeouts control:
+- <strong>Message processing timeouts</strong> preventing stuck message handlers
+- <strong>Queue polling timeouts</strong> for efficient resource utilization
+- <strong>Batch processing timeouts</strong> ensuring timely completion</p>
+<h4 id="4-service-mesh-integration">4. <strong>Service Mesh Integration</strong></h4>
+<p>Service mesh timeout policies provide:
+- <strong>Inter-service communication timeouts</strong> across the mesh
+- <strong>Circuit breaker integration</strong> with timeout-based failure detection
+- <strong>Load balancing timeout considerations</strong> for request routing</p>
+<h2 id="how-timeout-pattern-works">How Timeout Pattern Works</h2>
+<p>The Timeout pattern operates through configurable time limits applied at various levels of operation execution:</p>
+<h3 id="timeout-hierarchy">Timeout Hierarchy</h3>
+<pre><code>Application Timeout (30s)
+    └── Operation Timeout (20s)
+        └── HTTP Request Timeout (15s)
+            ├── Connection Timeout (5s)
+            └── Read Timeout (10s)
+</code></pre>
+<h3 id="timeout-execution-flow">Timeout Execution Flow</h3>
+<pre><code>Start Operation
+    ↓
+Set Timeout Timer
+    ↓
+Execute Operation ←→ Monitor Timer
+    ↓               ↓
+Success?        Timeout?
+    ↓ Yes          ↓ Yes
+Return Result   Cancel Operation
+                    ↓
+                Throw TimeoutException
+</code></pre>
+<h3 id="timeout-scope-levels">Timeout Scope Levels</h3>
+<h4 id="1-connection-timeout">1. <strong>Connection Timeout</strong></h4>
+<p>Time allowed for establishing network connections:</p>
+<pre><code class="language-java">// TCP connection establishment
+ConnectTimeout: 5s
+</code></pre>
+<h4 id="2-read-timeout">2. <strong>Read Timeout</strong></h4>
+<p>Time allowed for reading response data:</p>
+<pre><code class="language-java">// Socket read operations
+ReadTimeout: 10s
+</code></pre>
+<h4 id="3-request-timeout">3. <strong>Request Timeout</strong></h4>
+<p>Total time allowed for complete request-response cycle:</p>
+<pre><code class="language-java">// End-to-end request processing
+RequestTimeout: 15s
+</code></pre>
+<h4 id="4-operation-timeout">4. <strong>Operation Timeout</strong></h4>
+<p>Business operation time limit including retries:</p>
+<pre><code class="language-java">// Complete business operation
+OperationTimeout: 30s
+</code></pre>
+<h2 id="key-components">Key Components</h2>
+<h3 id="1-timeout-configuration">1. Timeout Configuration</h3>
+<p>Manages timeout values and policies:</p>
+<pre><code class="language-java">public class TimeoutConfiguration {
+    private final Duration connectionTimeout;
+    private final Duration readTimeout;
+    private final Duration requestTimeout;
+    private final Duration operationTimeout;
+
+    public static class Builder {
+        private Duration connectionTimeout = Duration.ofSeconds(5);
+        private Duration readTimeout = Duration.ofSeconds(10);
+        private Duration requestTimeout = Duration.ofSeconds(15);
+        private Duration operationTimeout = Duration.ofSeconds(30);
+
+        public Builder connectionTimeout(Duration timeout) {
+            this.connectionTimeout = timeout;
+            return this;
+        }
+
+        public Builder readTimeout(Duration timeout) {
+            this.readTimeout = timeout;
+            return this;
+        }
+
+        public TimeoutConfiguration build() {
+            validateTimeouts();
+            return new TimeoutConfiguration(
+                connectionTimeout, readTimeout, 
+                requestTimeout, operationTimeout
+            );
+        }
+
+        private void validateTimeouts() {
+            if (connectionTimeout.plus(readTimeout).compareTo(requestTimeout) &gt; 0) {
+                throw new IllegalArgumentException(
+                    &quot;Connection + Read timeout cannot exceed Request timeout&quot;
+                );
+            }
+        }
+    }
+}
+</code></pre>
+<h3 id="2-timeout-manager">2. Timeout Manager</h3>
+<p>Handles timeout enforcement and cancellation:</p>
+<pre><code class="language-java">public class TimeoutManager {
+    private final ScheduledExecutorService timeoutScheduler;
+    private final Map&lt;String, ScheduledFuture&lt;?&gt;&gt; activeTimeouts;
+
+    public &lt;T&gt; CompletableFuture&lt;T&gt; executeWithTimeout(
+            Supplier&lt;T&gt; operation,
+            Duration timeout,
+            String operationId) {
+
+        CompletableFuture&lt;T&gt; resultFuture = CompletableFuture.supplyAsync(operation);
+
+        ScheduledFuture&lt;?&gt; timeoutFuture = timeoutScheduler.schedule(
+            () -&gt; {
+                if (!resultFuture.isDone()) {
+                    resultFuture.completeExceptionally(
+                        new TimeoutException(&quot;Operation timed out after &quot; + timeout)
+                    );
+                }
+            },
+            timeout.toMillis(),
+            TimeUnit.MILLISECONDS
+        );
+
+        // Clean up timeout task when operation completes
+        resultFuture.whenComplete((result, throwable) -&gt; {
+            timeoutFuture.cancel(false);
+            activeTimeouts.remove(operationId);
+        });
+
+        activeTimeouts.put(operationId, timeoutFuture);
+        return resultFuture;
+    }
+}
+</code></pre>
+<h3 id="3-timeout-context">3. Timeout Context</h3>
+<p>Tracks timeout state and provides cancellation capabilities:</p>
+<pre><code class="language-java">public class TimeoutContext {
+    private final String operationId;
+    private final Instant startTime;
+    private final Duration timeout;
+    private volatile boolean cancelled = false;
+    private volatile Thread executingThread;
+
+    public boolean isExpired() {
+        return Duration.between(startTime, Instant.now()).compareTo(timeout) &gt; 0;
+    }
+
+    public Duration getRemainingTime() {
+        Duration elapsed = Duration.between(startTime, Instant.now());
+        return timeout.minus(elapsed);
+    }
+
+    public void cancel() {
+        cancelled = true;
+        if (executingThread != null) {
+            executingThread.interrupt();
+        }
+    }
+
+    public void checkCancellation() throws InterruptedException {
+        if (cancelled || Thread.currentThread().isInterrupted()) {
+            throw new InterruptedException(&quot;Operation was cancelled&quot;);
+        }
+        if (isExpired()) {
+            throw new TimeoutException(&quot;Operation timeout exceeded&quot;);
+        }
+    }
+}
+</code></pre>
+<h2 id="configuration-parameters">Configuration Parameters</h2>
+<h3 id="essential-settings">Essential Settings</h3>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Typical Values</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Connection Timeout</strong></td>
+<td>Time to establish connection</td>
+<td>2s-10s</td>
+</tr>
+<tr>
+<td><strong>Read Timeout</strong></td>
+<td>Time to read response data</td>
+<td>5s-30s</td>
+</tr>
+<tr>
+<td><strong>Request Timeout</strong></td>
+<td>Total request duration</td>
+<td>10s-60s</td>
+</tr>
+<tr>
+<td><strong>Operation Timeout</strong></td>
+<td>Complete operation limit</td>
+<td>30s-300s</td>
+</tr>
+</tbody>
+</table>
+<h3 id="example-configuration">Example Configuration</h3>
+<pre><code class="language-properties"># HTTP client timeouts
+http.client.connection-timeout=5s
+http.client.read-timeout=10s
+http.client.request-timeout=15s
+
+# Database timeouts
+database.connection-timeout=3s
+database.query-timeout=30s
+database.transaction-timeout=60s
+
+# Operation-level timeouts
+service.operation.default-timeout=30s
+service.operation.critical-timeout=60s
+service.operation.batch-timeout=300s
+</code></pre>
+<h2 id="implementation-examples">Implementation Examples</h2>
+<h3 id="1-http-client-timeout-configuration">1. HTTP Client Timeout Configuration</h3>
+<pre><code class="language-java">@Configuration
+public class HttpClientConfiguration {
+
+    @Bean
+    public RestTemplate restTemplateWithTimeouts() {
+        HttpComponentsClientHttpRequestFactory factory = 
+            new HttpComponentsClientHttpRequestFactory();
+
+        // Connection timeout: time to establish connection
+        factory.setConnectTimeout(5000);
+
+        // Read timeout: time to read response
+        factory.setReadTimeout(10000);
+
+        // Overall request timeout
+        factory.setConnectionRequestTimeout(15000);
+
+        return new RestTemplate(factory);
+    }
+
+    @Bean
+    public WebClient webClientWithTimeouts() {
+        return WebClient.builder()
+            .clientConnector(new ReactorClientHttpConnector(
+                HttpClient.create()
+                    .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
+                    .responseTimeout(Duration.ofSeconds(10))
+            ))
+            .build();
+    }
+}
+</code></pre>
+<h3 id="2-database-timeout-configuration">2. Database Timeout Configuration</h3>
+<pre><code class="language-java">@Configuration
+public class DatabaseConfiguration {
+
+    @Bean
+    @ConfigurationProperties(&quot;spring.datasource.hikari&quot;)
+    public HikariConfig hikariConfig() {
+        HikariConfig config = new HikariConfig();
+
+        // Connection acquisition timeout from pool
+        config.setConnectionTimeout(3000);
+
+        // Maximum connection lifetime
+        config.setMaxLifetime(600000);
+
+        // Connection validation timeout
+        config.setValidationTimeout(5000);
+
+        return config;
+    }
+
+    @Bean
+    public JdbcTemplate jdbcTemplateWithTimeout(DataSource dataSource) {
+        JdbcTemplate template = new JdbcTemplate(dataSource);
+
+        // Query timeout in seconds
+        template.setQueryTimeout(30);
+
+        return template;
+    }
+}
+</code></pre>
+<h3 id="3-custom-timeout-wrapper">3. Custom Timeout Wrapper</h3>
+<pre><code class="language-java">@Component
+public class TimeoutWrapper {
+    private final ScheduledExecutorService scheduler = 
+        Executors.newScheduledThreadPool(10);
+
+    public &lt;T&gt; T executeWithTimeout(
+            Supplier&lt;T&gt; operation,
+            Duration timeout,
+            String operationName) throws TimeoutException {
+
+        CompletableFuture&lt;T&gt; future = CompletableFuture.supplyAsync(operation);
+
+        try {
+            return future.get(timeout.toMillis(), TimeUnit.MILLISECONDS);
+        } catch (java.util.concurrent.TimeoutException e) {
+            future.cancel(true);
+            throw new TimeoutException(
+                &quot;Operation '&quot; + operationName + &quot;' timed out after &quot; + timeout
+            );
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException(&quot;Operation failed&quot;, e);
+        }
+    }
+
+    public &lt;T&gt; CompletableFuture&lt;T&gt; executeAsyncWithTimeout(
+            Supplier&lt;CompletableFuture&lt;T&gt;&gt; operation,
+            Duration timeout) {
+
+        CompletableFuture&lt;T&gt; operationFuture = operation.get();
+        CompletableFuture&lt;T&gt; timeoutFuture = new CompletableFuture&lt;&gt;();
+
+        // Schedule timeout
+        ScheduledFuture&lt;?&gt; timeoutTask = scheduler.schedule(
+            () -&gt; timeoutFuture.completeExceptionally(
+                new TimeoutException(&quot;Async operation timed out&quot;)
+            ),
+            timeout.toMillis(),
+            TimeUnit.MILLISECONDS
+        );
+
+        // Return whichever completes first
+        return operationFuture
+            .applyToEither(timeoutFuture, Function.identity())
+            .whenComplete((result, throwable) -&gt; timeoutTask.cancel(false));
+    }
+}
+</code></pre>
+<h3 id="4-quarkus-timeout-implementation">4. Quarkus Timeout Implementation</h3>
+<pre><code class="language-java">@ApplicationScoped
+public class TimeoutService {
+
+    @Timeout(value = 5, unit = ChronoUnit.SECONDS)
+    public String callExternalService(String data) {
+        // This method will timeout after 5 seconds
+        return externalServiceClient.process(data);
+    }
+
+    @Timeout(value = 30, unit = ChronoUnit.SECONDS)
+    @Retry(maxRetries = 3, delay = 1000)
+    public CompletionStage&lt;String&gt; callAsyncService(String data) {
+        return CompletableFuture.supplyAsync(
+            () -&gt; asyncServiceClient.process(data)
+        );
+    }
+}
+</code></pre>
+<h2 id="best-practices">Best Practices</h2>
+<h3 id="1-timeout-value-selection">1. Timeout Value Selection</h3>
+<pre><code class="language-java">public class TimeoutCalculator {
+
+    public static Duration calculateOptimalTimeout(ServiceProfile profile) {
+        // Base timeout on service characteristics
+        Duration baseTimeout = profile.getAverageResponseTime()
+                                     .multipliedBy(3); // 3x average for safety
+
+        // Add network overhead
+        Duration networkOverhead = Duration.ofMillis(500);
+
+        // Consider retry overhead if retries are enabled
+        Duration retryOverhead = profile.isRetryEnabled() ?
+            profile.getRetryDelay().multipliedBy(profile.getMaxRetries()) :
+            Duration.ZERO;
+
+        // Apply minimum and maximum bounds
+        Duration calculated = baseTimeout
+            .plus(networkOverhead)
+            .plus(retryOverhead);
+
+        return Duration.ofMillis(
+            Math.max(1000,                    // Minimum 1s
+                Math.min(60000,               // Maximum 60s
+                    calculated.toMillis()))
+        );
+    }
+}
+</code></pre>
+<h3 id="2-timeout-monitoring">2. Timeout Monitoring</h3>
+<pre><code class="language-java">@Component
+public class TimeoutMetrics {
+    private final MeterRegistry meterRegistry;
+
+    public void recordTimeout(String operationName, Duration configuredTimeout, 
+                             Duration actualDuration) {
+        Timer.builder(&quot;operation_timeout&quot;)
+            .tag(&quot;operation&quot;, operationName)
+            .tag(&quot;timeout_configured&quot;, configuredTimeout.toString())
+            .register(meterRegistry)
+            .record(actualDuration);
+
+        Counter.builder(&quot;timeout_events&quot;)
+            .tag(&quot;operation&quot;, operationName)
+            .tag(&quot;timeout_type&quot;, determineTimeoutType(configuredTimeout, actualDuration))
+            .register(meterRegistry)
+            .increment();
+    }
+
+    private String determineTimeoutType(Duration configured, Duration actual) {
+        if (actual.compareTo(configured) &gt;= 0) {
+            return &quot;hard_timeout&quot;;
+        } else if (actual.compareTo(configured.dividedBy(2)) &gt;= 0) {
+            return &quot;approaching_timeout&quot;;
+        } else {
+            return &quot;normal_completion&quot;;
+        }
+    }
+}
+</code></pre>
+<h3 id="3-graceful-timeout-handling">3. Graceful Timeout Handling</h3>
+<pre><code class="language-java">@Service
+public class GracefulTimeoutService {
+
+    public &lt;T&gt; Optional&lt;T&gt; executeWithGracefulTimeout(
+            Supplier&lt;T&gt; operation,
+            Duration timeout,
+            String operationName) {
+
+        try {
+            return Optional.of(
+                timeoutWrapper.executeWithTimeout(operation, timeout, operationName)
+            );
+        } catch (TimeoutException e) {
+            log.warn(&quot;Operation '{}' timed out after {}, using fallback&quot;, 
+                    operationName, timeout);
+
+            // Record timeout for monitoring
+            timeoutMetrics.recordTimeout(operationName, timeout, timeout);
+
+            // Return empty to signal timeout without throwing exception
+            return Optional.empty();
+        }
+    }
+
+    public &lt;T&gt; T executeWithFallback(
+            Supplier&lt;T&gt; primary,
+            Supplier&lt;T&gt; fallback,
+            Duration timeout,
+            String operationName) {
+
+        return executeWithGracefulTimeout(primary, timeout, operationName)
+            .orElseGet(() -&gt; {
+                log.info(&quot;Using fallback for operation '{}'&quot;, operationName);
+                return fallback.get();
+            });
+    }
+}
+</code></pre>
+<h2 id="common-pitfalls">Common Pitfalls</h2>
+<h3 id="1-inappropriate-timeout-values">1. <strong>Inappropriate Timeout Values</strong></h3>
+<p><strong>Problem</strong>: Timeouts too short cause premature failures; too long fail to protect resources<br />
+<strong>Solution</strong>: Base timeouts on empirical data and service characteristics</p>
+<h3 id="2-timeout-hierarchy-violations">2. <strong>Timeout Hierarchy Violations</strong></h3>
+<p><strong>Problem</strong>: Inner timeouts longer than outer timeouts create inconsistent behavior<br />
+<strong>Solution</strong>: Ensure timeout values decrease at each nested level</p>
+<h3 id="3-resource-cleanup-neglect">3. <strong>Resource Cleanup Neglect</strong></h3>
+<p><strong>Problem</strong>: Failed timeout handling leaves resources in inconsistent states<br />
+<strong>Solution</strong>: Implement proper cleanup in timeout handlers</p>
+<h3 id="4-thread-interruption-ignorance">4. <strong>Thread Interruption Ignorance</strong></h3>
+<p><strong>Problem</strong>: Operations don't respond to timeout-triggered interruptions<br />
+<strong>Solution</strong>: Regularly check Thread.interrupted() in long-running operations</p>
+<h3 id="5-cascading-timeout-effects">5. <strong>Cascading Timeout Effects</strong></h3>
+<p><strong>Problem</strong>: One timeout triggers others in a chain reaction<br />
+<strong>Solution</strong>: Implement circuit breakers and bulkheads alongside timeouts</p>
+<h2 id="integration-in-distributed-systems">Integration in Distributed Systems</h2>
+<p>In distributed integration scenarios, Timeout Pattern provides:</p>
+<h3 id="service-to-service-communication">Service-to-Service Communication</h3>
+<pre><code class="language-java">@RestTemplate
+@Timeout(value = 10, unit = ChronoUnit.SECONDS)
+public ContactResponse updateExternalContact(ContactRequest request) {
+    return restTemplate.postForObject(&quot;/api/contact/update&quot;, request, ContactResponse.class);
+}
+</code></pre>
+<h3 id="database-operations">Database Operations</h3>
+<pre><code class="language-java">@Transactional
+@Timeout(value = 30, unit = ChronoUnit.SECONDS)
+public void processBatchUpdate(List&lt;ContactData&gt; contacts) {
+    for (ContactData contact : contacts) {
+        contactRepository.updateContact(contact);
+
+        // Check for timeout periodically in long operations
+        if (Thread.currentThread().isInterrupted()) {
+            throw new InterruptedException(&quot;Batch operation was interrupted&quot;);
+        }
+    }
+}
+</code></pre>
+<h3 id="message-processing">Message Processing</h3>
+<pre><code class="language-java">@RabbitListener(queues = &quot;contact.processing.queue&quot;)
+@Timeout(value = 60, unit = ChronoUnit.SECONDS)
+public void processContactMessage(@Payload ContactUpdateEvent event) {
+    contactService.processUpdate(event);
+}
+</code></pre>
+<h2 id="conclusion">Conclusion</h2>
+<p>The Timeout pattern is fundamental for building reliable distributed systems that maintain predictable performance characteristics. It provides:</p>
+<ul>
+<li><strong>Resource Protection</strong>: Prevents operations from consuming resources indefinitely</li>
+<li><strong>Predictable Behavior</strong>: Ensures consistent response times even during failures</li>
+<li><strong>System Stability</strong>: Protects against cascading failures and resource exhaustion</li>
+<li><strong>User Experience</strong>: Maintains acceptable response times under all conditions</li>
+</ul>
+<p>When properly implemented with appropriate timeout values, monitoring, and graceful handling, the Timeout pattern serves as a critical foundation for system reliability and performance predictability.</p>
+<h2 id="references">References</h2>
+<ul>
+<li><a href="https://docs.microsoft.com/en-us/azure/architecture/patterns/timeout">Timeout Pattern - Microsoft Architecture Guide</a></li>
+<li><a href="https://blog.cloudflare.com/when-tcp-sockets-refuse-to-die/">TCP Timeout Tuning</a></li>
+<li><a href="https://www.baeldung.com/httpclient-timeout">HTTP Client Timeout Configuration</a></li>
+<li><a href="https://vladmihalcea.com/database-connection-pool-size/">Database Connection Timeout Best Practices</a></li>
+</ul>
+
+      <a href="../index.html" class="back-to-top">← Back to All Patterns</a>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <p>©2026 <a href="https://dataintegrationmastery.com/">Data Integration Mastery™</a> — All Rights Reserved</p>
+  </footer>
+</body>
+</html>

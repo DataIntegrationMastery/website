@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Performance Monitoring — Integration Architecture Patterns | Data Integration Mastery™</title>
+  <meta name="description" content="Performance Monitoring is a comprehensive observability pattern in enterprise integration architectures that systematically measures, analyzes, and optimizes...">
+  <meta name="keywords" content="performance monitoring, integration pattern, monitoring & observability patterns, integration architecture, EAI patterns, data integration">
+  <link rel="canonical" href="https://dataintegrationmastery.com/patterns/monitoring-observability-patterns/performance-monitoring.html">
+
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://dataintegrationmastery.com/patterns/monitoring-observability-patterns/performance-monitoring.html">
+  <meta property="og:title" content="Performance Monitoring — Integration Architecture Patterns">
+  <meta property="og:description" content="Performance Monitoring is a comprehensive observability pattern in enterprise integration architectures that systematically measures, analyzes, and optimizes...">
+  <meta property="og:image" content="https://dataintegrationmastery.com/assets/images/logo.png">
+  <meta property="og:site_name" content="Data Integration Mastery">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Performance Monitoring — Integration Architecture Patterns">
+  <meta name="twitter:description" content="Performance Monitoring is a comprehensive observability pattern in enterprise integration architectures that systematically measures, analyzes, and optimizes...">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/docs.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Performance Monitoring",
+    "description": "Performance Monitoring is a comprehensive observability pattern in enterprise integration architectures that systematically measures, analyzes, and optimizes...",
+    "url": "https://dataintegrationmastery.com/patterns/monitoring-observability-patterns/performance-monitoring.html",
+    "author": {
+      "@type": "Person",
+      "name": "Ari Vilkman",
+      "jobTitle": "Integration Architect"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Data Integration Mastery",
+      "url": "https://dataintegrationmastery.com"
+    },
+    "isPartOf": {
+      "@type": "CollectionPage",
+      "name": "Integration Architecture Patterns",
+      "url": "https://dataintegrationmastery.com/patterns/"
+    },
+    "about": {
+      "@type": "Thing",
+      "name": "Performance Monitoring"
+    },
+    "inLanguage": "en",
+    "isAccessibleForFree": true
+  }
+  </script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="https://dataintegrationmastery.com/" class="header-brand">
+        <img src="../../assets/images/dim-icon.png" alt="DIM" width="36" height="36">
+        <span class="header-title">Data Integration Mastery™</span>
+      </a>
+      <nav class="header-nav" aria-label="Main navigation">
+        <a href="https://dataintegrationmastery.com/">Home</a>
+        <a href="../index.html">All Patterns</a>
+        <a href="https://dataintegrationmastery.com/#free-course">Free Course</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="docs-layout">
+    <aside class="docs-sidebar" aria-label="Pattern categories">
+      <div class="sidebar-title">Pattern Categories</div>
+<div class="sidebar-section">
+  <a href="../index.html#resilience" class="sidebar-section-title">🛡️ Resilience Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../resilience-patterns/circuit-breaker.html">Circuit Breaker</a></li>
+    <li><a href="../resilience-patterns/retry-mechanism.html">Retry Mechanism</a></li>
+    <li><a href="../resilience-patterns/timeout.html">Timeout</a></li>
+    <li><a href="../resilience-patterns/dead-letter-queue.html">Dead Letter Queue</a></li>
+    <li><a href="../resilience-patterns/bulkhead.html">Bulkhead</a></li>
+    <li><a href="../resilience-patterns/fallback-graceful-degradation.html">Fallback / Graceful Degradation</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#messaging" class="sidebar-section-title">📨 Messaging Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../messaging-patterns/request-reply.html">Request-Reply</a></li>
+    <li><a href="../messaging-patterns/publish-subscribe.html">Publish-Subscribe</a></li>
+    <li><a href="../messaging-patterns/message-queue.html">Message Queue</a></li>
+    <li><a href="../messaging-patterns/event-streaming.html">Event Streaming</a></li>
+    <li><a href="../messaging-patterns/correlation-id.html">Correlation ID</a></li>
+    <li><a href="../messaging-patterns/message-routing.html">Message Routing</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#data-transformation" class="sidebar-section-title">🔄 Data Transformation Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../data-transformation-patterns/message-translator.html">Message Translator</a></li>
+    <li><a href="../data-transformation-patterns/content-filter.html">Content Filter</a></li>
+    <li><a href="../data-transformation-patterns/message-router.html">Message Router</a></li>
+    <li><a href="../data-transformation-patterns/aggregator.html">Aggregator</a></li>
+    <li><a href="../data-transformation-patterns/splitter.html">Splitter</a></li>
+    <li><a href="../data-transformation-patterns/data-mapper.html">Data Mapper</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#routing" class="sidebar-section-title">🔀 Routing Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../routing-patterns/content-based-router.html">Content-Based Router</a></li>
+    <li><a href="../routing-patterns/recipient-list.html">Recipient List</a></li>
+    <li><a href="../routing-patterns/load-balancer.html">Load Balancer</a></li>
+    <li><a href="../routing-patterns/message-filter.html">Message Filter</a></li>
+    <li><a href="../routing-patterns/dynamic-router.html">Dynamic Router</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#security" class="sidebar-section-title">🔐 Security Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../security-patterns/authentication.html">Authentication</a></li>
+    <li><a href="../security-patterns/authorization.html">Authorization</a></li>
+    <li><a href="../security-patterns/encryption.html">Encryption</a></li>
+    <li><a href="../security-patterns/token-management.html">Token Management</a></li>
+    <li><a href="../security-patterns/api-security.html">API Security</a></li>
+    <li><a href="../security-patterns/secret-management.html">Secret Management</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#orchestration" class="sidebar-section-title">🎭 Orchestration Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../orchestration-patterns/saga-pattern.html">Saga Pattern</a></li>
+    <li><a href="../orchestration-patterns/process-manager.html">Process Manager</a></li>
+    <li><a href="../orchestration-patterns/workflow-engine.html">Workflow Engine</a></li>
+    <li><a href="../orchestration-patterns/choreography.html">Choreography</a></li>
+    <li><a href="../orchestration-patterns/compensation-transactions.html">Compensation Transactions</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#observability" class="sidebar-section-title">📊 Monitoring & Observability Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="distributed-tracing.html">Distributed Tracing</a></li>
+    <li><a href="metrics-collection.html">Metrics Collection</a></li>
+    <li><a href="health-checks.html">Health Checks</a></li>
+    <li><a href="logging-strategies.html">Logging Strategies</a></li>
+    <li><a href="performance-monitoring.html" class="active">Performance Monitoring</a></li>
+    <li><a href="error-tracking.html">Error Tracking</a></li>
+  </ul>
+</div>
+
+    </aside>
+
+    <main id="main-content" class="docs-content">
+      <div class="breadcrumb">
+        <a href="https://dataintegrationmastery.com/">Home</a>
+        <span class="sep">›</span>
+        <a href="../index.html">Patterns</a>
+        <span class="sep">›</span>
+        <a href="../index.html#observability">Monitoring & Observability Patterns</a>
+        <span class="sep">›</span>
+        <strong>Performance Monitoring</strong>
+      </div>
+
+      <h1>Performance Monitoring</h1>
+
+      <h2 id="overview">Overview</h2>
+<p>Performance Monitoring is a comprehensive observability pattern in enterprise integration architectures that systematically measures, analyzes, and optimizes system performance characteristics including response times, throughput, resource utilization, scalability metrics, and user experience indicators across distributed applications and integration processes. Like a sophisticated diagnostic system that continuously monitors vital signs, operational efficiency, and performance indicators across multiple dimensions of system health, performance monitoring provides real-time and historical visibility into how well systems are meeting performance requirements and user expectations. This pattern is essential for ensuring optimal system performance, identifying performance bottlenecks, supporting capacity planning decisions, enabling proactive optimization, and maintaining high-quality user experiences in complex enterprise environments where performance directly impacts business operations and customer satisfaction.</p>
+<h3 id="theoretical-foundation">Theoretical Foundation</h3>
+<p>Performance Monitoring is grounded in <strong>systems performance engineering</strong>, <strong>statistical analysis theory</strong>, <strong>real-time data processing</strong>, and <strong>quality assurance methodologies</strong>. It incorporates concepts from <strong>queuing theory</strong>, <strong>resource management principles</strong>, <strong>user experience measurement</strong>, and <strong>predictive analytics</strong> to provide a comprehensive framework for performance assessment and optimization. The pattern addresses the fundamental need for continuous performance visibility, data-driven optimization decisions, proactive issue prevention, and evidence-based capacity planning in complex distributed systems.</p>
+<h3 id="core-principles">Core Principles</h3>
+<h4 id="1-multi-dimensional-performance-measurement">1. <strong>Multi-Dimensional Performance Measurement</strong></h4>
+<p>Comprehensive assessment of performance across different dimensions and perspectives:
+- <strong>Application performance</strong> - response times, throughput, error rates, and transaction success rates
+- <strong>Infrastructure performance</strong> - CPU utilization, memory usage, disk I/O, network bandwidth, and storage performance
+- <strong>User experience metrics</strong> - page load times, interaction response times, and user satisfaction indicators
+- <strong>Business performance</strong> - transaction processing rates, business process completion times, and revenue impact metrics</p>
+<h4 id="2-real-time-and-historical-performance-analysis">2. <strong>Real-Time and Historical Performance Analysis</strong></h4>
+<p>Continuous monitoring and analysis of performance data over different time horizons:
+- <strong>Real-time monitoring</strong> - immediate visibility into current system performance and anomalies
+- <strong>Trend analysis</strong> - identification of performance patterns and trends over time
+- <strong>Historical comparison</strong> - comparison of current performance against historical baselines and expectations
+- <strong>Predictive analytics</strong> - forecasting of future performance trends and potential issues</p>
+<h4 id="3-automated-performance-intelligence">3. <strong>Automated Performance Intelligence</strong></h4>
+<p>Intelligent automation for performance analysis, alerting, and optimization:
+- <strong>Anomaly detection</strong> - automated identification of performance deviations and unusual patterns
+- <strong>Threshold monitoring</strong> - automated alerting when performance metrics exceed defined thresholds
+- <strong>Performance correlation</strong> - automated analysis of relationships between different performance metrics
+- <strong>Optimization recommendations</strong> - intelligent suggestions for performance improvements and optimizations</p>
+<h4 id="4-contextual-performance-understanding">4. <strong>Contextual Performance Understanding</strong></h4>
+<p>Performance measurement with appropriate business and technical context:
+- <strong>Business context awareness</strong> - understanding performance metrics in relation to business activities and goals
+- <strong>Environmental correlation</strong> - correlation of performance with environmental factors and system changes
+- <strong>User impact assessment</strong> - evaluation of performance impact on user experience and business operations
+- <strong>Cost-performance analysis</strong> - assessment of performance improvements in relation to implementation costs</p>
+<h3 id="why-performance-monitoring-is-essential-in-integration-architecture">Why Performance Monitoring is Essential in Integration Architecture</h3>
+<h4 id="1-service-level-agreement-sla-management">1. <strong>Service Level Agreement (SLA) Management</strong></h4>
+<p>In enterprise environments with strict performance commitments, performance monitoring provides:
+- <strong>SLA compliance tracking</strong> - continuous monitoring of performance against SLA commitments
+- <strong>Performance guarantee verification</strong> - validation that systems meet contractual performance requirements
+- <strong>Breach prediction and prevention</strong> - early warning of potential SLA violations
+- <strong>Performance reporting</strong> - comprehensive reporting for SLA compliance and contract management</p>
+<h4 id="2-user-experience-optimization">2. <strong>User Experience Optimization</strong></h4>
+<p>Ensuring optimal user experience through performance visibility:
+- <strong>User journey performance</strong> - end-to-end performance monitoring of user interactions and workflows
+- <strong>Application responsiveness</strong> - monitoring of application response times and user interface performance
+- <strong>Mobile performance</strong> - specific monitoring of mobile application and responsive design performance
+- <strong>Accessibility performance</strong> - ensuring performance meets accessibility standards and requirements</p>
+<h4 id="3-capacity-planning-and-resource-optimization">3. <strong>Capacity Planning and Resource Optimization</strong></h4>
+<p>Supporting informed decisions about system capacity and resource allocation:
+- <strong>Resource utilization analysis</strong> - understanding current resource usage patterns and efficiency
+- <strong>Scalability assessment</strong> - evaluation of system scalability characteristics and limitations
+- <strong>Growth planning</strong> - data-driven planning for system growth and capacity expansion
+- <strong>Cost optimization</strong> - identification of opportunities for resource optimization and cost reduction</p>
+<h4 id="4-integration-performance-management">4. <strong>Integration Performance Management</strong></h4>
+<p>Specific monitoring of integration processes and data flows:
+- <strong>Integration flow performance</strong> - monitoring of data integration and message processing performance
+- <strong>Service dependency performance</strong> - monitoring of external service dependencies and their impact
+- <strong>Data transformation performance</strong> - analysis of data processing and transformation efficiency
+- <strong>Message queue performance</strong> - monitoring of message queuing systems and asynchronous processing</p>
+<h3 id="benefits-in-integration-contexts">Benefits in Integration Contexts</h3>
+<h4 id="1-technical-advantages">1. <strong>Technical Advantages</strong></h4>
+<ul>
+<li><strong>Bottleneck identification</strong> - rapid identification of performance bottlenecks and optimization opportunities</li>
+<li><strong>System optimization</strong> - data-driven optimization of system configuration and architecture</li>
+<li><strong>Preventive maintenance</strong> - proactive identification and resolution of performance issues</li>
+<li><strong>Performance validation</strong> - validation of performance improvements and optimization efforts</li>
+</ul>
+<h4 id="2-operational-benefits">2. <strong>Operational Benefits</strong></h4>
+<ul>
+<li><strong>Improved reliability</strong> - better system reliability through proactive performance management</li>
+<li><strong>Reduced downtime</strong> - prevention of performance-related outages and service disruptions</li>
+<li><strong>Operational efficiency</strong> - more efficient operations through performance visibility and automation</li>
+<li><strong>Cost management</strong> - better cost management through optimized resource utilization</li>
+</ul>
+<h4 id="3-integration-enablement">3. <strong>Integration Enablement</strong></h4>
+<ul>
+<li><strong>Service quality assurance</strong> - ensuring consistent quality of integration services</li>
+<li><strong>Dependency management</strong> - understanding and managing performance dependencies between services</li>
+<li><strong>Flow optimization</strong> - optimization of integration flows and data processing pipelines</li>
+<li><strong>Scalability planning</strong> - informed planning for integration system scalability and growth</li>
+</ul>
+<h4 id="4-business-value">4. <strong>Business Value</strong></h4>
+<ul>
+<li><strong>Customer satisfaction</strong> - improved customer satisfaction through better application performance</li>
+<li><strong>Business continuity</strong> - better business continuity through reliable performance management</li>
+<li><strong>Competitive advantage</strong> - competitive advantage through superior application performance</li>
+<li><strong>Revenue protection</strong> - protection of revenue through prevention of performance-related issues</li>
+</ul>
+<h3 id="integration-architecture-applications">Integration Architecture Applications</h3>
+<h4 id="1-comprehensive-performance-monitoring-system">1. <strong>Comprehensive Performance Monitoring System</strong></h4>
+<p>Enterprise-grade performance monitoring with real-time metrics and analytics:</p>
+<pre><code class="language-java">// Performance Monitoring Configuration
+@Configuration
+@EnableConfigurationProperties(PerformanceMonitoringProperties.class)
+public class PerformanceMonitoringConfiguration {
+
+    @Bean
+    public MeterRegistry meterRegistry() {
+        return new CompositeMeterRegistry();
+    }
+
+    @Bean
+    public PerformanceMetricsCollector performanceMetricsCollector(MeterRegistry meterRegistry) {
+        return new PerformanceMetricsCollector(meterRegistry);
+    }
+
+    @Bean
+    public ApplicationPerformanceMonitor applicationPerformanceMonitor() {
+        return new ApplicationPerformanceMonitor();
+    }
+
+    @Bean
+    public InfrastructurePerformanceMonitor infrastructurePerformanceMonitor() {
+        return new InfrastructurePerformanceMonitor();
+    }
+
+    @Bean
+    public UserExperienceMonitor userExperienceMonitor() {
+        return new UserExperienceMonitor();
+    }
+
+    @Bean
+    public BusinessPerformanceMonitor businessPerformanceMonitor() {
+        return new BusinessPerformanceMonitor();
+    }
+
+    @Bean
+    public PerformanceAnalyzer performanceAnalyzer() {
+        return new PerformanceAnalyzer();
+    }
+
+    @Bean
+    public PerformanceAlertManager performanceAlertManager() {
+        return new PerformanceAlertManager();
+    }
+}
+
+// Application Performance Monitor
+@Service
+public class ApplicationPerformanceMonitor {
+
+    @Autowired
+    private PerformanceMetricsCollector metricsCollector;
+
+    @Autowired
+    private PerformanceAnalyzer performanceAnalyzer;
+
+    private final Timer.Sample currentSample = Timer.start();
+
+    @EventListener
+    public void handleRequestStarted(RequestStartedEvent event) {
+        Timer.Sample sample = Timer.start(metricsCollector.getMeterRegistry());
+        event.getHttpServletRequest().setAttribute(&quot;timer.sample&quot;, sample);
+
+        RequestPerformanceContext context = new RequestPerformanceContext();
+        context.setRequestId(UUID.randomUUID().toString());
+        context.setStartTime(Instant.now());
+        context.setEndpoint(event.getHttpServletRequest().getRequestURI());
+        context.setMethod(event.getHttpServletRequest().getMethod());
+        context.setUserAgent(event.getHttpServletRequest().getHeader(&quot;User-Agent&quot;));
+        context.setRemoteAddr(event.getHttpServletRequest().getRemoteAddr());
+
+        event.getHttpServletRequest().setAttribute(&quot;performance.context&quot;, context);
+
+        // Track concurrent requests
+        metricsCollector.incrementConcurrentRequests(context.getEndpoint());
+
+        log.debug(&quot;Request started - ID: {}, Endpoint: {}, Method: {}&quot;, 
+                 context.getRequestId(), context.getEndpoint(), context.getMethod());
+    }
+
+    @EventListener
+    public void handleRequestCompleted(RequestCompletedEvent event) {
+        Timer.Sample sample = (Timer.Sample) event.getHttpServletRequest().getAttribute(&quot;timer.sample&quot;);
+        RequestPerformanceContext context = (RequestPerformanceContext) 
+            event.getHttpServletRequest().getAttribute(&quot;performance.context&quot;);
+
+        if (sample != null &amp;&amp; context != null) {
+            context.setEndTime(Instant.now());
+            context.setStatusCode(event.getResponse().getStatus());
+            context.setResponseSize(event.getResponse().getBufferSize());
+
+            long duration = Duration.between(context.getStartTime(), context.getEndTime()).toMillis();
+            context.setDuration(duration);
+
+            // Record timing metrics
+            sample.stop(Timer.builder(&quot;http.request.duration&quot;)
+                .tag(&quot;method&quot;, context.getMethod())
+                .tag(&quot;endpoint&quot;, normalizeEndpoint(context.getEndpoint()))
+                .tag(&quot;status&quot;, String.valueOf(context.getStatusCode()))
+                .register(metricsCollector.getMeterRegistry()));
+
+            // Record response size metrics
+            metricsCollector.recordResponseSize(context.getEndpoint(), context.getResponseSize());
+
+            // Record request rate metrics
+            metricsCollector.incrementRequestCounter(context.getEndpoint(), context.getStatusCode());
+
+            // Decrement concurrent requests
+            metricsCollector.decrementConcurrentRequests(context.getEndpoint());
+
+            // Analyze performance
+            analyzeRequestPerformance(context);
+
+            log.debug(&quot;Request completed - ID: {}, Duration: {}ms, Status: {}, Size: {} bytes&quot;, 
+                     context.getRequestId(), duration, context.getStatusCode(), context.getResponseSize());
+        }
+    }
+
+    public RequestPerformanceMetrics getRequestPerformanceMetrics(String endpoint, Duration period) {
+        Instant endTime = Instant.now();
+        Instant startTime = endTime.minus(period);
+
+        RequestPerformanceMetrics metrics = new RequestPerformanceMetrics();
+        metrics.setEndpoint(endpoint);
+        metrics.setPeriod(period);
+        metrics.setStartTime(startTime);
+        metrics.setEndTime(endTime);
+
+        // Get performance data from metrics collector
+        PerformanceData performanceData = metricsCollector.getPerformanceData(endpoint, startTime, endTime);
+
+        metrics.setTotalRequests(performanceData.getTotalRequests());
+        metrics.setSuccessfulRequests(performanceData.getSuccessfulRequests());
+        metrics.setErrorRequests(performanceData.getErrorRequests());
+        metrics.setAverageResponseTime(performanceData.getAverageResponseTime());
+        metrics.setMedianResponseTime(performanceData.getMedianResponseTime());
+        metrics.setP95ResponseTime(performanceData.getP95ResponseTime());
+        metrics.setP99ResponseTime(performanceData.getP99ResponseTime());
+        metrics.setMaxResponseTime(performanceData.getMaxResponseTime());
+        metrics.setMinResponseTime(performanceData.getMinResponseTime());
+        metrics.setThroughput(calculateThroughput(performanceData.getTotalRequests(), period));
+        metrics.setErrorRate(calculateErrorRate(performanceData));
+
+        // Calculate additional metrics
+        metrics.setRequestsPerMinute(calculateRequestsPerMinute(performanceData, period));
+        metrics.setAverageResponseSize(performanceData.getAverageResponseSize());
+        metrics.setConcurrentRequestsAvg(performanceData.getAverageConcurrentRequests());
+        metrics.setConcurrentRequestsMax(performanceData.getMaxConcurrentRequests());
+
+        return metrics;
+    }
+
+    public List&lt;PerformanceIssue&gt; identifyPerformanceIssues(String endpoint, Duration period) {
+        List&lt;PerformanceIssue&gt; issues = new ArrayList&lt;&gt;();
+        RequestPerformanceMetrics metrics = getRequestPerformanceMetrics(endpoint, period);
+
+        // Check response time thresholds
+        if (metrics.getAverageResponseTime() &gt; 5000) {
+            issues.add(new PerformanceIssue(
+                PerformanceIssueType.HIGH_RESPONSE_TIME,
+                &quot;High average response time&quot;,
+                String.format(&quot;Average response time %.2fms exceeds threshold of 5000ms&quot;, 
+                             metrics.getAverageResponseTime()),
+                PerformanceIssueSeverity.HIGH
+            ));
+        }
+
+        if (metrics.getP95ResponseTime() &gt; 10000) {
+            issues.add(new PerformanceIssue(
+                PerformanceIssueType.HIGH_RESPONSE_TIME_P95,
+                &quot;High P95 response time&quot;,
+                String.format(&quot;P95 response time %.2fms exceeds threshold of 10000ms&quot;, 
+                             metrics.getP95ResponseTime()),
+                PerformanceIssueSeverity.MEDIUM
+            ));
+        }
+
+        // Check error rate thresholds
+        if (metrics.getErrorRate() &gt; 0.05) { // 5% error rate
+            issues.add(new PerformanceIssue(
+                PerformanceIssueType.HIGH_ERROR_RATE,
+                &quot;High error rate&quot;,
+                String.format(&quot;Error rate %.2f%% exceeds threshold of 5%%&quot;, 
+                             metrics.getErrorRate() * 100),
+                PerformanceIssueSeverity.CRITICAL
+            ));
+        }
+
+        // Check throughput degradation
+        RequestPerformanceMetrics previousMetrics = getRequestPerformanceMetrics(endpoint, 
+            period.multipliedBy(2).minus(period));
+
+        if (previousMetrics.getThroughput() &gt; 0 &amp;&amp; 
+            metrics.getThroughput() &lt; previousMetrics.getThroughput() * 0.8) {
+            issues.add(new PerformanceIssue(
+                PerformanceIssueType.THROUGHPUT_DEGRADATION,
+                &quot;Throughput degradation&quot;,
+                String.format(&quot;Throughput %.2f req/s is 20%% lower than previous period %.2f req/s&quot;, 
+                             metrics.getThroughput(), previousMetrics.getThroughput()),
+                PerformanceIssueSeverity.MEDIUM
+            ));
+        }
+
+        return issues;
+    }
+
+    private void analyzeRequestPerformance(RequestPerformanceContext context) {
+        // Identify slow requests
+        if (context.getDuration() &gt; 5000) {
+            SlowRequestAlert alert = new SlowRequestAlert();
+            alert.setRequestId(context.getRequestId());
+            alert.setEndpoint(context.getEndpoint());
+            alert.setDuration(context.getDuration());
+            alert.setTimestamp(context.getEndTime());
+
+            performanceAnalyzer.analyzeSlowRequest(alert);
+        }
+
+        // Check for potential memory leaks (large responses)
+        if (context.getResponseSize() &gt; 10 * 1024 * 1024) { // 10MB
+            LargeResponseAlert alert = new LargeResponseAlert();
+            alert.setRequestId(context.getRequestId());
+            alert.setEndpoint(context.getEndpoint());
+            alert.setResponseSize(context.getResponseSize());
+            alert.setTimestamp(context.getEndTime());
+
+            performanceAnalyzer.analyzeLargeResponse(alert);
+        }
+    }
+
+    private String normalizeEndpoint(String endpoint) {
+        // Normalize endpoints with parameters (e.g., /users/{id} instead of /users/123)
+        return endpoint.replaceAll(&quot;/\\d+&quot;, &quot;/{id}&quot;)
+                      .replaceAll(&quot;/[a-fA-F0-9-]{36}&quot;, &quot;/{uuid}&quot;);
+    }
+
+    private double calculateThroughput(long totalRequests, Duration period) {
+        return (double) totalRequests / period.getSeconds();
+    }
+
+    private double calculateErrorRate(PerformanceData data) {
+        if (data.getTotalRequests() == 0) return 0.0;
+        return (double) data.getErrorRequests() / data.getTotalRequests();
+    }
+
+    private double calculateRequestsPerMinute(PerformanceData data, Duration period) {
+        return (double) data.getTotalRequests() / (period.getSeconds() / 60.0);
+    }
+}
+
+// Infrastructure Performance Monitor
+@Service
+public class InfrastructurePerformanceMonitor {
+
+    @Autowired
+    private PerformanceMetricsCollector metricsCollector;
+
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(2);
+
+    @PostConstruct
+    public void startMonitoring() {
+        // Monitor system metrics every 10 seconds
+        scheduler.scheduleAtFixedRate(this::collectSystemMetrics, 0, 10, TimeUnit.SECONDS);
+
+        // Monitor JVM metrics every 5 seconds
+        scheduler.scheduleAtFixedRate(this::collectJvmMetrics, 0, 5, TimeUnit.SECONDS);
+    }
+
+    private void collectSystemMetrics() {
+        try {
+            SystemMetrics systemMetrics = new SystemMetrics();
+            systemMetrics.setTimestamp(Instant.now());
+
+            // CPU metrics
+            OperatingSystemMXBean osBean = ManagementFactory.getOperatingSystemMXBean();
+            systemMetrics.setCpuUsage(osBean.getProcessCpuLoad() * 100);
+            systemMetrics.setSystemCpuUsage(osBean.getSystemCpuLoad() * 100);
+            systemMetrics.setAvailableProcessors(osBean.getAvailableProcessors());
+            systemMetrics.setSystemLoadAverage(osBean.getSystemLoadAverage());
+
+            // Memory metrics
+            MemoryMXBean memoryBean = ManagementFactory.getMemoryMXBean();
+            MemoryUsage heapMemory = memoryBean.getHeapMemoryUsage();
+            MemoryUsage nonHeapMemory = memoryBean.getNonHeapMemoryUsage();
+
+            systemMetrics.setHeapMemoryUsed(heapMemory.getUsed());
+            systemMetrics.setHeapMemoryMax(heapMemory.getMax());
+            systemMetrics.setHeapMemoryCommitted(heapMemory.getCommitted());
+            systemMetrics.setNonHeapMemoryUsed(nonHeapMemory.getUsed());
+            systemMetrics.setNonHeapMemoryMax(nonHeapMemory.getMax());
+
+            // Calculate memory utilization percentages
+            double heapUtilization = heapMemory.getMax() &gt; 0 ? 
+                (double) heapMemory.getUsed() / heapMemory.getMax() * 100 : 0;
+            systemMetrics.setHeapMemoryUtilization(heapUtilization);
+
+            // Thread metrics
+            ThreadMXBean threadBean = ManagementFactory.getThreadMXBean();
+            systemMetrics.setThreadCount(threadBean.getThreadCount());
+            systemMetrics.setDaemonThreadCount(threadBean.getDaemonThreadCount());
+            systemMetrics.setPeakThreadCount(threadBean.getPeakThreadCount());
+
+            // Garbage collection metrics
+            List&lt;GarbageCollectorMXBean&gt; gcBeans = ManagementFactory.getGarbageCollectorMXBeans();
+            long totalGcCollections = 0;
+            long totalGcTime = 0;
+
+            for (GarbageCollectorMXBean gcBean : gcBeans) {
+                totalGcCollections += gcBean.getCollectionCount();
+                totalGcTime += gcBean.getCollectionTime();
+            }
+
+            systemMetrics.setGcCollections(totalGcCollections);
+            systemMetrics.setGcTime(totalGcTime);
+
+            // Record metrics
+            metricsCollector.recordSystemMetrics(systemMetrics);
+
+            // Check for performance issues
+            checkSystemPerformanceThresholds(systemMetrics);
+
+        } catch (Exception e) {
+            log.error(&quot;Failed to collect system metrics&quot;, e);
+        }
+    }
+
+    private void collectJvmMetrics() {
+        try {
+            JvmMetrics jvmMetrics = new JvmMetrics();
+            jvmMetrics.setTimestamp(Instant.now());
+
+            // Class loading metrics
+            ClassLoadingMXBean classBean = ManagementFactory.getClassLoadingMXBean();
+            jvmMetrics.setLoadedClassCount(classBean.getLoadedClassCount());
+            jvmMetrics.setTotalLoadedClassCount(classBean.getTotalLoadedClassCount());
+            jvmMetrics.setUnloadedClassCount(classBean.getUnloadedClassCount());
+
+            // Compilation metrics
+            CompilationMXBean compilationBean = ManagementFactory.getCompilationMXBean();
+            if (compilationBean != null) {
+                jvmMetrics.setCompilationTime(compilationBean.getTotalCompilationTime());
+            }
+
+            // Runtime metrics
+            RuntimeMXBean runtimeBean = ManagementFactory.getRuntimeMXBean();
+            jvmMetrics.setUptime(runtimeBean.getUptime());
+            jvmMetrics.setVmName(runtimeBean.getVmName());
+            jvmMetrics.setVmVersion(runtimeBean.getVmVersion());
+
+            // Memory pool metrics
+            List&lt;MemoryPoolMXBean&gt; memoryPools = ManagementFactory.getMemoryPoolMXBeans();
+            Map&lt;String, MemoryPoolMetrics&gt; poolMetrics = new HashMap&lt;&gt;();
+
+            for (MemoryPoolMXBean pool : memoryPools) {
+                MemoryPoolMetrics poolMetric = new MemoryPoolMetrics();
+                poolMetric.setName(pool.getName());
+                poolMetric.setType(pool.getType().name());
+
+                MemoryUsage usage = pool.getUsage();
+                if (usage != null) {
+                    poolMetric.setUsed(usage.getUsed());
+                    poolMetric.setCommitted(usage.getCommitted());
+                    poolMetric.setMax(usage.getMax());
+                    poolMetric.setInit(usage.getInit());
+
+                    if (usage.getMax() &gt; 0) {
+                        poolMetric.setUtilization((double) usage.getUsed() / usage.getMax() * 100);
+                    }
+                }
+
+                poolMetrics.put(pool.getName(), poolMetric);
+            }
+
+            jvmMetrics.setMemoryPoolMetrics(poolMetrics);
+
+            // Record metrics
+            metricsCollector.recordJvmMetrics(jvmMetrics);
+
+            // Check for JVM performance issues
+            checkJvmPerformanceThresholds(jvmMetrics);
+
+        } catch (Exception e) {
+            log.error(&quot;Failed to collect JVM metrics&quot;, e);
+        }
+    }
+
+    public InfrastructurePerformanceReport generateInfrastructureReport(Duration period) {
+        Instant endTime = Instant.now();
+        Instant startTime = endTime.minus(period);
+
+        InfrastructurePerformanceReport report = new InfrastructurePerformanceReport();
+        report.setPeriod(period);
+        report.setStartTime(startTime);
+        report.setEndTime(endTime);
+        report.setGeneratedAt(Instant.now());
+
+        // Get system metrics summary
+        SystemMetricsSummary systemSummary = metricsCollector.getSystemMetricsSummary(startTime, endTime);
+        report.setSystemSummary(systemSummary);
+
+        // Get JVM metrics summary
+        JvmMetricsSummary jvmSummary = metricsCollector.getJvmMetricsSummary(startTime, endTime);
+        report.setJvmSummary(jvmSummary);
+
+        // Analyze performance trends
+        PerformanceTrend cpuTrend = analyzeCpuTrend(startTime, endTime);
+        PerformanceTrend memoryTrend = analyzeMemoryTrend(startTime, endTime);
+        PerformanceTrend gcTrend = analyzeGcTrend(startTime, endTime);
+
+        report.setCpuTrend(cpuTrend);
+        report.setMemoryTrend(memoryTrend);
+        report.setGcTrend(gcTrend);
+
+        // Identify resource utilization peaks
+        List&lt;ResourceUtilizationPeak&gt; peaks = identifyResourcePeaks(startTime, endTime);
+        report.setResourcePeaks(peaks);
+
+        // Generate recommendations
+        List&lt;PerformanceRecommendation&gt; recommendations = generateInfrastructureRecommendations(report);
+        report.setRecommendations(recommendations);
+
+        return report;
+    }
+
+    private void checkSystemPerformanceThresholds(SystemMetrics metrics) {
+        List&lt;PerformanceAlert&gt; alerts = new ArrayList&lt;&gt;();
+
+        // CPU utilization alerts
+        if (metrics.getCpuUsage() &gt; 80) {
+            alerts.add(createPerformanceAlert(
+                &quot;HIGH_CPU_USAGE&quot;,
+                &quot;High CPU usage detected&quot;,
+                String.format(&quot;CPU usage %.2f%% exceeds threshold of 80%%&quot;, metrics.getCpuUsage()),
+                PerformanceAlertSeverity.CRITICAL
+            ));
+        }
+
+        // Memory utilization alerts
+        if (metrics.getHeapMemoryUtilization() &gt; 85) {
+            alerts.add(createPerformanceAlert(
+                &quot;HIGH_MEMORY_USAGE&quot;,
+                &quot;High heap memory usage detected&quot;,
+                String.format(&quot;Heap memory utilization %.2f%% exceeds threshold of 85%%&quot;, 
+                             metrics.getHeapMemoryUtilization()),
+                PerformanceAlertSeverity.HIGH
+            ));
+        }
+
+        // System load alerts
+        if (metrics.getSystemLoadAverage() &gt; metrics.getAvailableProcessors() * 2) {
+            alerts.add(createPerformanceAlert(
+                &quot;HIGH_SYSTEM_LOAD&quot;,
+                &quot;High system load average detected&quot;,
+                String.format(&quot;System load average %.2f exceeds threshold of %d&quot;, 
+                             metrics.getSystemLoadAverage(), metrics.getAvailableProcessors() * 2),
+                PerformanceAlertSeverity.HIGH
+            ));
+        }
+
+        // Thread count alerts
+        if (metrics.getThreadCount() &gt; 500) {
+            alerts.add(createPerformanceAlert(
+                &quot;HIGH_THREAD_COUNT&quot;,
+                &quot;High thread count detected&quot;,
+                String.format(&quot;Thread count %d exceeds threshold of 500&quot;, metrics.getThreadCount()),
+                PerformanceAlertSeverity.MEDIUM
+            ));
+        }
+
+        // Send alerts if any
+        if (!alerts.isEmpty()) {
+            performanceAlertManager.sendAlerts(alerts);
+        }
+    }
+}
+
+// User Experience Monitor
+@Service
+public class UserExperienceMonitor {
+
+    @Autowired
+    private PerformanceMetricsCollector metricsCollector;
+
+    public void recordPageLoadTime(String page, long loadTimeMs, String userAgent, String sessionId) {
+        UserExperienceMetric metric = new UserExperienceMetric();
+        metric.setMetricType(&quot;PAGE_LOAD_TIME&quot;);
+        metric.setPage(page);
+        metric.setValue(loadTimeMs);
+        metric.setUserAgent(userAgent);
+        metric.setSessionId(sessionId);
+        metric.setTimestamp(Instant.now());
+
+        metricsCollector.recordUserExperienceMetric(metric);
+
+        // Check for slow page loads
+        if (loadTimeMs &gt; 3000) {
+            SlowPageLoadAlert alert = new SlowPageLoadAlert();
+            alert.setPage(page);
+            alert.setLoadTime(loadTimeMs);
+            alert.setUserAgent(userAgent);
+            alert.setSessionId(sessionId);
+            alert.setTimestamp(Instant.now());
+
+            performanceAlertManager.sendSlowPageLoadAlert(alert);
+        }
+
+        log.debug(&quot;Page load time recorded - Page: {}, LoadTime: {}ms, Session: {}&quot;, 
+                 page, loadTimeMs, sessionId);
+    }
+
+    public void recordInteractionTime(String interaction, long responseTimeMs, String page, String sessionId) {
+        UserExperienceMetric metric = new UserExperienceMetric();
+        metric.setMetricType(&quot;INTERACTION_TIME&quot;);
+        metric.setInteraction(interaction);
+        metric.setPage(page);
+        metric.setValue(responseTimeMs);
+        metric.setSessionId(sessionId);
+        metric.setTimestamp(Instant.now());
+
+        metricsCollector.recordUserExperienceMetric(metric);
+
+        log.debug(&quot;Interaction time recorded - Interaction: {}, ResponseTime: {}ms, Page: {}, Session: {}&quot;, 
+                 interaction, responseTimeMs, page, sessionId);
+    }
+
+    public void recordUserSatisfaction(String page, int satisfactionScore, String feedback, String sessionId) {
+        UserExperienceMetric metric = new UserExperienceMetric();
+        metric.setMetricType(&quot;USER_SATISFACTION&quot;);
+        metric.setPage(page);
+        metric.setValue(satisfactionScore);
+        metric.setFeedback(feedback);
+        metric.setSessionId(sessionId);
+        metric.setTimestamp(Instant.now());
+
+        metricsCollector.recordUserExperienceMetric(metric);
+
+        log.info(&quot;User satisfaction recorded - Page: {}, Score: {}, Feedback: {}, Session: {}&quot;, 
+                page, satisfactionScore, feedback, sessionId);
+    }
+
+    public UserExperienceReport generateUserExperienceReport(Duration period) {
+        Instant endTime = Instant.now();
+        Instant startTime = endTime.minus(period);
+
+        UserExperienceReport report = new UserExperienceReport();
+        report.setPeriod(period);
+        report.setStartTime(startTime);
+        report.setEndTime(endTime);
+        report.setGeneratedAt(Instant.now());
+
+        // Get page performance metrics
+        Map&lt;String, PagePerformanceMetrics&gt; pageMetrics = getPagePerformanceMetrics(startTime, endTime);
+        report.setPageMetrics(pageMetrics);
+
+        // Get interaction performance metrics
+        Map&lt;String, InteractionPerformanceMetrics&gt; interactionMetrics = 
+            getInteractionPerformanceMetrics(startTime, endTime);
+        report.setInteractionMetrics(interactionMetrics);
+
+        // Get user satisfaction metrics
+        UserSatisfactionMetrics satisfactionMetrics = getUserSatisfactionMetrics(startTime, endTime);
+        report.setSatisfactionMetrics(satisfactionMetrics);
+
+        // Analyze user experience trends
+        List&lt;UserExperienceTrend&gt; trends = analyzeUserExperienceTrends(startTime, endTime);
+        report.setTrends(trends);
+
+        // Identify user experience issues
+        List&lt;UserExperienceIssue&gt; issues = identifyUserExperienceIssues(report);
+        report.setIssues(issues);
+
+        // Generate improvement recommendations
+        List&lt;UserExperienceRecommendation&gt; recommendations = 
+            generateUserExperienceRecommendations(report);
+        report.setRecommendations(recommendations);
+
+        return report;
+    }
+}
+</code></pre>
+<h4 id="2-business-performance-monitoring">2. <strong>Business Performance Monitoring</strong></h4>
+<p>Business-focused performance monitoring for enterprise integration processes:</p>
+<pre><code class="language-java">// Business Performance Monitor
+@Service
+public class BusinessPerformanceMonitor {
+
+    @Autowired
+    private PerformanceMetricsCollector metricsCollector;
+
+    @Autowired
+    private BusinessEventLogger businessEventLogger;
+
+    public void recordOrderProcessingTime(String orderId, long processingTimeMs, 
+                                        OrderStatus finalStatus, Map&lt;String, Object&gt; context) {
+        BusinessPerformanceMetric metric = new BusinessPerformanceMetric();
+        metric.setMetricType(&quot;ORDER_PROCESSING_TIME&quot;);
+        metric.setEntityId(orderId);
+        metric.setValue(processingTimeMs);
+        metric.setBusinessContext(context);
+        metric.setTimestamp(Instant.now());
+
+        metricsCollector.recordBusinessPerformanceMetric(metric);
+
+        // Log business event
+        businessEventLogger.logOrderProcessingCompleted(orderId, processingTimeMs, finalStatus);
+
+        // Check SLA compliance
+        if (processingTimeMs &gt; 300000) { // 5 minutes SLA
+            BusinessSlaViolation violation = new BusinessSlaViolation();
+            violation.setSlaType(&quot;ORDER_PROCESSING_TIME&quot;);
+            violation.setEntityId(orderId);
+            violation.setActualValue(processingTimeMs);
+            violation.setExpectedValue(300000);
+            violation.setViolationSeverity(BusinessSlaViolationSeverity.MEDIUM);
+            violation.setTimestamp(Instant.now());
+
+            handleBusinessSlaViolation(violation);
+        }
+
+        log.info(&quot;Order processing time recorded - OrderId: {}, ProcessingTime: {}ms, Status: {}&quot;, 
+                orderId, processingTimeMs, finalStatus);
+    }
+
+    public void recordPaymentProcessingTime(String paymentId, String orderId, long processingTimeMs, 
+                                          PaymentStatus status, BigDecimal amount) {
+        BusinessPerformanceMetric metric = new BusinessPerformanceMetric();
+        metric.setMetricType(&quot;PAYMENT_PROCESSING_TIME&quot;);
+        metric.setEntityId(paymentId);
+        metric.setValue(processingTimeMs);
+        metric.setBusinessContext(Map.of(
+            &quot;orderId&quot;, orderId,
+            &quot;amount&quot;, amount,
+            &quot;status&quot;, status.name()
+        ));
+        metric.setTimestamp(Instant.now());
+
+        metricsCollector.recordBusinessPerformanceMetric(metric);
+
+        // Check payment processing SLA
+        if (processingTimeMs &gt; 60000) { // 1 minute SLA for payment processing
+            BusinessSlaViolation violation = new BusinessSlaViolation();
+            violation.setSlaType(&quot;PAYMENT_PROCESSING_TIME&quot;);
+            violation.setEntityId(paymentId);
+            violation.setActualValue(processingTimeMs);
+            violation.setExpectedValue(60000);
+            violation.setViolationSeverity(BusinessSlaViolationSeverity.HIGH);
+            violation.setTimestamp(Instant.now());
+
+            handleBusinessSlaViolation(violation);
+        }
+
+        log.info(&quot;Payment processing time recorded - PaymentId: {}, OrderId: {}, ProcessingTime: {}ms, Status: {}&quot;, 
+                paymentId, orderId, processingTimeMs, status);
+    }
+
+    public void recordInventoryUpdateTime(String productId, long updateTimeMs, 
+                                        InventoryUpdateType updateType, int quantityChange) {
+        BusinessPerformanceMetric metric = new BusinessPerformanceMetric();
+        metric.setMetricType(&quot;INVENTORY_UPDATE_TIME&quot;);
+        metric.setEntityId(productId);
+        metric.setValue(updateTimeMs);
+        metric.setBusinessContext(Map.of(
+            &quot;updateType&quot;, updateType.name(),
+            &quot;quantityChange&quot;, quantityChange
+        ));
+        metric.setTimestamp(Instant.now());
+
+        metricsCollector.recordBusinessPerformanceMetric(metric);
+
+        log.debug(&quot;Inventory update time recorded - ProductId: {}, UpdateTime: {}ms, Type: {}, Change: {}&quot;, 
+                 productId, updateTimeMs, updateType, quantityChange);
+    }
+
+    public BusinessPerformanceReport generateBusinessPerformanceReport(Duration period) {
+        Instant endTime = Instant.now();
+        Instant startTime = endTime.minus(period);
+
+        BusinessPerformanceReport report = new BusinessPerformanceReport();
+        report.setPeriod(period);
+        report.setStartTime(startTime);
+        report.setEndTime(endTime);
+        report.setGeneratedAt(Instant.now());
+
+        // Order processing performance
+        OrderProcessingPerformance orderPerformance = getOrderProcessingPerformance(startTime, endTime);
+        report.setOrderProcessingPerformance(orderPerformance);
+
+        // Payment processing performance
+        PaymentProcessingPerformance paymentPerformance = getPaymentProcessingPerformance(startTime, endTime);
+        report.setPaymentProcessingPerformance(paymentPerformance);
+
+        // Inventory performance
+        InventoryPerformance inventoryPerformance = getInventoryPerformance(startTime, endTime);
+        report.setInventoryPerformance(inventoryPerformance);
+
+        // SLA compliance metrics
+        SlaComplianceReport slaCompliance = getSlaComplianceReport(startTime, endTime);
+        report.setSlaCompliance(slaCompliance);
+
+        // Business KPI metrics
+        BusinessKpiMetrics kpiMetrics = getBusinessKpiMetrics(startTime, endTime);
+        report.setKpiMetrics(kpiMetrics);
+
+        // Performance trends
+        List&lt;BusinessPerformanceTrend&gt; trends = analyzeBusinessPerformanceTrends(startTime, endTime);
+        report.setTrends(trends);
+
+        // Business impact analysis
+        BusinessImpactAnalysis impactAnalysis = analyzeBusinessImpact(report);
+        report.setImpactAnalysis(impactAnalysis);
+
+        return report;
+    }
+
+    private OrderProcessingPerformance getOrderProcessingPerformance(Instant startTime, Instant endTime) {
+        List&lt;BusinessPerformanceMetric&gt; metrics = metricsCollector.getBusinessPerformanceMetrics(
+            &quot;ORDER_PROCESSING_TIME&quot;, startTime, endTime);
+
+        OrderProcessingPerformance performance = new OrderProcessingPerformance();
+        performance.setTotalOrders(metrics.size());
+
+        if (!metrics.isEmpty()) {
+            DoubleSummaryStatistics stats = metrics.stream()
+                .mapToDouble(BusinessPerformanceMetric::getValue)
+                .summaryStatistics();
+
+            performance.setAverageProcessingTime(stats.getAverage());
+            performance.setMaxProcessingTime(stats.getMax());
+            performance.setMinProcessingTime(stats.getMin());
+
+            // Calculate percentiles
+            List&lt;Double&gt; sortedTimes = metrics.stream()
+                .mapToDouble(BusinessPerformanceMetric::getValue)
+                .sorted()
+                .boxed()
+                .collect(Collectors.toList());
+
+            performance.setMedianProcessingTime(calculatePercentile(sortedTimes, 50));
+            performance.setP95ProcessingTime(calculatePercentile(sortedTimes, 95));
+            performance.setP99ProcessingTime(calculatePercentile(sortedTimes, 99));
+
+            // Calculate SLA compliance
+            long slaCompliantOrders = metrics.stream()
+                .mapToLong(m -&gt; m.getValue() &lt;= 300000 ? 1 : 0) // 5 minute SLA
+                .sum();
+
+            performance.setSlaComplianceRate((double) slaCompliantOrders / metrics.size());
+            performance.setSlaViolations(metrics.size() - (int) slaCompliantOrders);
+        }
+
+        return performance;
+    }
+
+    private void handleBusinessSlaViolation(BusinessSlaViolation violation) {
+        // Log SLA violation
+        log.warn(&quot;Business SLA violation detected - Type: {}, EntityId: {}, Actual: {}ms, Expected: {}ms, Severity: {}&quot;, 
+                violation.getSlaType(), violation.getEntityId(), violation.getActualValue(), 
+                violation.getExpectedValue(), violation.getViolationSeverity());
+
+        // Create performance alert
+        BusinessPerformanceAlert alert = new BusinessPerformanceAlert();
+        alert.setAlertType(&quot;SLA_VIOLATION&quot;);
+        alert.setSeverity(mapSeverity(violation.getViolationSeverity()));
+        alert.setTitle(&quot;Business SLA Violation&quot;);
+        alert.setMessage(String.format(&quot;SLA violation for %s - Entity: %s, Actual: %dms, Expected: %dms&quot;, 
+            violation.getSlaType(), violation.getEntityId(), 
+            violation.getActualValue(), violation.getExpectedValue()));
+        alert.setTimestamp(violation.getTimestamp());
+        alert.setViolation(violation);
+
+        performanceAlertManager.sendBusinessPerformanceAlert(alert);
+
+        // Store violation for reporting
+        metricsCollector.recordSlaViolation(violation);
+    }
+}
+
+// Performance Alert Manager
+@Service
+public class PerformanceAlertManager {
+
+    @Autowired
+    private NotificationService notificationService;
+
+    @Value(&quot;${performance.alerts.slack.webhook-url}&quot;)
+    private String slackWebhookUrl;
+
+    @Value(&quot;${performance.alerts.email.recipients}&quot;)
+    private List&lt;String&gt; emailRecipients;
+
+    public void sendPerformanceAlert(PerformanceAlert alert) {
+        try {
+            // Create notification message
+            NotificationMessage message = createNotificationMessage(alert);
+
+            // Send to appropriate channels based on severity
+            switch (alert.getSeverity()) {
+                case CRITICAL:
+                    notificationService.sendEmail(emailRecipients, message);
+                    notificationService.sendSlack(slackWebhookUrl, message);
+                    notificationService.sendSms(getOnCallContacts(), message);
+                    break;
+
+                case HIGH:
+                    notificationService.sendEmail(emailRecipients, message);
+                    notificationService.sendSlack(slackWebhookUrl, message);
+                    break;
+
+                case MEDIUM:
+                    notificationService.sendSlack(slackWebhookUrl, message);
+                    break;
+
+                case LOW:
+                    // Only log, no notifications
+                    log.info(&quot;Performance alert logged - {}: {}&quot;, alert.getTitle(), alert.getMessage());
+                    break;
+            }
+
+            // Store alert for reporting
+            storePerformanceAlert(alert);
+
+            log.info(&quot;Performance alert sent - Type: {}, Severity: {}, Message: {}&quot;, 
+                    alert.getType(), alert.getSeverity(), alert.getMessage());
+
+        } catch (Exception e) {
+            log.error(&quot;Failed to send performance alert&quot;, e);
+        }
+    }
+
+    public void sendBusinessPerformanceAlert(BusinessPerformanceAlert alert) {
+        try {
+            // Create business-focused notification
+            BusinessNotificationMessage message = createBusinessNotificationMessage(alert);
+
+            // Send to business stakeholders
+            List&lt;String&gt; businessRecipients = getBusinessStakeholders(alert.getViolation().getSlaType());
+            notificationService.sendEmail(businessRecipients, message);
+
+            // Send to technical team
+            notificationService.sendSlack(slackWebhookUrl, message);
+
+            // Store alert
+            storeBusinessPerformanceAlert(alert);
+
+            log.info(&quot;Business performance alert sent - Type: {}, SLA: {}, Violation: {}&quot;, 
+                    alert.getAlertType(), alert.getViolation().getSlaType(), 
+                    alert.getViolation().getEntityId());
+
+        } catch (Exception e) {
+            log.error(&quot;Failed to send business performance alert&quot;, e);
+        }
+    }
+}
+</code></pre>
+<h2 id="best-practices">Best Practices</h2>
+<h3 id="1-comprehensive-performance-metrics-strategy">1. <strong>Comprehensive Performance Metrics Strategy</strong></h3>
+<ul>
+<li>Define clear performance metrics aligned with business objectives and user experience goals</li>
+<li>Implement performance monitoring at multiple levels (application, infrastructure, business, user experience)</li>
+<li>Use standardized performance measurement methodologies and industry benchmarks</li>
+<li>Establish performance baselines and targets for different system components and business processes</li>
+<li>Implement continuous performance measurement and trending analysis</li>
+</ul>
+<h3 id="2-real-time-performance-monitoring-and-alerting">2. <strong>Real-Time Performance Monitoring and Alerting</strong></h3>
+<ul>
+<li>Implement real-time performance monitoring with appropriate alerting thresholds</li>
+<li>Use intelligent alerting to reduce false positives and alert fatigue</li>
+<li>Implement escalation policies for different performance issue severities</li>
+<li>Provide context-rich alerts with actionable information for issue resolution</li>
+<li>Implement automated remediation for common performance issues when possible</li>
+</ul>
+<h3 id="3-performance-data-collection-and-storage">3. <strong>Performance Data Collection and Storage</strong></h3>
+<ul>
+<li>Use efficient data collection mechanisms that minimize performance overhead</li>
+<li>Implement appropriate data retention policies for different types of performance data</li>
+<li>Use time-series databases optimized for performance metrics storage and analysis</li>
+<li>Implement data aggregation and summarization for long-term trend analysis</li>
+<li>Ensure performance data is available for historical analysis and reporting</li>
+</ul>
+<h3 id="4-performance-analysis-and-optimization">4. <strong>Performance Analysis and Optimization</strong></h3>
+<ul>
+<li>Implement automated performance analysis to identify trends, patterns, and anomalies</li>
+<li>Use statistical analysis and machine learning for predictive performance management</li>
+<li>Implement correlation analysis to understand relationships between different performance metrics</li>
+<li>Provide performance optimization recommendations based on data analysis</li>
+<li>Implement A/B testing capabilities for performance optimization validation</li>
+</ul>
+<h3 id="5-integration-and-automation">5. <strong>Integration and Automation</strong></h3>
+<ul>
+<li>Integrate performance monitoring with deployment pipelines for continuous performance validation</li>
+<li>Implement automated performance regression testing as part of the development process</li>
+<li>Use performance monitoring data for automated scaling and resource management decisions</li>
+<li>Integrate with incident management systems for efficient performance issue resolution</li>
+<li>Implement performance dashboards and reporting for different stakeholder groups</li>
+</ul>
+<h3 id="6-business-alignment-and-communication">6. <strong>Business Alignment and Communication</strong></h3>
+<ul>
+<li>Align performance metrics with business objectives and customer experience goals</li>
+<li>Provide business-relevant performance reports and dashboards for stakeholders</li>
+<li>Implement SLA monitoring and reporting for business and customer commitments</li>
+<li>Communicate performance improvements and impacts in business terms</li>
+<li>Use performance monitoring data to support business decision-making and planning</li>
+</ul>
+<p>Performance Monitoring is essential for maintaining optimal system performance, ensuring excellent user experiences, meeting business objectives, and supporting data-driven optimization decisions in complex enterprise integration architectures, providing the foundation for high-performing and reliable systems that meet business and customer expectations.</p>
+
+      <a href="../index.html" class="back-to-top">← Back to All Patterns</a>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <p>©2026 <a href="https://dataintegrationmastery.com/">Data Integration Mastery™</a> — All Rights Reserved</p>
+  </footer>
+</body>
+</html>

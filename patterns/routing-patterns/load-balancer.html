@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Load Balancer Pattern — Integration Architecture Patterns | Data Integration Mastery™</title>
+  <meta name="description" content="The Load Balancer pattern is a critical performance and reliability pattern in enterprise integration architectures that distributes incoming messages or req...">
+  <meta name="keywords" content="load balancer pattern, integration pattern, routing patterns, integration architecture, EAI patterns, data integration">
+  <link rel="canonical" href="https://dataintegrationmastery.com/patterns/routing-patterns/load-balancer.html">
+
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://dataintegrationmastery.com/patterns/routing-patterns/load-balancer.html">
+  <meta property="og:title" content="Load Balancer Pattern — Integration Architecture Patterns">
+  <meta property="og:description" content="The Load Balancer pattern is a critical performance and reliability pattern in enterprise integration architectures that distributes incoming messages or req...">
+  <meta property="og:image" content="https://dataintegrationmastery.com/assets/images/logo.png">
+  <meta property="og:site_name" content="Data Integration Mastery">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Load Balancer Pattern — Integration Architecture Patterns">
+  <meta name="twitter:description" content="The Load Balancer pattern is a critical performance and reliability pattern in enterprise integration architectures that distributes incoming messages or req...">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/docs.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Load Balancer Pattern",
+    "description": "The Load Balancer pattern is a critical performance and reliability pattern in enterprise integration architectures that distributes incoming messages or req...",
+    "url": "https://dataintegrationmastery.com/patterns/routing-patterns/load-balancer.html",
+    "author": {
+      "@type": "Person",
+      "name": "Ari Vilkman",
+      "jobTitle": "Integration Architect"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Data Integration Mastery",
+      "url": "https://dataintegrationmastery.com"
+    },
+    "isPartOf": {
+      "@type": "CollectionPage",
+      "name": "Integration Architecture Patterns",
+      "url": "https://dataintegrationmastery.com/patterns/"
+    },
+    "about": {
+      "@type": "Thing",
+      "name": "Load Balancer Pattern"
+    },
+    "inLanguage": "en",
+    "isAccessibleForFree": true
+  }
+  </script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="https://dataintegrationmastery.com/" class="header-brand">
+        <img src="../../assets/images/dim-icon.png" alt="DIM" width="36" height="36">
+        <span class="header-title">Data Integration Mastery™</span>
+      </a>
+      <nav class="header-nav" aria-label="Main navigation">
+        <a href="https://dataintegrationmastery.com/">Home</a>
+        <a href="../index.html">All Patterns</a>
+        <a href="https://dataintegrationmastery.com/#free-course">Free Course</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="docs-layout">
+    <aside class="docs-sidebar" aria-label="Pattern categories">
+      <div class="sidebar-title">Pattern Categories</div>
+<div class="sidebar-section">
+  <a href="../index.html#resilience" class="sidebar-section-title">🛡️ Resilience Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../resilience-patterns/circuit-breaker.html">Circuit Breaker</a></li>
+    <li><a href="../resilience-patterns/retry-mechanism.html">Retry Mechanism</a></li>
+    <li><a href="../resilience-patterns/timeout.html">Timeout</a></li>
+    <li><a href="../resilience-patterns/dead-letter-queue.html">Dead Letter Queue</a></li>
+    <li><a href="../resilience-patterns/bulkhead.html">Bulkhead</a></li>
+    <li><a href="../resilience-patterns/fallback-graceful-degradation.html">Fallback / Graceful Degradation</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#messaging" class="sidebar-section-title">📨 Messaging Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../messaging-patterns/request-reply.html">Request-Reply</a></li>
+    <li><a href="../messaging-patterns/publish-subscribe.html">Publish-Subscribe</a></li>
+    <li><a href="../messaging-patterns/message-queue.html">Message Queue</a></li>
+    <li><a href="../messaging-patterns/event-streaming.html">Event Streaming</a></li>
+    <li><a href="../messaging-patterns/correlation-id.html">Correlation ID</a></li>
+    <li><a href="../messaging-patterns/message-routing.html">Message Routing</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#data-transformation" class="sidebar-section-title">🔄 Data Transformation Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../data-transformation-patterns/message-translator.html">Message Translator</a></li>
+    <li><a href="../data-transformation-patterns/content-filter.html">Content Filter</a></li>
+    <li><a href="../data-transformation-patterns/message-router.html">Message Router</a></li>
+    <li><a href="../data-transformation-patterns/aggregator.html">Aggregator</a></li>
+    <li><a href="../data-transformation-patterns/splitter.html">Splitter</a></li>
+    <li><a href="../data-transformation-patterns/data-mapper.html">Data Mapper</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#routing" class="sidebar-section-title">🔀 Routing Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="content-based-router.html">Content-Based Router</a></li>
+    <li><a href="recipient-list.html">Recipient List</a></li>
+    <li><a href="load-balancer.html" class="active">Load Balancer</a></li>
+    <li><a href="message-filter.html">Message Filter</a></li>
+    <li><a href="dynamic-router.html">Dynamic Router</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#security" class="sidebar-section-title">🔐 Security Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../security-patterns/authentication.html">Authentication</a></li>
+    <li><a href="../security-patterns/authorization.html">Authorization</a></li>
+    <li><a href="../security-patterns/encryption.html">Encryption</a></li>
+    <li><a href="../security-patterns/token-management.html">Token Management</a></li>
+    <li><a href="../security-patterns/api-security.html">API Security</a></li>
+    <li><a href="../security-patterns/secret-management.html">Secret Management</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#orchestration" class="sidebar-section-title">🎭 Orchestration Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../orchestration-patterns/saga-pattern.html">Saga Pattern</a></li>
+    <li><a href="../orchestration-patterns/process-manager.html">Process Manager</a></li>
+    <li><a href="../orchestration-patterns/workflow-engine.html">Workflow Engine</a></li>
+    <li><a href="../orchestration-patterns/choreography.html">Choreography</a></li>
+    <li><a href="../orchestration-patterns/compensation-transactions.html">Compensation Transactions</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#observability" class="sidebar-section-title">📊 Monitoring & Observability Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../monitoring-observability-patterns/distributed-tracing.html">Distributed Tracing</a></li>
+    <li><a href="../monitoring-observability-patterns/metrics-collection.html">Metrics Collection</a></li>
+    <li><a href="../monitoring-observability-patterns/health-checks.html">Health Checks</a></li>
+    <li><a href="../monitoring-observability-patterns/logging-strategies.html">Logging Strategies</a></li>
+    <li><a href="../monitoring-observability-patterns/performance-monitoring.html">Performance Monitoring</a></li>
+    <li><a href="../monitoring-observability-patterns/error-tracking.html">Error Tracking</a></li>
+  </ul>
+</div>
+
+    </aside>
+
+    <main id="main-content" class="docs-content">
+      <div class="breadcrumb">
+        <a href="https://dataintegrationmastery.com/">Home</a>
+        <span class="sep">›</span>
+        <a href="../index.html">Patterns</a>
+        <span class="sep">›</span>
+        <a href="../index.html#routing">Routing Patterns</a>
+        <span class="sep">›</span>
+        <strong>Load Balancer Pattern</strong>
+      </div>
+
+      <h1>Load Balancer Pattern</h1>
+
+      <h2 id="overview">Overview</h2>
+<p>The Load Balancer pattern is a critical performance and reliability pattern in enterprise integration architectures that distributes incoming messages or requests across multiple equivalent service instances to optimize resource utilization, maximize throughput, and ensure high availability. Like a traffic director at a busy intersection, the Load Balancer intelligently routes requests to the most appropriate available service instance based on various algorithms and real-time system metrics.</p>
+<h3 id="theoretical-foundation">Theoretical Foundation</h3>
+<p>The Load Balancer pattern is grounded in <strong>queueing theory</strong> and <strong>distributed systems performance optimization</strong>, specifically addressing the challenge of <strong>workload distribution</strong> and <strong>resource utilization optimization</strong> in distributed architectures. The pattern embodies the principle of <strong>"optimal resource allocation"</strong> - distributing work across available resources to minimize response time, maximize throughput, and prevent any single resource from becoming a bottleneck.</p>
+<h3 id="core-principles">Core Principles</h3>
+<h4 id="1-intelligent-request-distribution">1. <strong>Intelligent Request Distribution</strong></h4>
+<p>The Load Balancer uses sophisticated algorithms to distribute requests:
+- <strong>Round-robin distribution</strong> - cycling through available instances sequentially
+- <strong>Weighted distribution</strong> - directing more traffic to higher-capacity instances
+- <strong>Load-based routing</strong> - routing to least loaded or fastest responding instances
+- <strong>Geographic routing</strong> - directing requests to geographically closest instances</p>
+<h4 id="2-health-monitoring-and-failover">2. <strong>Health Monitoring and Failover</strong></h4>
+<p>The pattern continuously monitors service instance health:
+- <strong>Health check integration</strong> - regularly verifying instance availability and performance
+- <strong>Automatic failover</strong> - redirecting traffic from failed instances to healthy ones
+- <strong>Graceful degradation</strong> - maintaining service with reduced capacity when instances fail
+- <strong>Circuit breaker integration</strong> - preventing requests to consistently failing instances</p>
+<h4 id="3-performance-optimization">3. <strong>Performance Optimization</strong></h4>
+<p>Load Balancers optimize system performance through:
+- <strong>Connection pooling</strong> - maintaining efficient connections to backend instances
+- <strong>Session affinity</strong> - routing related requests to the same instance when needed
+- <strong>Caching strategies</strong> - reducing load through intelligent caching
+- <strong>Request batching</strong> - grouping requests for more efficient processing</p>
+<h4 id="4-scalability-and-elasticity">4. <strong>Scalability and Elasticity</strong></h4>
+<p>The pattern supports dynamic scaling:
+- <strong>Auto-scaling integration</strong> - working with auto-scaling systems to add/remove instances
+- <strong>Instance discovery</strong> - automatically discovering new service instances
+- <strong>Capacity planning</strong> - providing metrics for capacity planning decisions
+- <strong>Traffic shaping</strong> - managing traffic patterns and peak loads</p>
+<h3 id="why-load-balancers-are-essential-in-integration-architecture">Why Load Balancers are Essential in Integration Architecture</h3>
+<h4 id="1-microservices-architecture-support">1. <strong>Microservices Architecture Support</strong></h4>
+<p>In microservices environments, load balancers enable:
+- <strong>Service instance distribution</strong> - spreading load across multiple service instances
+- <strong>Service discovery integration</strong> - dynamically routing to available service instances
+- <strong>Canary deployments</strong> - gradually routing traffic to new service versions
+- <strong>Blue-green deployments</strong> - instant traffic switching between service versions</p>
+<h4 id="2-high-availability-and-reliability">2. <strong>High Availability and Reliability</strong></h4>
+<p>For mission-critical systems:
+- <strong>Fault tolerance</strong> - continuing service operation when individual instances fail
+- <strong>Disaster recovery</strong> - routing traffic to backup data centers or regions
+- <strong>Maintenance windows</strong> - allowing instance updates without service interruption
+- <strong>Capacity management</strong> - preventing service overload and performance degradation</p>
+<h4 id="3-performance-and-scalability">3. <strong>Performance and Scalability</strong></h4>
+<p>To meet demanding performance requirements:
+- <strong>Horizontal scaling</strong> - adding instances to handle increased load
+- <strong>Resource optimization</strong> - maximizing utilization of available computing resources
+- <strong>Response time optimization</strong> - minimizing latency through intelligent routing
+- <strong>Throughput maximization</strong> - achieving maximum possible transaction processing rates</p>
+<h4 id="4-cost-optimization">4. <strong>Cost Optimization</strong></h4>
+<p>For efficient resource utilization:
+- <strong>Resource efficiency</strong> - ensuring optimal use of computing resources
+- <strong>Auto-scaling cost control</strong> - scaling resources based on actual demand
+- <strong>Multi-cloud optimization</strong> - leveraging best pricing across cloud providers
+- <strong>Peak load management</strong> - handling traffic spikes without over-provisioning</p>
+<h3 id="benefits-in-integration-contexts">Benefits in Integration Contexts</h3>
+<h4 id="1-system-reliability">1. <strong>System Reliability</strong></h4>
+<ul>
+<li><strong>High availability</strong> - maintaining service availability despite individual component failures</li>
+<li><strong>Fault isolation</strong> - preventing single point of failure scenarios</li>
+<li><strong>Graceful degradation</strong> - maintaining partial functionality during outages</li>
+<li><strong>Disaster recovery</strong> - automatic failover to backup systems</li>
+</ul>
+<h4 id="2-performance-enhancement">2. <strong>Performance Enhancement</strong></h4>
+<ul>
+<li><strong>Improved response times</strong> - routing to fastest or least loaded instances</li>
+<li><strong>Increased throughput</strong> - processing more requests through parallel processing</li>
+<li><strong>Reduced latency</strong> - optimizing routing for geographic proximity</li>
+<li><strong>Better resource utilization</strong> - maximizing efficiency of available resources</li>
+</ul>
+<h4 id="3-operational-efficiency">3. <strong>Operational Efficiency</strong></h4>
+<ul>
+<li><strong>Simplified deployment</strong> - rolling updates without service interruption</li>
+<li><strong>Maintenance flexibility</strong> - performing maintenance on individual instances</li>
+<li><strong>Capacity planning</strong> - better visibility into resource requirements</li>
+<li><strong>Automated recovery</strong> - reducing manual intervention during failures</li>
+</ul>
+<h4 id="4-business-continuity">4. <strong>Business Continuity</strong></h4>
+<ul>
+<li><strong>Service reliability</strong> - ensuring critical business services remain available</li>
+<li><strong>Peak load handling</strong> - managing seasonal or promotional traffic spikes</li>
+<li><strong>Global reach</strong> - serving users from optimal geographic locations</li>
+<li><strong>SLA compliance</strong> - meeting service level agreement requirements</li>
+</ul>
+<h3 id="integration-architecture-applications">Integration Architecture Applications</h3>
+<h4 id="1-api-gateway-and-management">1. <strong>API Gateway and Management</strong></h4>
+<p>Load Balancers in API gateways provide:
+- <strong>Backend service distribution</strong> - routing API calls across multiple backend instances
+- <strong>Rate limiting distribution</strong> - preventing any single backend from being overwhelmed
+- <strong>Geographic routing</strong> - directing requests to regional API endpoints
+- <strong>Version-based routing</strong> - distributing traffic across different API versions</p>
+<h4 id="2-enterprise-service-bus-esb">2. <strong>Enterprise Service Bus (ESB)</strong></h4>
+<p>In ESB implementations:
+- <strong>Service endpoint balancing</strong> - distributing requests across service implementations
+- <strong>Message processing distribution</strong> - spreading message processing load
+- <strong>Transformation service balancing</strong> - routing to available transformation engines
+- <strong>Protocol adapter distribution</strong> - balancing load across protocol adapters</p>
+<h4 id="3-event-processing-systems">3. <strong>Event Processing Systems</strong></h4>
+<p>For event-driven architectures:
+- <strong>Event consumer balancing</strong> - distributing events across consumer instances
+- <strong>Stream processing distribution</strong> - routing events to available stream processors
+- <strong>Event store distribution</strong> - balancing writes across event store instances
+- <strong>Saga coordination balancing</strong> - distributing saga executions across coordinators</p>
+<h4 id="4-data-pipeline-and-etl">4. <strong>Data Pipeline and ETL</strong></h4>
+<p>In data processing workflows:
+- <strong>Worker instance balancing</strong> - distributing data processing tasks across workers
+- <strong>Data source balancing</strong> - routing data extraction across multiple connections
+- <strong>Transformation engine distribution</strong> - balancing transformation workload
+- <strong>Data sink distribution</strong> - spreading data writes across multiple targets</p>
+<h2 id="implementation-patterns">Implementation Patterns</h2>
+<h3 id="1-round-robin-load-balancer">1. <strong>Round-Robin Load Balancer</strong></h3>
+<pre><code class="language-java">// Simple round-robin load balancing implementation
+@Component
+public class RoundRobinLoadBalancer {
+
+    private final List&lt;ServiceInstance&gt; instances;
+    private final AtomicInteger currentIndex;
+
+    public RoundRobinLoadBalancer(List&lt;ServiceInstance&gt; instances) {
+        this.instances = new CopyOnWriteArrayList&lt;&gt;(instances);
+        this.currentIndex = new AtomicInteger(0);
+    }
+
+    public ServiceInstance selectInstance() {
+        if (instances.isEmpty()) {
+            throw new NoAvailableInstanceException(&quot;No service instances available&quot;);
+        }
+
+        List&lt;ServiceInstance&gt; healthyInstances = getHealthyInstances();
+
+        if (healthyInstances.isEmpty()) {
+            throw new NoAvailableInstanceException(&quot;No healthy service instances available&quot;);
+        }
+
+        int index = currentIndex.getAndUpdate(i -&gt; (i + 1) % healthyInstances.size());
+        return healthyInstances.get(index);
+    }
+
+    private List&lt;ServiceInstance&gt; getHealthyInstances() {
+        return instances.stream()
+            .filter(ServiceInstance::isHealthy)
+            .filter(ServiceInstance::isEnabled)
+            .collect(Collectors.toList());
+    }
+
+    public void addInstance(ServiceInstance instance) {
+        instances.add(instance);
+        log.info(&quot;Added service instance: {}&quot;, instance.getId());
+    }
+
+    public void removeInstance(String instanceId) {
+        instances.removeIf(instance -&gt; instance.getId().equals(instanceId));
+        log.info(&quot;Removed service instance: {}&quot;, instanceId);
+    }
+
+    public LoadBalancerStats getStats() {
+        return LoadBalancerStats.builder()
+            .totalInstances(instances.size())
+            .healthyInstances(getHealthyInstances().size())
+            .algorithm(&quot;ROUND_ROBIN&quot;)
+            .build();
+    }
+}
+</code></pre>
+<h3 id="2-weighted-load-balancer">2. <strong>Weighted Load Balancer</strong></h3>
+<pre><code class="language-java">// Load balancer with instance weighting capabilities
+@Component
+public class WeightedLoadBalancer {
+
+    private final List&lt;WeightedInstance&gt; instances;
+    private final Random random = new Random();
+
+    public WeightedLoadBalancer() {
+        this.instances = new CopyOnWriteArrayList&lt;&gt;();
+    }
+
+    public ServiceInstance selectInstance() {
+        List&lt;WeightedInstance&gt; healthyInstances = getHealthyWeightedInstances();
+
+        if (healthyInstances.isEmpty()) {
+            throw new NoAvailableInstanceException(&quot;No healthy weighted instances available&quot;);
+        }
+
+        int totalWeight = healthyInstances.stream()
+            .mapToInt(WeightedInstance::getWeight)
+            .sum();
+
+        if (totalWeight == 0) {
+            // Fall back to round-robin if all weights are zero
+            return healthyInstances.get(random.nextInt(healthyInstances.size())).getInstance();
+        }
+
+        int randomWeight = random.nextInt(totalWeight);
+        int currentWeight = 0;
+
+        for (WeightedInstance weightedInstance : healthyInstances) {
+            currentWeight += weightedInstance.getWeight();
+            if (randomWeight &lt; currentWeight) {
+                return weightedInstance.getInstance();
+            }
+        }
+
+        // Fallback (should not reach here)
+        return healthyInstances.get(0).getInstance();
+    }
+
+    private List&lt;WeightedInstance&gt; getHealthyWeightedInstances() {
+        return instances.stream()
+            .filter(wi -&gt; wi.getInstance().isHealthy())
+            .filter(wi -&gt; wi.getInstance().isEnabled())
+            .collect(Collectors.toList());
+    }
+
+    public void addInstance(ServiceInstance instance, int weight) {
+        WeightedInstance weightedInstance = new WeightedInstance(instance, weight);
+        instances.add(weightedInstance);
+        log.info(&quot;Added weighted instance: {} with weight: {}&quot;, instance.getId(), weight);
+    }
+
+    public void updateInstanceWeight(String instanceId, int newWeight) {
+        instances.stream()
+            .filter(wi -&gt; wi.getInstance().getId().equals(instanceId))
+            .findFirst()
+            .ifPresentOrElse(
+                wi -&gt; {
+                    wi.setWeight(newWeight);
+                    log.info(&quot;Updated weight for instance {}: {}&quot;, instanceId, newWeight);
+                },
+                () -&gt; log.warn(&quot;Instance {} not found for weight update&quot;, instanceId)
+            );
+    }
+}
+
+public class WeightedInstance {
+    private final ServiceInstance instance;
+    private volatile int weight;
+
+    public WeightedInstance(ServiceInstance instance, int weight) {
+        this.instance = instance;
+        this.weight = weight;
+    }
+
+    // getters and setters
+}
+</code></pre>
+<h3 id="3-least-loaded-load-balancer">3. <strong>Least-Loaded Load Balancer</strong></h3>
+<pre><code class="language-java">// Load balancer that routes to least loaded instance
+@Component
+public class LeastLoadedLoadBalancer {
+
+    @Autowired
+    private InstanceMetricsService metricsService;
+
+    private final List&lt;ServiceInstance&gt; instances;
+
+    public LeastLoadedLoadBalancer() {
+        this.instances = new CopyOnWriteArrayList&lt;&gt;();
+    }
+
+    public ServiceInstance selectInstance() {
+        List&lt;ServiceInstance&gt; healthyInstances = getHealthyInstances();
+
+        if (healthyInstances.isEmpty()) {
+            throw new NoAvailableInstanceException(&quot;No healthy instances available&quot;);
+        }
+
+        return healthyInstances.stream()
+            .min(Comparator.comparing(this::getInstanceLoad))
+            .orElseThrow(() -&gt; new IllegalStateException(&quot;Could not select least loaded instance&quot;));
+    }
+
+    private double getInstanceLoad(ServiceInstance instance) {
+        InstanceMetrics metrics = metricsService.getMetrics(instance.getId());
+
+        if (metrics == null) {
+            return Double.MAX_VALUE; // Avoid instances with no metrics
+        }
+
+        // Calculate composite load score
+        double cpuLoad = metrics.getCpuUsage() * 0.4;
+        double memoryLoad = metrics.getMemoryUsage() * 0.3;
+        double requestLoad = (metrics.getActiveRequests() / (double) metrics.getMaxConcurrentRequests()) * 0.3;
+
+        return cpuLoad + memoryLoad + requestLoad;
+    }
+
+    private List&lt;ServiceInstance&gt; getHealthyInstances() {
+        return instances.stream()
+            .filter(ServiceInstance::isHealthy)
+            .filter(ServiceInstance::isEnabled)
+            .filter(this::hasRecentMetrics)
+            .collect(Collectors.toList());
+    }
+
+    private boolean hasRecentMetrics(ServiceInstance instance) {
+        InstanceMetrics metrics = metricsService.getMetrics(instance.getId());
+        if (metrics == null) {
+            return false;
+        }
+
+        Duration timeSinceLastUpdate = Duration.between(metrics.getLastUpdated(), Instant.now());
+        return timeSinceLastUpdate.toSeconds() &lt; 30; // Metrics must be less than 30 seconds old
+    }
+}
+
+@Service
+public class InstanceMetricsService {
+
+    private final Map&lt;String, InstanceMetrics&gt; metricsCache = new ConcurrentHashMap&lt;&gt;();
+
+    @Scheduled(fixedDelay = 5000) // Update every 5 seconds
+    public void updateMetrics() {
+        // Update metrics for all tracked instances
+        metricsCache.keySet().forEach(this::refreshInstanceMetrics);
+    }
+
+    private void refreshInstanceMetrics(String instanceId) {
+        try {
+            InstanceMetrics metrics = fetchMetricsFromInstance(instanceId);
+            metricsCache.put(instanceId, metrics);
+        } catch (Exception e) {
+            log.warn(&quot;Failed to update metrics for instance {}: {}&quot;, instanceId, e.getMessage());
+        }
+    }
+
+    public InstanceMetrics getMetrics(String instanceId) {
+        return metricsCache.get(instanceId);
+    }
+}
+</code></pre>
+<h3 id="4-geographic-load-balancer">4. <strong>Geographic Load Balancer</strong></h3>
+<pre><code class="language-java">// Load balancer that considers geographic proximity
+@Component
+public class GeographicLoadBalancer {
+
+    private final Map&lt;String, List&lt;ServiceInstance&gt;&gt; instancesByRegion;
+
+    public GeographicLoadBalancer() {
+        this.instancesByRegion = new ConcurrentHashMap&lt;&gt;();
+    }
+
+    public ServiceInstance selectInstance(String clientRegion, String clientCountry) {
+        // Try to find instance in same region first
+        ServiceInstance regionalInstance = selectFromRegion(clientRegion);
+        if (regionalInstance != null) {
+            return regionalInstance;
+        }
+
+        // Try neighboring regions
+        List&lt;String&gt; neighboringRegions = getNeighboringRegions(clientRegion);
+        for (String neighboringRegion : neighboringRegions) {
+            ServiceInstance neighborInstance = selectFromRegion(neighboringRegion);
+            if (neighborInstance != null) {
+                return neighborInstance;
+            }
+        }
+
+        // Fall back to any available instance
+        ServiceInstance fallbackInstance = selectFromAnyRegion();
+        if (fallbackInstance == null) {
+            throw new NoAvailableInstanceException(&quot;No instances available in any region&quot;);
+        }
+
+        return fallbackInstance;
+    }
+
+    private ServiceInstance selectFromRegion(String region) {
+        List&lt;ServiceInstance&gt; regionalInstances = instancesByRegion.get(region);
+
+        if (regionalInstances == null || regionalInstances.isEmpty()) {
+            return null;
+        }
+
+        List&lt;ServiceInstance&gt; healthyInstances = regionalInstances.stream()
+            .filter(ServiceInstance::isHealthy)
+            .filter(ServiceInstance::isEnabled)
+            .collect(Collectors.toList());
+
+        if (healthyInstances.isEmpty()) {
+            return null;
+        }
+
+        // Use round-robin within region
+        int index = (int) (System.nanoTime() % healthyInstances.size());
+        return healthyInstances.get(index);
+    }
+
+    private ServiceInstance selectFromAnyRegion() {
+        return instancesByRegion.values().stream()
+            .flatMap(Collection::stream)
+            .filter(ServiceInstance::isHealthy)
+            .filter(ServiceInstance::isEnabled)
+            .findFirst()
+            .orElse(null);
+    }
+
+    private List&lt;String&gt; getNeighboringRegions(String region) {
+        return switch (region) {
+            case &quot;EU_NORTH&quot; -&gt; Arrays.asList(&quot;EU_WEST&quot;, &quot;EU_CENTRAL&quot;);
+            case &quot;EU_WEST&quot; -&gt; Arrays.asList(&quot;EU_NORTH&quot;, &quot;EU_CENTRAL&quot;, &quot;US_EAST&quot;);
+            case &quot;US_EAST&quot; -&gt; Arrays.asList(&quot;US_WEST&quot;, &quot;EU_WEST&quot;);
+            case &quot;US_WEST&quot; -&gt; Arrays.asList(&quot;US_EAST&quot;, &quot;ASIA_PACIFIC&quot;);
+            case &quot;ASIA_PACIFIC&quot; -&gt; Arrays.asList(&quot;US_WEST&quot;, &quot;EU_CENTRAL&quot;);
+            default -&gt; Collections.emptyList();
+        };
+    }
+
+    public void addInstance(ServiceInstance instance, String region) {
+        instancesByRegion.computeIfAbsent(region, k -&gt; new CopyOnWriteArrayList&lt;&gt;())
+            .add(instance);
+        log.info(&quot;Added instance {} to region {}&quot;, instance.getId(), region);
+    }
+
+    public GeographicLoadBalancerStats getStats() {
+        Map&lt;String, Integer&gt; instanceCountByRegion = instancesByRegion.entrySet().stream()
+            .collect(Collectors.toMap(
+                Map.Entry::getKey,
+                entry -&gt; entry.getValue().size()
+            ));
+
+        return GeographicLoadBalancerStats.builder()
+            .instanceCountByRegion(instanceCountByRegion)
+            .totalRegions(instancesByRegion.size())
+            .totalInstances(instancesByRegion.values().stream().mapToInt(List::size).sum())
+            .build();
+    }
+}
+</code></pre>
+<h2 id="apache-camel-implementation">Apache Camel Implementation</h2>
+<h3 id="1-simple-load-balancer-route">1. <strong>Simple Load Balancer Route</strong></h3>
+<pre><code class="language-java">@Component
+public class SimpleLoadBalancerRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from(&quot;direct:loadBalancedRoute&quot;)
+            .routeId(&quot;simple-load-balancer&quot;)
+            .log(&quot;Load balancing request&quot;)
+            .loadBalance()
+            .roundRobin()
+            .to(&quot;direct:service1&quot;, &quot;direct:service2&quot;, &quot;direct:service3&quot;)
+            .end()
+            .log(&quot;Load balanced processing completed&quot;);
+    }
+}
+</code></pre>
+<h3 id="2-weighted-load-balancer-route">2. <strong>Weighted Load Balancer Route</strong></h3>
+<pre><code class="language-java">@Component
+public class WeightedLoadBalancerRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from(&quot;direct:weightedLoadBalance&quot;)
+            .routeId(&quot;weighted-load-balancer&quot;)
+            .log(&quot;Applying weighted load balancing&quot;)
+            .loadBalance()
+            .weighted(false, &quot;3,2,1&quot;) // Service1=3, Service2=2, Service3=1
+            .to(&quot;direct:highCapacityService&quot;, &quot;direct:mediumCapacityService&quot;, &quot;direct:lowCapacityService&quot;)
+            .end()
+            .log(&quot;Weighted load balancing completed&quot;);
+    }
+}
+</code></pre>
+<h3 id="3-failover-load-balancer-route">3. <strong>Failover Load Balancer Route</strong></h3>
+<pre><code class="language-java">@Component
+public class FailoverLoadBalancerRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from(&quot;direct:failoverLoadBalance&quot;)
+            .routeId(&quot;failover-load-balancer&quot;)
+            .log(&quot;Applying failover load balancing&quot;)
+            .loadBalance()
+            .failover(2, false, true) // 2 attempts, no round-robin, sticky
+            .to(&quot;direct:primaryService&quot;, &quot;direct:secondaryService&quot;, &quot;direct:backupService&quot;)
+            .end()
+            .log(&quot;Failover load balancing completed&quot;);
+    }
+}
+</code></pre>
+<h3 id="4-custom-load-balancer-route">4. <strong>Custom Load Balancer Route</strong></h3>
+<pre><code class="language-java">@Component
+public class CustomLoadBalancerRoute extends RouteBuilder {
+
+    @Autowired
+    private CustomLoadBalancingStrategy loadBalancingStrategy;
+
+    @Override
+    public void configure() throws Exception {
+        from(&quot;direct:customLoadBalance&quot;)
+            .routeId(&quot;custom-load-balancer&quot;)
+            .log(&quot;Applying custom load balancing strategy&quot;)
+            .loadBalance(loadBalancingStrategy)
+            .to(&quot;direct:service1&quot;, &quot;direct:service2&quot;, &quot;direct:service3&quot;, &quot;direct:service4&quot;)
+            .end()
+            .log(&quot;Custom load balancing completed&quot;);
+    }
+}
+
+@Component
+public class CustomLoadBalancingStrategy implements LoadBalancerSupport {
+
+    @Autowired
+    private InstanceHealthService healthService;
+
+    @Override
+    public Processor process(List&lt;Processor&gt; processors) {
+        return exchange -&gt; {
+            List&lt;Processor&gt; healthyProcessors = processors.stream()
+                .filter(processor -&gt; isProcessorHealthy(processor))
+                .collect(Collectors.toList());
+
+            if (healthyProcessors.isEmpty()) {
+                throw new RuntimeException(&quot;No healthy processors available&quot;);
+            }
+
+            // Select processor based on custom logic (e.g., least loaded)
+            Processor selectedProcessor = selectOptimalProcessor(healthyProcessors, exchange);
+            selectedProcessor.process(exchange);
+        };
+    }
+
+    private boolean isProcessorHealthy(Processor processor) {
+        // Implementation to check processor health
+        String processorId = extractProcessorId(processor);
+        return healthService.isHealthy(processorId);
+    }
+
+    private Processor selectOptimalProcessor(List&lt;Processor&gt; processors, Exchange exchange) {
+        // Custom selection logic based on load, response time, etc.
+        return processors.stream()
+            .min(Comparator.comparing(processor -&gt; getProcessorLoad(processor)))
+            .orElse(processors.get(0));
+    }
+}
+</code></pre>
+<h3 id="5-circuit-breaker-integration-route">5. <strong>Circuit Breaker Integration Route</strong></h3>
+<pre><code class="language-java">@Component
+public class CircuitBreakerLoadBalancerRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from(&quot;direct:circuitBreakerLoadBalance&quot;)
+            .routeId(&quot;circuit-breaker-load-balancer&quot;)
+            .log(&quot;Load balancing with circuit breaker protection&quot;)
+            .loadBalance()
+            .roundRobin()
+            .to(&quot;direct:serviceWithCircuitBreaker1&quot;, 
+                &quot;direct:serviceWithCircuitBreaker2&quot;, 
+                &quot;direct:serviceWithCircuitBreaker3&quot;)
+            .end();
+
+        // Service routes with circuit breakers
+        from(&quot;direct:serviceWithCircuitBreaker1&quot;)
+            .circuitBreaker()
+                .resilience4jConfiguration()
+                    .circuitBreakerRef(&quot;service1CircuitBreaker&quot;)
+                .end()
+                .log(&quot;Processing with service 1&quot;)
+                .to(&quot;{{service1.endpoint}}&quot;)
+            .onFallback()
+                .log(&quot;Service 1 circuit breaker open, using fallback&quot;)
+                .setBody(constant(&quot;Service 1 temporarily unavailable&quot;))
+            .end();
+
+        from(&quot;direct:serviceWithCircuitBreaker2&quot;)
+            .circuitBreaker()
+                .resilience4jConfiguration()
+                    .circuitBreakerRef(&quot;service2CircuitBreaker&quot;)
+                .end()
+                .log(&quot;Processing with service 2&quot;)
+                .to(&quot;{{service2.endpoint}}&quot;)
+            .onFallback()
+                .log(&quot;Service 2 circuit breaker open, using fallback&quot;)
+                .setBody(constant(&quot;Service 2 temporarily unavailable&quot;))
+            .end();
+
+        from(&quot;direct:serviceWithCircuitBreaker3&quot;)
+            .circuitBreaker()
+                .resilience4jConfiguration()
+                    .circuitBreakerRef(&quot;service3CircuitBreaker&quot;)
+                .end()
+                .log(&quot;Processing with service 3&quot;)
+                .to(&quot;{{service3.endpoint}}&quot;)
+            .onFallback()
+                .log(&quot;Service 3 circuit breaker open, using fallback&quot;)
+                .setBody(constant(&quot;Service 3 temporarily unavailable&quot;))
+            .end();
+    }
+}
+</code></pre>
+<h2 id="best-practices">Best Practices</h2>
+<h3 id="1-health-monitoring">1. <strong>Health Monitoring</strong></h3>
+<ul>
+<li>Implement comprehensive health checks for all service instances</li>
+<li>Use both active and passive health monitoring approaches</li>
+<li>Monitor not just availability but also performance metrics</li>
+<li>Implement graceful health check degradation during high load</li>
+<li>Provide health check endpoints that validate actual service functionality</li>
+</ul>
+<h3 id="2-load-balancing-algorithms">2. <strong>Load Balancing Algorithms</strong></h3>
+<ul>
+<li>Choose appropriate algorithms based on service characteristics and requirements</li>
+<li>Consider using adaptive algorithms that adjust based on real-time metrics</li>
+<li>Implement fallback mechanisms when primary algorithms cannot make decisions</li>
+<li>Monitor algorithm effectiveness and adjust configuration accordingly</li>
+<li>Use session affinity judiciously as it can impact load distribution</li>
+</ul>
+<h3 id="3-failover-and-recovery">3. <strong>Failover and Recovery</strong></h3>
+<ul>
+<li>Implement automatic failover to healthy instances</li>
+<li>Use circuit breakers to prevent cascading failures</li>
+<li>Provide graceful degradation when capacity is reduced</li>
+<li>Implement automatic recovery detection and instance re-integration</li>
+<li>Maintain service during rolling updates and deployments</li>
+</ul>
+<h3 id="4-performance-optimization">4. <strong>Performance Optimization</strong></h3>
+<ul>
+<li>Use connection pooling to backend services</li>
+<li>Implement request batching where appropriate</li>
+<li>Cache frequently accessed data to reduce backend load</li>
+<li>Monitor and optimize load balancer performance overhead</li>
+<li>Use asynchronous processing where possible</li>
+</ul>
+<h3 id="5-monitoring-and-observability">5. <strong>Monitoring and Observability</strong></h3>
+<ul>
+<li>Track load distribution metrics across all instances</li>
+<li>Monitor response times and error rates per instance</li>
+<li>Implement distributed tracing through load balancer boundaries</li>
+<li>Alert on uneven load distribution or instance failures</li>
+<li>Provide visibility into load balancing decisions and effectiveness</li>
+</ul>
+<p>The Load Balancer pattern is fundamental for building scalable, reliable enterprise integration solutions that can efficiently distribute workload across multiple service instances while maintaining high availability and optimal performance characteristics.</p>
+
+      <a href="../index.html" class="back-to-top">← Back to All Patterns</a>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <p>©2026 <a href="https://dataintegrationmastery.com/">Data Integration Mastery™</a> — All Rights Reserved</p>
+  </footer>
+</body>
+</html>

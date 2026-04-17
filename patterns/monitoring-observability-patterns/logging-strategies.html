@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Logging Strategies — Integration Architecture Patterns | Data Integration Mastery™</title>
+  <meta name="description" content="Logging Strategies is a comprehensive approach to designing, implementing, and managing structured, efficient, and actionable logging systems in enterprise i...">
+  <meta name="keywords" content="logging strategies, integration pattern, monitoring & observability patterns, integration architecture, EAI patterns, data integration">
+  <link rel="canonical" href="https://dataintegrationmastery.com/patterns/monitoring-observability-patterns/logging-strategies.html">
+
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://dataintegrationmastery.com/patterns/monitoring-observability-patterns/logging-strategies.html">
+  <meta property="og:title" content="Logging Strategies — Integration Architecture Patterns">
+  <meta property="og:description" content="Logging Strategies is a comprehensive approach to designing, implementing, and managing structured, efficient, and actionable logging systems in enterprise i...">
+  <meta property="og:image" content="https://dataintegrationmastery.com/assets/images/logo.png">
+  <meta property="og:site_name" content="Data Integration Mastery">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Logging Strategies — Integration Architecture Patterns">
+  <meta name="twitter:description" content="Logging Strategies is a comprehensive approach to designing, implementing, and managing structured, efficient, and actionable logging systems in enterprise i...">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/docs.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Logging Strategies",
+    "description": "Logging Strategies is a comprehensive approach to designing, implementing, and managing structured, efficient, and actionable logging systems in enterprise i...",
+    "url": "https://dataintegrationmastery.com/patterns/monitoring-observability-patterns/logging-strategies.html",
+    "author": {
+      "@type": "Person",
+      "name": "Ari Vilkman",
+      "jobTitle": "Integration Architect"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Data Integration Mastery",
+      "url": "https://dataintegrationmastery.com"
+    },
+    "isPartOf": {
+      "@type": "CollectionPage",
+      "name": "Integration Architecture Patterns",
+      "url": "https://dataintegrationmastery.com/patterns/"
+    },
+    "about": {
+      "@type": "Thing",
+      "name": "Logging Strategies"
+    },
+    "inLanguage": "en",
+    "isAccessibleForFree": true
+  }
+  </script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="https://dataintegrationmastery.com/" class="header-brand">
+        <img src="../../assets/images/dim-icon.png" alt="DIM" width="36" height="36">
+        <span class="header-title">Data Integration Mastery™</span>
+      </a>
+      <nav class="header-nav" aria-label="Main navigation">
+        <a href="https://dataintegrationmastery.com/">Home</a>
+        <a href="../index.html">All Patterns</a>
+        <a href="https://dataintegrationmastery.com/#free-course">Free Course</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="docs-layout">
+    <aside class="docs-sidebar" aria-label="Pattern categories">
+      <div class="sidebar-title">Pattern Categories</div>
+<div class="sidebar-section">
+  <a href="../index.html#resilience" class="sidebar-section-title">🛡️ Resilience Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../resilience-patterns/circuit-breaker.html">Circuit Breaker</a></li>
+    <li><a href="../resilience-patterns/retry-mechanism.html">Retry Mechanism</a></li>
+    <li><a href="../resilience-patterns/timeout.html">Timeout</a></li>
+    <li><a href="../resilience-patterns/dead-letter-queue.html">Dead Letter Queue</a></li>
+    <li><a href="../resilience-patterns/bulkhead.html">Bulkhead</a></li>
+    <li><a href="../resilience-patterns/fallback-graceful-degradation.html">Fallback / Graceful Degradation</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#messaging" class="sidebar-section-title">📨 Messaging Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../messaging-patterns/request-reply.html">Request-Reply</a></li>
+    <li><a href="../messaging-patterns/publish-subscribe.html">Publish-Subscribe</a></li>
+    <li><a href="../messaging-patterns/message-queue.html">Message Queue</a></li>
+    <li><a href="../messaging-patterns/event-streaming.html">Event Streaming</a></li>
+    <li><a href="../messaging-patterns/correlation-id.html">Correlation ID</a></li>
+    <li><a href="../messaging-patterns/message-routing.html">Message Routing</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#data-transformation" class="sidebar-section-title">🔄 Data Transformation Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../data-transformation-patterns/message-translator.html">Message Translator</a></li>
+    <li><a href="../data-transformation-patterns/content-filter.html">Content Filter</a></li>
+    <li><a href="../data-transformation-patterns/message-router.html">Message Router</a></li>
+    <li><a href="../data-transformation-patterns/aggregator.html">Aggregator</a></li>
+    <li><a href="../data-transformation-patterns/splitter.html">Splitter</a></li>
+    <li><a href="../data-transformation-patterns/data-mapper.html">Data Mapper</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#routing" class="sidebar-section-title">🔀 Routing Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../routing-patterns/content-based-router.html">Content-Based Router</a></li>
+    <li><a href="../routing-patterns/recipient-list.html">Recipient List</a></li>
+    <li><a href="../routing-patterns/load-balancer.html">Load Balancer</a></li>
+    <li><a href="../routing-patterns/message-filter.html">Message Filter</a></li>
+    <li><a href="../routing-patterns/dynamic-router.html">Dynamic Router</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#security" class="sidebar-section-title">🔐 Security Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../security-patterns/authentication.html">Authentication</a></li>
+    <li><a href="../security-patterns/authorization.html">Authorization</a></li>
+    <li><a href="../security-patterns/encryption.html">Encryption</a></li>
+    <li><a href="../security-patterns/token-management.html">Token Management</a></li>
+    <li><a href="../security-patterns/api-security.html">API Security</a></li>
+    <li><a href="../security-patterns/secret-management.html">Secret Management</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#orchestration" class="sidebar-section-title">🎭 Orchestration Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../orchestration-patterns/saga-pattern.html">Saga Pattern</a></li>
+    <li><a href="../orchestration-patterns/process-manager.html">Process Manager</a></li>
+    <li><a href="../orchestration-patterns/workflow-engine.html">Workflow Engine</a></li>
+    <li><a href="../orchestration-patterns/choreography.html">Choreography</a></li>
+    <li><a href="../orchestration-patterns/compensation-transactions.html">Compensation Transactions</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#observability" class="sidebar-section-title">📊 Monitoring & Observability Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="distributed-tracing.html">Distributed Tracing</a></li>
+    <li><a href="metrics-collection.html">Metrics Collection</a></li>
+    <li><a href="health-checks.html">Health Checks</a></li>
+    <li><a href="logging-strategies.html" class="active">Logging Strategies</a></li>
+    <li><a href="performance-monitoring.html">Performance Monitoring</a></li>
+    <li><a href="error-tracking.html">Error Tracking</a></li>
+  </ul>
+</div>
+
+    </aside>
+
+    <main id="main-content" class="docs-content">
+      <div class="breadcrumb">
+        <a href="https://dataintegrationmastery.com/">Home</a>
+        <span class="sep">›</span>
+        <a href="../index.html">Patterns</a>
+        <span class="sep">›</span>
+        <a href="../index.html#observability">Monitoring & Observability Patterns</a>
+        <span class="sep">›</span>
+        <strong>Logging Strategies</strong>
+      </div>
+
+      <h1>Logging Strategies</h1>
+
+      <h2 id="overview">Overview</h2>
+<p>Logging Strategies is a comprehensive approach to designing, implementing, and managing structured, efficient, and actionable logging systems in enterprise integration architectures that systematically capture, format, store, and analyze application events, errors, performance metrics, and business activities across distributed systems. Like a detailed and organized journal system that records not just what happens but also the context, relationships, and significance of events for future reference and analysis, logging strategies provide a unified framework for capturing and managing the vast amounts of operational, diagnostic, and business information generated by complex integration systems. This pattern is essential for troubleshooting issues, monitoring system behavior, ensuring compliance requirements, supporting audit trails, and enabling data-driven operational insights in enterprise environments where effective logging is critical for system reliability and business operations.</p>
+<h3 id="theoretical-foundation">Theoretical Foundation</h3>
+<p>Logging Strategies is grounded in <strong>information theory</strong>, <strong>systems observability principles</strong>, <strong>data management concepts</strong>, and <strong>forensic analysis methodologies</strong>. It incorporates concepts from <strong>structured data storage</strong>, <strong>event-driven architectures</strong>, <strong>real-time data processing</strong>, and <strong>compliance management</strong> to provide a comprehensive framework for enterprise logging. The pattern addresses the fundamental need for systematic information capture, efficient data storage, intelligent data processing, and actionable insights generation from system operational data.</p>
+<h3 id="core-principles">Core Principles</h3>
+<h4 id="1-structured-and-contextual-logging">1. <strong>Structured and Contextual Logging</strong></h4>
+<p>Systematic organization of log data with consistent structure and comprehensive context:
+- <strong>Structured log formats</strong> - consistent, parseable format for all log entries (JSON, XML, key-value pairs)
+- <strong>Contextual enrichment</strong> - inclusion of relevant context information (user ID, session, transaction ID, business context)
+- <strong>Correlation identifiers</strong> - unique identifiers to correlate related log entries across services and time
+- <strong>Semantic tagging</strong> - meaningful tags and metadata for log categorization and filtering</p>
+<h4 id="2-multi-level-and-categorized-logging">2. <strong>Multi-Level and Categorized Logging</strong></h4>
+<p>Comprehensive logging at appropriate levels and categories:
+- <strong>Log levels</strong> - structured severity levels (TRACE, DEBUG, INFO, WARN, ERROR, FATAL)
+- <strong>Category-based logging</strong> - logical separation of logs by functional area (security, business, technical, audit)
+- <strong>Component-specific logging</strong> - dedicated logging for different system components and integrations
+- <strong>Business event logging</strong> - specific logging of business-significant events and transactions</p>
+<h4 id="3-performance-optimized-logging-infrastructure">3. <strong>Performance-Optimized Logging Infrastructure</strong></h4>
+<p>Efficient logging implementation that minimizes performance impact:
+- <strong>Asynchronous logging</strong> - non-blocking logging operations to avoid application performance degradation
+- <strong>Buffering and batching</strong> - efficient log data collection and transmission strategies
+- <strong>Log level management</strong> - dynamic log level configuration for performance optimization
+- <strong>Resource-conscious design</strong> - appropriate balance between logging comprehensiveness and resource usage</p>
+<h4 id="4-centralized-collection-and-management">4. <strong>Centralized Collection and Management</strong></h4>
+<p>Unified log data collection, storage, and management infrastructure:
+- <strong>Centralized log aggregation</strong> - collection of logs from distributed services into centralized storage
+- <strong>Log routing and filtering</strong> - intelligent routing of different log types to appropriate destinations
+- <strong>Retention policy management</strong> - systematic log data lifecycle management and archival strategies
+- <strong>Access control and security</strong> - secure log data access and protection of sensitive information</p>
+<h3 id="why-logging-strategies-are-essential-in-integration-architecture">Why Logging Strategies are Essential in Integration Architecture</h3>
+<h4 id="1-comprehensive-system-observability">1. <strong>Comprehensive System Observability</strong></h4>
+<p>In complex distributed integration systems, logging strategies provide:
+- <strong>End-to-end visibility</strong> - complete view of transaction flows across multiple services and systems
+- <strong>Integration flow tracking</strong> - detailed tracking of data and message flows through integration processes
+- <strong>System behavior analysis</strong> - understanding of system behavior patterns and performance characteristics
+- <strong>Cross-service correlation</strong> - ability to correlate activities and events across different services and components</p>
+<h4 id="2-effective-troubleshooting-and-debugging">2. <strong>Effective Troubleshooting and Debugging</strong></h4>
+<p>Supporting rapid issue identification and resolution:
+- <strong>Error investigation</strong> - detailed information for diagnosing and resolving system errors and failures
+- <strong>Performance analysis</strong> - log data for identifying performance bottlenecks and optimization opportunities
+- <strong>Root cause analysis</strong> - comprehensive data for determining the underlying causes of system issues
+- <strong>Historical analysis</strong> - access to historical log data for understanding recurring issues and patterns</p>
+<h4 id="3-security-and-compliance-management">3. <strong>Security and Compliance Management</strong></h4>
+<p>Meeting security requirements and regulatory compliance needs:
+- <strong>Audit trails</strong> - comprehensive audit trails for regulatory compliance and governance requirements
+- <strong>Security monitoring</strong> - logging of security-related events for threat detection and investigation
+- <strong>Access tracking</strong> - detailed logging of data and system access for security and compliance purposes
+- <strong>Forensic analysis</strong> - detailed log data for security incident investigation and forensic analysis</p>
+<h4 id="4-business-intelligence-and-analytics">4. <strong>Business Intelligence and Analytics</strong></h4>
+<p>Supporting business insights and operational intelligence:
+- <strong>Business activity tracking</strong> - comprehensive logging of business transactions and activities
+- <strong>Operational analytics</strong> - data for understanding business process efficiency and effectiveness
+- <strong>Customer journey analysis</strong> - detailed tracking of customer interactions and experiences
+- <strong>Performance metrics</strong> - business performance data derived from operational log information</p>
+<h3 id="benefits-in-integration-contexts">Benefits in Integration Contexts</h3>
+<h4 id="1-technical-advantages">1. <strong>Technical Advantages</strong></h4>
+<ul>
+<li><strong>Rapid troubleshooting</strong> - efficient identification and resolution of technical issues</li>
+<li><strong>Performance optimization</strong> - data-driven performance tuning and capacity planning</li>
+<li><strong>System monitoring</strong> - comprehensive monitoring of system health and performance</li>
+<li><strong>Integration reliability</strong> - improved integration reliability through better visibility and diagnostics</li>
+</ul>
+<h4 id="2-operational-benefits">2. <strong>Operational Benefits</strong></h4>
+<ul>
+<li><strong>Reduced MTTR</strong> (Mean Time to Resolution) - faster issue resolution through comprehensive logging</li>
+<li><strong>Operational efficiency</strong> - more efficient operations through automated log analysis and alerting</li>
+<li><strong>Capacity planning</strong> - better capacity planning through historical performance and usage data</li>
+<li><strong>Quality assurance</strong> - improved system quality through comprehensive testing and monitoring data</li>
+</ul>
+<h4 id="3-integration-enablement">3. <strong>Integration Enablement</strong></h4>
+<ul>
+<li><strong>Service coordination</strong> - better coordination of distributed services through shared logging infrastructure</li>
+<li><strong>Transaction monitoring</strong> - comprehensive monitoring of distributed transactions and business processes</li>
+<li><strong>Dependency management</strong> - clear understanding of service dependencies and interaction patterns</li>
+<li><strong>Change management</strong> - tracking of system changes and their impacts through logging data</li>
+</ul>
+<h4 id="4-business-value">4. <strong>Business Value</strong></h4>
+<ul>
+<li><strong>Compliance assurance</strong> - meeting regulatory and business compliance requirements through audit trails</li>
+<li><strong>Risk mitigation</strong> - reduced business risk through comprehensive monitoring and alerting</li>
+<li><strong>Customer experience</strong> - improved customer experience through better system reliability and performance</li>
+<li><strong>Business insights</strong> - actionable business insights derived from operational and business activity logs</li>
+</ul>
+<h3 id="integration-architecture-applications">Integration Architecture Applications</h3>
+<h4 id="1-structured-logging-implementation">1. <strong>Structured Logging Implementation</strong></h4>
+<p>Comprehensive structured logging framework for enterprise applications:</p>
+<pre><code class="language-java">// Logging Configuration
+@Configuration
+public class LoggingConfiguration {
+
+    @Bean
+    public Logger structuredLogger() {
+        LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
+
+        // Configure JSON encoder for structured logging
+        JsonEncoder jsonEncoder = new JsonEncoder();
+        jsonEncoder.setContext(context);
+        jsonEncoder.start();
+
+        // Configure console appender with JSON format
+        ConsoleAppender&lt;ILoggingEvent&gt; consoleAppender = new ConsoleAppender&lt;&gt;();
+        consoleAppender.setContext(context);
+        consoleAppender.setEncoder(jsonEncoder);
+        consoleAppender.start();
+
+        // Configure file appender with rolling policy
+        RollingFileAppender&lt;ILoggingEvent&gt; fileAppender = new RollingFileAppender&lt;&gt;();
+        fileAppender.setContext(context);
+        fileAppender.setFile(&quot;logs/application.json&quot;);
+
+        // Configure rolling policy
+        TimeBasedRollingPolicy&lt;ILoggingEvent&gt; rollingPolicy = new TimeBasedRollingPolicy&lt;&gt;();
+        rollingPolicy.setContext(context);
+        rollingPolicy.setParent(fileAppender);
+        rollingPolicy.setFileNamePattern(&quot;logs/application.%d{yyyy-MM-dd}.%i.json.gz&quot;);
+        rollingPolicy.setMaxHistory(30);
+        rollingPolicy.setTotalSizeCap(FileSize.valueOf(&quot;10GB&quot;));
+
+        SizeAndTimeBasedRollingPolicy&lt;ILoggingEvent&gt; sizeAndTimePolicy = 
+            new SizeAndTimeBasedRollingPolicy&lt;&gt;();
+        sizeAndTimePolicy.setContext(context);
+        sizeAndTimePolicy.setParent(fileAppender);
+        sizeAndTimePolicy.setFileNamePattern(&quot;logs/application.%d{yyyy-MM-dd}.%i.json.gz&quot;);
+        sizeAndTimePolicy.setMaxFileSize(FileSize.valueOf(&quot;100MB&quot;));
+        sizeAndTimePolicy.setMaxHistory(30);
+        sizeAndTimePolicy.setTotalSizeCap(FileSize.valueOf(&quot;10GB&quot;));
+        sizeAndTimePolicy.start();
+
+        fileAppender.setRollingPolicy(sizeAndTimePolicy);
+        fileAppender.setEncoder(jsonEncoder);
+        fileAppender.start();
+
+        // Configure root logger
+        ch.qos.logback.classic.Logger rootLogger = context.getLogger(Logger.ROOT_LOGGER_NAME);
+        rootLogger.addAppender(consoleAppender);
+        rootLogger.addAppender(fileAppender);
+        rootLogger.setLevel(Level.INFO);
+
+        return rootLogger;
+    }
+
+    @Bean
+    public LoggingContextManager loggingContextManager() {
+        return new LoggingContextManager();
+    }
+
+    @Bean
+    public BusinessEventLogger businessEventLogger() {
+        return new BusinessEventLogger();
+    }
+
+    @Bean
+    public SecurityEventLogger securityEventLogger() {
+        return new SecurityEventLogger();
+    }
+
+    @Bean
+    public PerformanceLogger performanceLogger() {
+        return new PerformanceLogger();
+    }
+}
+
+// Structured Logging Service
+@Service
+public class StructuredLoggingService {
+
+    private static final Logger logger = LoggerFactory.getLogger(StructuredLoggingService.class);
+    private static final String CORRELATION_ID_KEY = &quot;correlationId&quot;;
+    private static final String USER_ID_KEY = &quot;userId&quot;;
+    private static final String SESSION_ID_KEY = &quot;sessionId&quot;;
+    private static final String COMPONENT_KEY = &quot;component&quot;;
+    private static final String EVENT_TYPE_KEY = &quot;eventType&quot;;
+
+    @Autowired
+    private LoggingContextManager contextManager;
+
+    public void logInfo(String message, Object... args) {
+        logStructured(Level.INFO, message, null, args);
+    }
+
+    public void logWarn(String message, Object... args) {
+        logStructured(Level.WARN, message, null, args);
+    }
+
+    public void logError(String message, Throwable throwable, Object... args) {
+        logStructured(Level.ERROR, message, throwable, args);
+    }
+
+    public void logDebug(String message, Object... args) {
+        logStructured(Level.DEBUG, message, null, args);
+    }
+
+    public void logTrace(String message, Object... args) {
+        logStructured(Level.TRACE, message, null, args);
+    }
+
+    private void logStructured(Level level, String message, Throwable throwable, Object... args) {
+        try {
+            // Get current logging context
+            LoggingContext context = contextManager.getCurrentContext();
+
+            // Create structured log entry
+            StructuredLogEntry logEntry = new StructuredLogEntry();
+            logEntry.setTimestamp(Instant.now());
+            logEntry.setLevel(level.levelStr);
+            logEntry.setMessage(formatMessage(message, args));
+            logEntry.setThread(Thread.currentThread().getName());
+            logEntry.setLogger(logger.getName());
+
+            // Add context information
+            if (context != null) {
+                logEntry.setCorrelationId(context.getCorrelationId());
+                logEntry.setUserId(context.getUserId());
+                logEntry.setSessionId(context.getSessionId());
+                logEntry.setComponent(context.getComponent());
+                logEntry.setEventType(context.getEventType());
+                logEntry.setBusinessContext(context.getBusinessContext());
+            }
+
+            // Add exception information if present
+            if (throwable != null) {
+                ExceptionInfo exceptionInfo = new ExceptionInfo();
+                exceptionInfo.setExceptionClass(throwable.getClass().getName());
+                exceptionInfo.setExceptionMessage(throwable.getMessage());
+                exceptionInfo.setStackTrace(getStackTraceString(throwable));
+
+                if (throwable.getCause() != null) {
+                    ExceptionInfo causeInfo = new ExceptionInfo();
+                    causeInfo.setExceptionClass(throwable.getCause().getClass().getName());
+                    causeInfo.setExceptionMessage(throwable.getCause().getMessage());
+                    exceptionInfo.setCause(causeInfo);
+                }
+
+                logEntry.setException(exceptionInfo);
+            }
+
+            // Convert to JSON and log
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.registerModule(new JavaTimeModule());
+            String jsonLog = mapper.writeValueAsString(logEntry);
+
+            // Log based on level
+            switch (level.toInt()) {
+                case Level.TRACE_INT:
+                    logger.trace(jsonLog);
+                    break;
+                case Level.DEBUG_INT:
+                    logger.debug(jsonLog);
+                    break;
+                case Level.INFO_INT:
+                    logger.info(jsonLog);
+                    break;
+                case Level.WARN_INT:
+                    logger.warn(jsonLog);
+                    break;
+                case Level.ERROR_INT:
+                    logger.error(jsonLog);
+                    break;
+                default:
+                    logger.info(jsonLog);
+            }
+
+        } catch (Exception e) {
+            // Fallback to simple logging if structured logging fails
+            logger.error(&quot;Failed to create structured log entry: &quot; + e.getMessage());
+            logger.error(&quot;Original message: &quot; + formatMessage(message, args));
+            if (throwable != null) {
+                logger.error(&quot;Original exception&quot;, throwable);
+            }
+        }
+    }
+
+    private String formatMessage(String message, Object... args) {
+        if (args == null || args.length == 0) {
+            return message;
+        }
+        return MessageFormatter.arrayFormat(message, args).getMessage();
+    }
+
+    private String getStackTraceString(Throwable throwable) {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        throwable.printStackTrace(pw);
+        return sw.toString();
+    }
+}
+
+// Business Event Logging
+@Service
+public class BusinessEventLogger {
+
+    @Autowired
+    private StructuredLoggingService loggingService;
+
+    @Autowired
+    private LoggingContextManager contextManager;
+
+    public void logOrderCreated(Order order, String userId) {
+        try (LoggingContext context = contextManager.createBusinessContext(&quot;ORDER&quot;, &quot;ORDER_CREATED&quot;)) {
+            context.setUserId(userId);
+            context.addBusinessDetail(&quot;orderId&quot;, order.getId());
+            context.addBusinessDetail(&quot;orderTotal&quot;, order.getTotalAmount());
+            context.addBusinessDetail(&quot;itemCount&quot;, order.getItems().size());
+            context.addBusinessDetail(&quot;customerId&quot;, order.getCustomerId());
+
+            BusinessEventData eventData = new BusinessEventData();
+            eventData.setEventType(&quot;ORDER_CREATED&quot;);
+            eventData.setEntityType(&quot;ORDER&quot;);
+            eventData.setEntityId(order.getId());
+            eventData.setUserId(userId);
+            eventData.setTimestamp(Instant.now());
+            eventData.setEventDetails(createOrderEventDetails(order));
+
+            loggingService.logInfo(&quot;Business event: Order created - OrderId: {}, CustomerId: {}, Total: {}, Items: {}&quot;,
+                order.getId(), order.getCustomerId(), order.getTotalAmount(), order.getItems().size());
+
+            // Additional business metrics logging
+            logBusinessMetrics(&quot;order.created&quot;, 1, Map.of(
+                &quot;orderValue&quot;, order.getTotalAmount().doubleValue(),
+                &quot;itemCount&quot;, order.getItems().size(),
+                &quot;paymentMethod&quot;, order.getPaymentMethod()
+            ));
+
+        } catch (Exception e) {
+            loggingService.logError(&quot;Failed to log order creation business event&quot;, e, order.getId());
+        }
+    }
+
+    public void logPaymentProcessed(Payment payment, String userId) {
+        try (LoggingContext context = contextManager.createBusinessContext(&quot;PAYMENT&quot;, &quot;PAYMENT_PROCESSED&quot;)) {
+            context.setUserId(userId);
+            context.addBusinessDetail(&quot;paymentId&quot;, payment.getId());
+            context.addBusinessDetail(&quot;amount&quot;, payment.getAmount());
+            context.addBusinessDetail(&quot;paymentMethod&quot;, payment.getPaymentMethod());
+            context.addBusinessDetail(&quot;orderId&quot;, payment.getOrderId());
+
+            loggingService.logInfo(&quot;Business event: Payment processed - PaymentId: {}, OrderId: {}, Amount: {}, Method: {}&quot;,
+                payment.getId(), payment.getOrderId(), payment.getAmount(), payment.getPaymentMethod());
+
+            logBusinessMetrics(&quot;payment.processed&quot;, 1, Map.of(
+                &quot;amount&quot;, payment.getAmount().doubleValue(),
+                &quot;method&quot;, payment.getPaymentMethod(),
+                &quot;processingTime&quot;, payment.getProcessingTimeMs()
+            ));
+
+        } catch (Exception e) {
+            loggingService.logError(&quot;Failed to log payment processing business event&quot;, e, payment.getId());
+        }
+    }
+
+    public void logInventoryUpdated(String productId, int oldQuantity, int newQuantity, String reason) {
+        try (LoggingContext context = contextManager.createBusinessContext(&quot;INVENTORY&quot;, &quot;INVENTORY_UPDATED&quot;)) {
+            context.addBusinessDetail(&quot;productId&quot;, productId);
+            context.addBusinessDetail(&quot;oldQuantity&quot;, oldQuantity);
+            context.addBusinessDetail(&quot;newQuantity&quot;, newQuantity);
+            context.addBusinessDetail(&quot;reason&quot;, reason);
+            context.addBusinessDetail(&quot;quantityChange&quot;, newQuantity - oldQuantity);
+
+            loggingService.logInfo(&quot;Business event: Inventory updated - ProductId: {}, OldQty: {}, NewQty: {}, Change: {}, Reason: {}&quot;,
+                productId, oldQuantity, newQuantity, (newQuantity - oldQuantity), reason);
+
+            logBusinessMetrics(&quot;inventory.updated&quot;, 1, Map.of(
+                &quot;quantityChange&quot;, Math.abs(newQuantity - oldQuantity),
+                &quot;reason&quot;, reason,
+                &quot;lowStock&quot;, newQuantity &lt; 10 ? 1 : 0
+            ));
+
+        } catch (Exception e) {
+            loggingService.logError(&quot;Failed to log inventory update business event&quot;, e, productId);
+        }
+    }
+
+    public void logUserAction(String userId, String action, String resource, Map&lt;String, Object&gt; actionDetails) {
+        try (LoggingContext context = contextManager.createBusinessContext(&quot;USER_ACTION&quot;, action)) {
+            context.setUserId(userId);
+            context.addBusinessDetail(&quot;action&quot;, action);
+            context.addBusinessDetail(&quot;resource&quot;, resource);
+
+            if (actionDetails != null) {
+                actionDetails.forEach(context::addBusinessDetail);
+            }
+
+            loggingService.logInfo(&quot;Business event: User action - UserId: {}, Action: {}, Resource: {}&quot;,
+                userId, action, resource);
+
+            logBusinessMetrics(&quot;user.action&quot;, 1, Map.of(
+                &quot;action&quot;, action,
+                &quot;resource&quot;, resource,
+                &quot;userId&quot;, userId
+            ));
+
+        } catch (Exception e) {
+            loggingService.logError(&quot;Failed to log user action business event&quot;, e, userId, action, resource);
+        }
+    }
+
+    private Map&lt;String, Object&gt; createOrderEventDetails(Order order) {
+        Map&lt;String, Object&gt; details = new HashMap&lt;&gt;();
+        details.put(&quot;orderId&quot;, order.getId());
+        details.put(&quot;customerId&quot;, order.getCustomerId());
+        details.put(&quot;totalAmount&quot;, order.getTotalAmount());
+        details.put(&quot;currency&quot;, order.getCurrency());
+        details.put(&quot;itemCount&quot;, order.getItems().size());
+        details.put(&quot;shippingAddress&quot;, order.getShippingAddress());
+        details.put(&quot;paymentMethod&quot;, order.getPaymentMethod());
+        details.put(&quot;orderDate&quot;, order.getCreatedAt());
+
+        // Add item details
+        List&lt;Map&lt;String, Object&gt;&gt; itemDetails = order.getItems().stream()
+            .map(item -&gt; Map.of(
+                &quot;productId&quot;, item.getProductId(),
+                &quot;quantity&quot;, item.getQuantity(),
+                &quot;unitPrice&quot;, item.getUnitPrice(),
+                &quot;totalPrice&quot;, item.getTotalPrice()
+            ))
+            .collect(Collectors.toList());
+
+        details.put(&quot;items&quot;, itemDetails);
+
+        return details;
+    }
+
+    private void logBusinessMetrics(String metricName, double value, Map&lt;String, Object&gt; tags) {
+        try {
+            BusinessMetric metric = new BusinessMetric();
+            metric.setName(metricName);
+            metric.setValue(value);
+            metric.setTags(tags);
+            metric.setTimestamp(Instant.now());
+
+            // Log as structured metric event
+            loggingService.logInfo(&quot;Business metric: {} = {}, tags: {}&quot;, metricName, value, tags);
+
+        } catch (Exception e) {
+            loggingService.logError(&quot;Failed to log business metric&quot;, e, metricName, value);
+        }
+    }
+}
+
+// Security Event Logging
+@Service
+public class SecurityEventLogger {
+
+    @Autowired
+    private StructuredLoggingService loggingService;
+
+    @Autowired
+    private LoggingContextManager contextManager;
+
+    public void logAuthenticationAttempt(String username, String ipAddress, boolean successful) {
+        try (LoggingContext context = contextManager.createSecurityContext(&quot;AUTHENTICATION&quot;, 
+                successful ? &quot;AUTH_SUCCESS&quot; : &quot;AUTH_FAILURE&quot;)) {
+            context.addSecurityDetail(&quot;username&quot;, username);
+            context.addSecurityDetail(&quot;ipAddress&quot;, ipAddress);
+            context.addSecurityDetail(&quot;successful&quot;, successful);
+            context.addSecurityDetail(&quot;userAgent&quot;, getCurrentUserAgent());
+
+            SecurityEventData eventData = new SecurityEventData();
+            eventData.setEventType(successful ? &quot;AUTH_SUCCESS&quot; : &quot;AUTH_FAILURE&quot;);
+            eventData.setUsername(username);
+            eventData.setIpAddress(ipAddress);
+            eventData.setTimestamp(Instant.now());
+            eventData.setUserAgent(getCurrentUserAgent());
+
+            if (successful) {
+                loggingService.logInfo(&quot;Security event: Authentication successful - Username: {}, IP: {}&quot;,
+                    username, ipAddress);
+            } else {
+                loggingService.logWarn(&quot;Security event: Authentication failed - Username: {}, IP: {}&quot;,
+                    username, ipAddress);
+            }
+
+            // Log security metrics
+            logSecurityMetric(&quot;authentication.attempt&quot;, 1, Map.of(
+                &quot;result&quot;, successful ? &quot;success&quot; : &quot;failure&quot;,
+                &quot;ipAddress&quot;, ipAddress
+            ));
+
+        } catch (Exception e) {
+            loggingService.logError(&quot;Failed to log authentication attempt&quot;, e, username, ipAddress);
+        }
+    }
+
+    public void logAuthorizationFailure(String username, String resource, String action, String reason) {
+        try (LoggingContext context = contextManager.createSecurityContext(&quot;AUTHORIZATION&quot;, &quot;AUTHZ_FAILURE&quot;)) {
+            context.setUserId(username);
+            context.addSecurityDetail(&quot;username&quot;, username);
+            context.addSecurityDetail(&quot;resource&quot;, resource);
+            context.addSecurityDetail(&quot;action&quot;, action);
+            context.addSecurityDetail(&quot;reason&quot;, reason);
+            context.addSecurityDetail(&quot;ipAddress&quot;, getCurrentIpAddress());
+
+            loggingService.logWarn(&quot;Security event: Authorization failed - Username: {}, Resource: {}, Action: {}, Reason: {}&quot;,
+                username, resource, action, reason);
+
+            logSecurityMetric(&quot;authorization.failure&quot;, 1, Map.of(
+                &quot;resource&quot;, resource,
+                &quot;action&quot;, action,
+                &quot;reason&quot;, reason
+            ));
+
+        } catch (Exception e) {
+            loggingService.logError(&quot;Failed to log authorization failure&quot;, e, username, resource, action);
+        }
+    }
+
+    public void logSuspiciousActivity(String description, String username, String ipAddress, 
+                                     Map&lt;String, Object&gt; activityDetails) {
+        try (LoggingContext context = contextManager.createSecurityContext(&quot;SECURITY&quot;, &quot;SUSPICIOUS_ACTIVITY&quot;)) {
+            context.setUserId(username);
+            context.addSecurityDetail(&quot;description&quot;, description);
+            context.addSecurityDetail(&quot;username&quot;, username);
+            context.addSecurityDetail(&quot;ipAddress&quot;, ipAddress);
+            context.addSecurityDetail(&quot;severity&quot;, &quot;HIGH&quot;);
+
+            if (activityDetails != null) {
+                activityDetails.forEach(context::addSecurityDetail);
+            }
+
+            loggingService.logWarn(&quot;Security event: Suspicious activity detected - Description: {}, Username: {}, IP: {}&quot;,
+                description, username, ipAddress);
+
+            logSecurityMetric(&quot;suspicious.activity&quot;, 1, Map.of(
+                &quot;type&quot;, description,
+                &quot;ipAddress&quot;, ipAddress,
+                &quot;severity&quot;, &quot;HIGH&quot;
+            ));
+
+        } catch (Exception e) {
+            loggingService.logError(&quot;Failed to log suspicious activity&quot;, e, description, username, ipAddress);
+        }
+    }
+
+    public void logDataAccess(String username, String resource, String operation, boolean authorized) {
+        try (LoggingContext context = contextManager.createSecurityContext(&quot;DATA_ACCESS&quot;, operation)) {
+            context.setUserId(username);
+            context.addSecurityDetail(&quot;username&quot;, username);
+            context.addSecurityDetail(&quot;resource&quot;, resource);
+            context.addSecurityDetail(&quot;operation&quot;, operation);
+            context.addSecurityDetail(&quot;authorized&quot;, authorized);
+            context.addSecurityDetail(&quot;ipAddress&quot;, getCurrentIpAddress());
+            context.addSecurityDetail(&quot;timestamp&quot;, Instant.now());
+
+            if (authorized) {
+                loggingService.logInfo(&quot;Security event: Data access - Username: {}, Resource: {}, Operation: {}&quot;,
+                    username, resource, operation);
+            } else {
+                loggingService.logWarn(&quot;Security event: Unauthorized data access attempt - Username: {}, Resource: {}, Operation: {}&quot;,
+                    username, resource, operation);
+            }
+
+            logSecurityMetric(&quot;data.access&quot;, 1, Map.of(
+                &quot;resource&quot;, resource,
+                &quot;operation&quot;, operation,
+                &quot;authorized&quot;, authorized ? &quot;true&quot; : &quot;false&quot;
+            ));
+
+        } catch (Exception e) {
+            loggingService.logError(&quot;Failed to log data access event&quot;, e, username, resource, operation);
+        }
+    }
+
+    private void logSecurityMetric(String metricName, double value, Map&lt;String, Object&gt; tags) {
+        try {
+            SecurityMetric metric = new SecurityMetric();
+            metric.setName(metricName);
+            metric.setValue(value);
+            metric.setTags(tags);
+            metric.setTimestamp(Instant.now());
+            metric.setSeverity(determineSeverity(metricName, tags));
+
+            loggingService.logInfo(&quot;Security metric: {} = {}, tags: {}&quot;, metricName, value, tags);
+
+        } catch (Exception e) {
+            loggingService.logError(&quot;Failed to log security metric&quot;, e, metricName, value);
+        }
+    }
+}
+
+// Performance Logging
+@Service
+public class PerformanceLogger {
+
+    @Autowired
+    private StructuredLoggingService loggingService;
+
+    @Autowired
+    private LoggingContextManager contextManager;
+
+    public PerformanceTimer startTimer(String operationName) {
+        return new PerformanceTimer(operationName, this);
+    }
+
+    public void logOperationPerformance(String operationName, long durationMs, 
+                                       String component, Map&lt;String, Object&gt; metrics) {
+        try (LoggingContext context = contextManager.createPerformanceContext(component, operationName)) {
+            context.addPerformanceDetail(&quot;operationName&quot;, operationName);
+            context.addPerformanceDetail(&quot;durationMs&quot;, durationMs);
+            context.addPerformanceDetail(&quot;component&quot;, component);
+
+            if (metrics != null) {
+                metrics.forEach(context::addPerformanceDetail);
+            }
+
+            // Determine log level based on performance
+            if (durationMs &gt; 10000) { // &gt; 10 seconds
+                loggingService.logWarn(&quot;Performance: Slow operation - Operation: {}, Duration: {}ms, Component: {}&quot;,
+                    operationName, durationMs, component);
+            } else if (durationMs &gt; 5000) { // &gt; 5 seconds
+                loggingService.logInfo(&quot;Performance: Operation completed - Operation: {}, Duration: {}ms, Component: {}&quot;,
+                    operationName, durationMs, component);
+            } else {
+                loggingService.logDebug(&quot;Performance: Operation completed - Operation: {}, Duration: {}ms, Component: {}&quot;,
+                    operationName, durationMs, component);
+            }
+
+            // Log performance metrics
+            logPerformanceMetric(&quot;operation.duration&quot;, durationMs, Map.of(
+                &quot;operation&quot;, operationName,
+                &quot;component&quot;, component,
+                &quot;slow&quot;, durationMs &gt; 5000 ? &quot;true&quot; : &quot;false&quot;
+            ));
+
+        } catch (Exception e) {
+            loggingService.logError(&quot;Failed to log operation performance&quot;, e, operationName, durationMs);
+        }
+    }
+
+    public void logDatabasePerformance(String queryType, String table, long durationMs, int recordCount) {
+        try (LoggingContext context = contextManager.createPerformanceContext(&quot;DATABASE&quot;, queryType)) {
+            context.addPerformanceDetail(&quot;queryType&quot;, queryType);
+            context.addPerformanceDetail(&quot;table&quot;, table);
+            context.addPerformanceDetail(&quot;durationMs&quot;, durationMs);
+            context.addPerformanceDetail(&quot;recordCount&quot;, recordCount);
+
+            if (durationMs &gt; 1000) {
+                loggingService.logWarn(&quot;Performance: Slow database query - Type: {}, Table: {}, Duration: {}ms, Records: {}&quot;,
+                    queryType, table, durationMs, recordCount);
+            } else {
+                loggingService.logDebug(&quot;Performance: Database query - Type: {}, Table: {}, Duration: {}ms, Records: {}&quot;,
+                    queryType, table, durationMs, recordCount);
+            }
+
+            logPerformanceMetric(&quot;database.query.duration&quot;, durationMs, Map.of(
+                &quot;queryType&quot;, queryType,
+                &quot;table&quot;, table,
+                &quot;recordCount&quot;, recordCount
+            ));
+
+        } catch (Exception e) {
+            loggingService.logError(&quot;Failed to log database performance&quot;, e, queryType, table, durationMs);
+        }
+    }
+
+    public void logExternalServicePerformance(String serviceName, String endpoint, long durationMs, 
+                                            int statusCode, boolean successful) {
+        try (LoggingContext context = contextManager.createPerformanceContext(&quot;EXTERNAL_SERVICE&quot;, serviceName)) {
+            context.addPerformanceDetail(&quot;serviceName&quot;, serviceName);
+            context.addPerformanceDetail(&quot;endpoint&quot;, endpoint);
+            context.addPerformanceDetail(&quot;durationMs&quot;, durationMs);
+            context.addPerformanceDetail(&quot;statusCode&quot;, statusCode);
+            context.addPerformanceDetail(&quot;successful&quot;, successful);
+
+            if (!successful || durationMs &gt; 5000) {
+                loggingService.logWarn(&quot;Performance: External service call - Service: {}, Duration: {}ms, Status: {}, Success: {}&quot;,
+                    serviceName, durationMs, statusCode, successful);
+            } else {
+                loggingService.logDebug(&quot;Performance: External service call - Service: {}, Duration: {}ms, Status: {}&quot;,
+                    serviceName, durationMs, statusCode);
+            }
+
+            logPerformanceMetric(&quot;external.service.duration&quot;, durationMs, Map.of(
+                &quot;service&quot;, serviceName,
+                &quot;statusCode&quot;, statusCode,
+                &quot;successful&quot;, successful ? &quot;true&quot; : &quot;false&quot;
+            ));
+
+        } catch (Exception e) {
+            loggingService.logError(&quot;Failed to log external service performance&quot;, e, serviceName, endpoint);
+        }
+    }
+
+    private void logPerformanceMetric(String metricName, double value, Map&lt;String, Object&gt; tags) {
+        try {
+            PerformanceMetric metric = new PerformanceMetric();
+            metric.setName(metricName);
+            metric.setValue(value);
+            metric.setTags(tags);
+            metric.setTimestamp(Instant.now());
+
+            loggingService.logDebug(&quot;Performance metric: {} = {}, tags: {}&quot;, metricName, value, tags);
+
+        } catch (Exception e) {
+            loggingService.logError(&quot;Failed to log performance metric&quot;, e, metricName, value);
+        }
+    }
+}
+</code></pre>
+<h4 id="2-apache-camel-integration-logging">2. <strong>Apache Camel Integration Logging</strong></h4>
+<p>Comprehensive logging for Camel routes and integration processes:</p>
+<pre><code class="language-java">@Component
+public class CamelLoggingRoute extends RouteBuilder {
+
+    @Autowired
+    private StructuredLoggingService loggingService;
+
+    @Autowired
+    private BusinessEventLogger businessEventLogger;
+
+    @Override
+    public void configure() throws Exception {
+
+        // Configure global Camel logging
+        getContext().setUseMDCLogging(true);
+        getContext().setLogMask(true);
+
+        // Global error handler with comprehensive logging
+        errorHandler(deadLetterChannel(&quot;direct:error-handler&quot;)
+            .maximumRedeliveries(3)
+            .redeliveryDelay(2000)
+            .useExponentialBackOff()
+            .onRedelivery(new LoggingRedeliveryProcessor())
+            .retryAttemptedLogLevel(LoggingLevel.WARN)
+            .retriesExhaustedLogLevel(LoggingLevel.ERROR));
+
+        // Order processing route with detailed logging
+        from(&quot;kafka:order-events&quot;)
+            .routeId(&quot;process-order&quot;)
+            .onException(Exception.class)
+                .handled(true)
+                .to(&quot;direct:log-order-processing-error&quot;)
+                .to(&quot;kafka:order-errors&quot;)
+            .end()
+            .process(exchange -&gt; {
+                // Start logging context
+                String correlationId = exchange.getIn().getHeader(&quot;correlationId&quot;, String.class);
+                if (correlationId == null) {
+                    correlationId = UUID.randomUUID().toString();
+                    exchange.getIn().setHeader(&quot;correlationId&quot;, correlationId);
+                }
+
+                MDC.put(&quot;correlationId&quot;, correlationId);
+                MDC.put(&quot;route&quot;, &quot;process-order&quot;);
+
+                loggingService.logInfo(&quot;Processing order event - CorrelationId: {}&quot;, correlationId);
+            })
+            .unmarshal().json(JsonLibrary.Jackson, Order.class)
+            .process(new OrderValidationProcessor())
+            .to(&quot;direct:log-order-validated&quot;)
+            .to(&quot;direct:check-inventory&quot;)
+            .to(&quot;direct:log-inventory-checked&quot;)
+            .to(&quot;direct:process-payment&quot;)
+            .to(&quot;direct:log-payment-processed&quot;)
+            .to(&quot;direct:update-order-status&quot;)
+            .to(&quot;direct:log-order-completed&quot;)
+            .process(exchange -&gt; {
+                Order order = exchange.getIn().getBody(Order.class);
+                businessEventLogger.logOrderCreated(order, order.getCustomerId());
+
+                loggingService.logInfo(&quot;Order processing completed - OrderId: {}, Status: {}&quot;, 
+                    order.getId(), order.getStatus());
+
+                // Clear MDC
+                MDC.clear();
+            });
+
+        // Inventory check with performance logging
+        from(&quot;direct:check-inventory&quot;)
+            .routeId(&quot;check-inventory&quot;)
+            .process(exchange -&gt; {
+                long startTime = System.currentTimeMillis();
+                exchange.setProperty(&quot;inventoryCheckStart&quot;, startTime);
+
+                Order order = exchange.getIn().getBody(Order.class);
+                loggingService.logInfo(&quot;Starting inventory check - OrderId: {}, Items: {}&quot;, 
+                    order.getId(), order.getItems().size());
+            })
+            .to(&quot;http://inventory-service:8080/check&quot;)
+            .process(exchange -&gt; {
+                long startTime = exchange.getProperty(&quot;inventoryCheckStart&quot;, Long.class);
+                long duration = System.currentTimeMillis() - startTime;
+
+                Order order = exchange.getIn().getBody(Order.class);
+                InventoryResponse response = exchange.getIn().getHeader(&quot;inventoryResponse&quot;, InventoryResponse.class);
+
+                performanceLogger.logExternalServicePerformance(
+                    &quot;inventory-service&quot;, &quot;/check&quot;, duration, 
+                    exchange.getIn().getHeader(Exchange.HTTP_RESPONSE_CODE, Integer.class), 
+                    response.isAvailable());
+
+                if (response.isAvailable()) {
+                    loggingService.logInfo(&quot;Inventory check successful - OrderId: {}, Duration: {}ms&quot;, 
+                        order.getId(), duration);
+                } else {
+                    loggingService.logWarn(&quot;Inventory check failed - OrderId: {}, Reason: {}, Duration: {}ms&quot;, 
+                        order.getId(), response.getReason(), duration);
+                }
+            });
+
+        // Payment processing with security logging
+        from(&quot;direct:process-payment&quot;)
+            .routeId(&quot;process-payment&quot;)
+            .process(exchange -&gt; {
+                Order order = exchange.getIn().getBody(Order.class);
+
+                // Log sensitive operation
+                securityEventLogger.logDataAccess(
+                    order.getCustomerId(), 
+                    &quot;PAYMENT_INFO&quot;, 
+                    &quot;PROCESS_PAYMENT&quot;, 
+                    true);
+
+                // Mask sensitive data in logs
+                Payment maskedPayment = maskPaymentData(order.getPayment());
+
+                loggingService.logInfo(&quot;Processing payment - OrderId: {}, Amount: {}, Method: {}&quot;, 
+                    order.getId(), order.getTotalAmount(), maskedPayment.getMethodType());
+            })
+            .setHeader(&quot;X-Correlation-ID&quot;, simple(&quot;${exchangeProperty.correlationId}&quot;))
+            .to(&quot;http://payment-service:8080/process&quot;)
+            .process(new PaymentResponseProcessor())
+            .process(exchange -&gt; {
+                Order order = exchange.getIn().getBody(Order.class);
+                PaymentResponse response = exchange.getIn().getHeader(&quot;paymentResponse&quot;, PaymentResponse.class);
+
+                businessEventLogger.logPaymentProcessed(
+                    response.getPayment(), 
+                    order.getCustomerId());
+
+                if (response.isSuccessful()) {
+                    loggingService.logInfo(&quot;Payment processed successfully - OrderId: {}, PaymentId: {}&quot;, 
+                        order.getId(), response.getPaymentId());
+                } else {
+                    loggingService.logError(&quot;Payment processing failed - OrderId: {}, Reason: {}&quot;, 
+                        order.getId(), response.getErrorMessage());
+                }
+            });
+
+        // Comprehensive error logging
+        from(&quot;direct:error-handler&quot;)
+            .routeId(&quot;error-handler&quot;)
+            .process(exchange -&gt; {
+                Exception exception = exchange.getProperty(Exchange.EXCEPTION_CAUGHT, Exception.class);
+                String correlationId = exchange.getIn().getHeader(&quot;correlationId&quot;, String.class);
+                String routeId = exchange.getFromRouteId();
+
+                ErrorLogEntry errorLog = new ErrorLogEntry();
+                errorLog.setCorrelationId(correlationId);
+                errorLog.setRouteId(routeId);
+                errorLog.setExceptionType(exception.getClass().getName());
+                errorLog.setExceptionMessage(exception.getMessage());
+                errorLog.setTimestamp(Instant.now());
+                errorLog.setStackTrace(getStackTrace(exception));
+
+                // Add context information
+                errorLog.setExchangeId(exchange.getExchangeId());
+                errorLog.setMessageBody(getBodyAsString(exchange));
+                errorLog.setHeaders(exchange.getIn().getHeaders());
+
+                loggingService.logError(&quot;Route processing error - Route: {}, CorrelationId: {}, Exception: {}&quot;, 
+                    exception, routeId, correlationId, exception.getClass().getSimpleName());
+
+                // Log business impact
+                assessAndLogBusinessImpact(errorLog);
+            });
+
+        // Integration flow tracking
+        from(&quot;direct:log-order-validated&quot;)
+            .process(exchange -&gt; {
+                Order order = exchange.getIn().getBody(Order.class);
+
+                IntegrationFlowEvent event = new IntegrationFlowEvent();
+                event.setFlowName(&quot;ORDER_PROCESSING&quot;);
+                event.setStepName(&quot;ORDER_VALIDATED&quot;);
+                event.setCorrelationId(exchange.getIn().getHeader(&quot;correlationId&quot;, String.class));
+                event.setTimestamp(Instant.now());
+                event.setEntityId(order.getId());
+                event.setStatus(&quot;SUCCESS&quot;);
+
+                loggingService.logInfo(&quot;Integration flow step completed - Flow: {}, Step: {}, OrderId: {}&quot;, 
+                    event.getFlowName(), event.getStepName(), order.getId());
+            });
+
+        from(&quot;direct:log-inventory-checked&quot;)
+            .process(exchange -&gt; {
+                Order order = exchange.getIn().getBody(Order.class);
+                InventoryResponse inventoryResponse = exchange.getIn().getHeader(&quot;inventoryResponse&quot;, InventoryResponse.class);
+
+                IntegrationFlowEvent event = new IntegrationFlowEvent();
+                event.setFlowName(&quot;ORDER_PROCESSING&quot;);
+                event.setStepName(&quot;INVENTORY_CHECKED&quot;);
+                event.setCorrelationId(exchange.getIn().getHeader(&quot;correlationId&quot;, String.class));
+                event.setTimestamp(Instant.now());
+                event.setEntityId(order.getId());
+                event.setStatus(inventoryResponse.isAvailable() ? &quot;SUCCESS&quot; : &quot;FAILED&quot;);
+                event.setDetails(Map.of(&quot;available&quot;, inventoryResponse.isAvailable(), 
+                                       &quot;reason&quot;, inventoryResponse.getReason()));
+
+                loggingService.logInfo(&quot;Integration flow step completed - Flow: {}, Step: {}, OrderId: {}, Available: {}&quot;, 
+                    event.getFlowName(), event.getStepName(), order.getId(), inventoryResponse.isAvailable());
+            });
+
+        // Message routing logging
+        from(&quot;direct:route-messages&quot;)
+            .routeId(&quot;route-messages&quot;)
+            .choice()
+                .when(header(&quot;messageType&quot;).isEqualTo(&quot;ORDER&quot;))
+                    .process(exchange -&gt; {
+                        loggingService.logInfo(&quot;Routing message to order processing - MessageId: {}, Type: ORDER&quot;, 
+                            exchange.getIn().getMessageId());
+                    })
+                    .to(&quot;direct:process-order-message&quot;)
+                .when(header(&quot;messageType&quot;).isEqualTo(&quot;INVENTORY&quot;))
+                    .process(exchange -&gt; {
+                        loggingService.logInfo(&quot;Routing message to inventory processing - MessageId: {}, Type: INVENTORY&quot;, 
+                            exchange.getIn().getMessageId());
+                    })
+                    .to(&quot;direct:process-inventory-message&quot;)
+                .otherwise()
+                    .process(exchange -&gt; {
+                        String messageType = exchange.getIn().getHeader(&quot;messageType&quot;, String.class);
+                        loggingService.logWarn(&quot;Unknown message type - MessageId: {}, Type: {}&quot;, 
+                            exchange.getIn().getMessageId(), messageType);
+                    })
+                    .to(&quot;direct:handle-unknown-message&quot;)
+            .end();
+
+        // Audit trail logging
+        from(&quot;direct:create-audit-trail&quot;)
+            .routeId(&quot;create-audit-trail&quot;)
+            .process(exchange -&gt; {
+                AuditEvent auditEvent = exchange.getIn().getBody(AuditEvent.class);
+
+                AuditLogEntry auditLog = new AuditLogEntry();
+                auditLog.setEventType(auditEvent.getEventType());
+                auditLog.setUserId(auditEvent.getUserId());
+                auditLog.setResourceId(auditEvent.getResourceId());
+                auditLog.setAction(auditEvent.getAction());
+                auditLog.setTimestamp(Instant.now());
+                auditLog.setDetails(auditEvent.getDetails());
+                auditLog.setIpAddress(auditEvent.getIpAddress());
+                auditLog.setUserAgent(auditEvent.getUserAgent());
+
+                loggingService.logInfo(&quot;Audit event: {} - User: {}, Resource: {}, Action: {}&quot;, 
+                    auditEvent.getEventType(), auditEvent.getUserId(), 
+                    auditEvent.getResourceId(), auditEvent.getAction());
+
+                // Store audit log in dedicated audit storage
+                exchange.getIn().setBody(auditLog);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to(&quot;kafka:audit-events&quot;)
+            .to(&quot;direct:store-audit-log&quot;);
+    }
+
+    private class OrderValidationProcessor implements Processor {
+        @Override
+        public void process(Exchange exchange) throws Exception {
+            Order order = exchange.getIn().getBody(Order.class);
+
+            ValidationContext validationContext = new ValidationContext();
+            validationContext.setEntityId(order.getId());
+            validationContext.setEntityType(&quot;ORDER&quot;);
+            validationContext.setValidationType(&quot;BUSINESS_RULES&quot;);
+
+            try {
+                // Validate order
+                OrderValidationResult result = validateOrder(order);
+                validationContext.setValid(result.isValid());
+                validationContext.setValidationErrors(result.getErrors());
+
+                if (!result.isValid()) {
+                    loggingService.logWarn(&quot;Order validation failed - OrderId: {}, Errors: {}&quot;, 
+                        order.getId(), result.getErrors());
+                    throw new OrderValidationException(&quot;Order validation failed: &quot; + 
+                        String.join(&quot;, &quot;, result.getErrors()));
+                } else {
+                    loggingService.logInfo(&quot;Order validation successful - OrderId: {}&quot;, order.getId());
+                }
+
+            } catch (Exception e) {
+                validationContext.setValid(false);
+                validationContext.setValidationException(e.getMessage());
+
+                loggingService.logError(&quot;Order validation error - OrderId: {}&quot;, e, order.getId());
+                throw e;
+            } finally {
+                // Always log validation attempt
+                logValidationAttempt(validationContext);
+            }
+        }
+    }
+}
+</code></pre>
+<h2 id="best-practices">Best Practices</h2>
+<h3 id="1-log-structure-and-content-design">1. <strong>Log Structure and Content Design</strong></h3>
+<ul>
+<li>Use consistent, structured log formats (JSON, key-value pairs) for all log entries</li>
+<li>Include essential context information (correlation IDs, user IDs, session IDs) in all relevant logs</li>
+<li>Design meaningful log messages that provide clear information about events and their context</li>
+<li>Use appropriate log levels consistently across the application and organization</li>
+<li>Include timing information and performance metrics in operational logs</li>
+</ul>
+<h3 id="2-security-and-sensitive-data-handling">2. <strong>Security and Sensitive Data Handling</strong></h3>
+<ul>
+<li>Never log sensitive data such as passwords, credit card numbers, or personal information</li>
+<li>Implement data masking and obfuscation for sensitive data that must be referenced in logs</li>
+<li>Use secure log transmission and storage mechanisms to protect log data</li>
+<li>Implement appropriate access controls and audit trails for log data access</li>
+<li>Ensure compliance with data privacy regulations (GDPR, HIPAA, etc.) in logging practices</li>
+</ul>
+<h3 id="3-performance-and-resource-management">3. <strong>Performance and Resource Management</strong></h3>
+<ul>
+<li>Use asynchronous logging to minimize performance impact on application operations</li>
+<li>Implement appropriate buffering and batching strategies for log data transmission</li>
+<li>Monitor and manage log storage capacity and implement proper retention policies</li>
+<li>Use log level configuration to control logging verbosity in different environments</li>
+<li>Implement log sampling and filtering for high-volume logging scenarios</li>
+</ul>
+<h3 id="4-centralized-management-and-operations">4. <strong>Centralized Management and Operations</strong></h3>
+<ul>
+<li>Implement centralized log collection and aggregation for distributed systems</li>
+<li>Use standardized log formats and schemas across all applications and services</li>
+<li>Implement automated log analysis and alerting for operational and security events</li>
+<li>Provide searchable and analyzable log storage and querying capabilities</li>
+<li>Implement proper log backup and disaster recovery procedures</li>
+</ul>
+<h3 id="5-integration-and-automation">5. <strong>Integration and Automation</strong></h3>
+<ul>
+<li>Integrate logging with monitoring and alerting systems for comprehensive observability</li>
+<li>Implement automated log analysis for anomaly detection and issue identification</li>
+<li>Use logging data for business intelligence and operational analytics</li>
+<li>Integrate with incident management and response systems for operational efficiency</li>
+<li>Implement logging configuration management for consistent logging across environments</li>
+</ul>
+<h3 id="6-compliance-and-governance">6. <strong>Compliance and Governance</strong></h3>
+<ul>
+<li>Implement comprehensive audit trails for compliance and governance requirements</li>
+<li>Ensure log data integrity and tamper-proofing for regulatory compliance</li>
+<li>Implement appropriate log data retention and disposal policies</li>
+<li>Provide log data export and reporting capabilities for compliance auditing</li>
+<li>Document logging practices and policies for regulatory and operational transparency</li>
+</ul>
+<p>Logging Strategies are fundamental to maintaining operational excellence, security, compliance, and business intelligence in enterprise integration architectures, providing the essential foundation for understanding, monitoring, and optimizing complex distributed systems and business processes.</p>
+
+      <a href="../index.html" class="back-to-top">← Back to All Patterns</a>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <p>©2026 <a href="https://dataintegrationmastery.com/">Data Integration Mastery™</a> — All Rights Reserved</p>
+  </footer>
+</body>
+</html>

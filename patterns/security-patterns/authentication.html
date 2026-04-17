@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Authentication Pattern — Integration Architecture Patterns | Data Integration Mastery™</title>
+  <meta name="description" content="The Authentication pattern is a fundamental security mechanism in enterprise integration architectures that verifies the identity of users, services, and sys...">
+  <meta name="keywords" content="authentication pattern, integration pattern, security patterns, integration architecture, EAI patterns, data integration">
+  <link rel="canonical" href="https://dataintegrationmastery.com/patterns/security-patterns/authentication.html">
+
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://dataintegrationmastery.com/patterns/security-patterns/authentication.html">
+  <meta property="og:title" content="Authentication Pattern — Integration Architecture Patterns">
+  <meta property="og:description" content="The Authentication pattern is a fundamental security mechanism in enterprise integration architectures that verifies the identity of users, services, and sys...">
+  <meta property="og:image" content="https://dataintegrationmastery.com/assets/images/logo.png">
+  <meta property="og:site_name" content="Data Integration Mastery">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Authentication Pattern — Integration Architecture Patterns">
+  <meta name="twitter:description" content="The Authentication pattern is a fundamental security mechanism in enterprise integration architectures that verifies the identity of users, services, and sys...">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/docs.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Authentication Pattern",
+    "description": "The Authentication pattern is a fundamental security mechanism in enterprise integration architectures that verifies the identity of users, services, and sys...",
+    "url": "https://dataintegrationmastery.com/patterns/security-patterns/authentication.html",
+    "author": {
+      "@type": "Person",
+      "name": "Ari Vilkman",
+      "jobTitle": "Integration Architect"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Data Integration Mastery",
+      "url": "https://dataintegrationmastery.com"
+    },
+    "isPartOf": {
+      "@type": "CollectionPage",
+      "name": "Integration Architecture Patterns",
+      "url": "https://dataintegrationmastery.com/patterns/"
+    },
+    "about": {
+      "@type": "Thing",
+      "name": "Authentication Pattern"
+    },
+    "inLanguage": "en",
+    "isAccessibleForFree": true
+  }
+  </script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="https://dataintegrationmastery.com/" class="header-brand">
+        <img src="../../assets/images/dim-icon.png" alt="DIM" width="36" height="36">
+        <span class="header-title">Data Integration Mastery™</span>
+      </a>
+      <nav class="header-nav" aria-label="Main navigation">
+        <a href="https://dataintegrationmastery.com/">Home</a>
+        <a href="../index.html">All Patterns</a>
+        <a href="https://dataintegrationmastery.com/#free-course">Free Course</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="docs-layout">
+    <aside class="docs-sidebar" aria-label="Pattern categories">
+      <div class="sidebar-title">Pattern Categories</div>
+<div class="sidebar-section">
+  <a href="../index.html#resilience" class="sidebar-section-title">🛡️ Resilience Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../resilience-patterns/circuit-breaker.html">Circuit Breaker</a></li>
+    <li><a href="../resilience-patterns/retry-mechanism.html">Retry Mechanism</a></li>
+    <li><a href="../resilience-patterns/timeout.html">Timeout</a></li>
+    <li><a href="../resilience-patterns/dead-letter-queue.html">Dead Letter Queue</a></li>
+    <li><a href="../resilience-patterns/bulkhead.html">Bulkhead</a></li>
+    <li><a href="../resilience-patterns/fallback-graceful-degradation.html">Fallback / Graceful Degradation</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#messaging" class="sidebar-section-title">📨 Messaging Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../messaging-patterns/request-reply.html">Request-Reply</a></li>
+    <li><a href="../messaging-patterns/publish-subscribe.html">Publish-Subscribe</a></li>
+    <li><a href="../messaging-patterns/message-queue.html">Message Queue</a></li>
+    <li><a href="../messaging-patterns/event-streaming.html">Event Streaming</a></li>
+    <li><a href="../messaging-patterns/correlation-id.html">Correlation ID</a></li>
+    <li><a href="../messaging-patterns/message-routing.html">Message Routing</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#data-transformation" class="sidebar-section-title">🔄 Data Transformation Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../data-transformation-patterns/message-translator.html">Message Translator</a></li>
+    <li><a href="../data-transformation-patterns/content-filter.html">Content Filter</a></li>
+    <li><a href="../data-transformation-patterns/message-router.html">Message Router</a></li>
+    <li><a href="../data-transformation-patterns/aggregator.html">Aggregator</a></li>
+    <li><a href="../data-transformation-patterns/splitter.html">Splitter</a></li>
+    <li><a href="../data-transformation-patterns/data-mapper.html">Data Mapper</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#routing" class="sidebar-section-title">🔀 Routing Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../routing-patterns/content-based-router.html">Content-Based Router</a></li>
+    <li><a href="../routing-patterns/recipient-list.html">Recipient List</a></li>
+    <li><a href="../routing-patterns/load-balancer.html">Load Balancer</a></li>
+    <li><a href="../routing-patterns/message-filter.html">Message Filter</a></li>
+    <li><a href="../routing-patterns/dynamic-router.html">Dynamic Router</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#security" class="sidebar-section-title">🔐 Security Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="authentication.html" class="active">Authentication</a></li>
+    <li><a href="authorization.html">Authorization</a></li>
+    <li><a href="encryption.html">Encryption</a></li>
+    <li><a href="token-management.html">Token Management</a></li>
+    <li><a href="api-security.html">API Security</a></li>
+    <li><a href="secret-management.html">Secret Management</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#orchestration" class="sidebar-section-title">🎭 Orchestration Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../orchestration-patterns/saga-pattern.html">Saga Pattern</a></li>
+    <li><a href="../orchestration-patterns/process-manager.html">Process Manager</a></li>
+    <li><a href="../orchestration-patterns/workflow-engine.html">Workflow Engine</a></li>
+    <li><a href="../orchestration-patterns/choreography.html">Choreography</a></li>
+    <li><a href="../orchestration-patterns/compensation-transactions.html">Compensation Transactions</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#observability" class="sidebar-section-title">📊 Monitoring & Observability Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../monitoring-observability-patterns/distributed-tracing.html">Distributed Tracing</a></li>
+    <li><a href="../monitoring-observability-patterns/metrics-collection.html">Metrics Collection</a></li>
+    <li><a href="../monitoring-observability-patterns/health-checks.html">Health Checks</a></li>
+    <li><a href="../monitoring-observability-patterns/logging-strategies.html">Logging Strategies</a></li>
+    <li><a href="../monitoring-observability-patterns/performance-monitoring.html">Performance Monitoring</a></li>
+    <li><a href="../monitoring-observability-patterns/error-tracking.html">Error Tracking</a></li>
+  </ul>
+</div>
+
+    </aside>
+
+    <main id="main-content" class="docs-content">
+      <div class="breadcrumb">
+        <a href="https://dataintegrationmastery.com/">Home</a>
+        <span class="sep">›</span>
+        <a href="../index.html">Patterns</a>
+        <span class="sep">›</span>
+        <a href="../index.html#security">Security Patterns</a>
+        <span class="sep">›</span>
+        <strong>Authentication Pattern</strong>
+      </div>
+
+      <h1>Authentication Pattern</h1>
+
+      <h2 id="overview">Overview</h2>
+<p>The Authentication pattern is a fundamental security mechanism in enterprise integration architectures that verifies the identity of users, services, and systems attempting to access protected resources. Like a security checkpoint at a building entrance that verifies identity documents, authentication serves as the first line of defense in establishing trust and ensuring that only legitimate entities can interact with integration services. This pattern encompasses various methods of identity verification, from simple username/password combinations to sophisticated multi-factor authentication and biometric systems, forming the foundation upon which all other security measures are built.</p>
+<h3 id="theoretical-foundation">Theoretical Foundation</h3>
+<p>The Authentication pattern is grounded in <strong>identity verification theory</strong> and <strong>cryptographic security principles</strong>, specifically addressing the challenge of <strong>entity identification</strong> in distributed systems. The pattern incorporates concepts from <strong>public key infrastructure (PKI)</strong>, <strong>cryptographic protocols</strong>, and <strong>identity management systems</strong> to provide secure, scalable, and reliable mechanisms for verifying the authenticity of entities requesting access to system resources.</p>
+<h3 id="core-principles">Core Principles</h3>
+<h4 id="1-identity-verification">1. <strong>Identity Verification</strong></h4>
+<p>Authentication establishes and validates identity through multiple mechanisms:
+- <strong>Something you know</strong> - passwords, PINs, security questions, or passphrases
+- <strong>Something you are</strong> - biometric characteristics like fingerprints, facial recognition, or voice patterns
+- <strong>Something you have</strong> - physical tokens, smart cards, mobile devices, or hardware security modules
+- <strong>Somewhere you are</strong> - geographic location, network location, or device characteristics</p>
+<h4 id="2-multi-factor-authentication-mfa">2. <strong>Multi-Factor Authentication (MFA)</strong></h4>
+<p>Combining multiple authentication factors for enhanced security:
+- <strong>Two-factor authentication (2FA)</strong> - combining two different authentication factors
+- <strong>Risk-based authentication</strong> - adjusting authentication requirements based on risk assessment
+- <strong>Adaptive authentication</strong> - dynamically changing authentication methods based on context
+- <strong>Step-up authentication</strong> - requiring additional authentication for sensitive operations</p>
+<h4 id="3-credential-management">3. <strong>Credential Management</strong></h4>
+<p>Secure handling of authentication credentials:
+- <strong>Password policies</strong> - enforcing strong password requirements and rotation schedules
+- <strong>Credential storage</strong> - secure storage using hashing, salting, and encryption
+- <strong>Credential transmission</strong> - protecting credentials during network transmission
+- <strong>Credential lifecycle</strong> - managing creation, updates, expiration, and revocation</p>
+<h4 id="4-session-management">4. <strong>Session Management</strong></h4>
+<p>Managing authenticated sessions securely:
+- <strong>Session establishment</strong> - creating secure sessions after successful authentication
+- <strong>Session tokens</strong> - generating and managing secure session identifiers
+- <strong>Session timeout</strong> - automatically terminating inactive sessions
+- <strong>Session termination</strong> - providing secure logout and session cleanup</p>
+<h3 id="why-authentication-is-essential-in-integration-architecture">Why Authentication is Essential in Integration Architecture</h3>
+<h4 id="1-security-foundation">1. <strong>Security Foundation</strong></h4>
+<p>Authentication provides the fundamental security layer:
+- <strong>Identity verification</strong> - ensuring only legitimate users and systems can access resources
+- <strong>Trust establishment</strong> - creating a foundation of trust for subsequent security decisions
+- <strong>Access control enablement</strong> - providing verified identity for authorization decisions
+- <strong>Audit trail creation</strong> - establishing accountability through verified identity records</p>
+<h4 id="2-regulatory-compliance">2. <strong>Regulatory Compliance</strong></h4>
+<p>For meeting compliance requirements:
+- <strong>Data protection regulations</strong> - ensuring only authorized entities access personal data
+- <strong>Financial regulations</strong> - verifying identity for financial transactions and data access
+- <strong>Healthcare compliance</strong> - protecting patient data through strong authentication
+- <strong>Industry standards</strong> - meeting authentication requirements for specific industries</p>
+<h4 id="3-risk-mitigation">3. <strong>Risk Mitigation</strong></h4>
+<p>Reducing security risks through proper authentication:
+- <strong>Unauthorized access prevention</strong> - blocking illegitimate access attempts
+- <strong>Data breach protection</strong> - preventing unauthorized data exposure
+- <strong>System integrity</strong> - maintaining system security through verified access
+- <strong>Business continuity</strong> - ensuring operations continue securely</p>
+<h4 id="4-integration-security">4. <strong>Integration Security</strong></h4>
+<p>For secure system-to-system communication:
+- <strong>Service authentication</strong> - verifying the identity of calling services
+- <strong>API security</strong> - protecting API endpoints through authentication
+- <strong>Message integrity</strong> - ensuring messages come from verified sources
+- <strong>Trust boundaries</strong> - establishing secure communication between different systems</p>
+<h3 id="benefits-in-integration-contexts">Benefits in Integration Contexts</h3>
+<h4 id="1-enhanced-security-posture">1. <strong>Enhanced Security Posture</strong></h4>
+<ul>
+<li><strong>Threat reduction</strong> - significantly reducing unauthorized access attempts</li>
+<li><strong>Attack surface minimization</strong> - limiting access points through strong authentication</li>
+<li><strong>Security incidents prevention</strong> - stopping attacks at the authentication layer</li>
+<li><strong>Compliance demonstration</strong> - showing adherence to security best practices</li>
+</ul>
+<h4 id="2-operational-excellence">2. <strong>Operational Excellence</strong></h4>
+<ul>
+<li><strong>Automated verification</strong> - reducing manual identity verification overhead</li>
+<li><strong>Centralized authentication</strong> - managing authentication consistently across systems</li>
+<li><strong>Single sign-on (SSO)</strong> - improving user experience through unified authentication</li>
+<li><strong>Scalable security</strong> - supporting growing numbers of users and systems</li>
+</ul>
+<h4 id="3-business-value">3. <strong>Business Value</strong></h4>
+<ul>
+<li><strong>Customer trust</strong> - building confidence through strong security measures</li>
+<li><strong>Competitive advantage</strong> - demonstrating superior security capabilities</li>
+<li><strong>Cost reduction</strong> - preventing costly security breaches and incidents</li>
+<li><strong>Operational efficiency</strong> - streamlining access management processes</li>
+</ul>
+<h4 id="4-integration-enablement">4. <strong>Integration Enablement</strong></h4>
+<ul>
+<li><strong>Secure partnerships</strong> - enabling trusted integration with external partners</li>
+<li><strong>API ecosystem</strong> - supporting secure API-based integrations</li>
+<li><strong>Cloud adoption</strong> - facilitating secure cloud service integration</li>
+<li><strong>Digital transformation</strong> - enabling secure digital business processes</li>
+</ul>
+<h3 id="integration-architecture-applications">Integration Architecture Applications</h3>
+<h4 id="1-enterprise-application-integration">1. <strong>Enterprise Application Integration</strong></h4>
+<p>Authentication in enterprise systems provides:
+- <strong>Service-to-service authentication</strong> - verifying identity of calling services
+- <strong>User authentication federation</strong> - sharing authentication across multiple systems
+- <strong>Legacy system integration</strong> - adding authentication to existing systems
+- <strong>Cross-domain authentication</strong> - enabling authentication across organizational boundaries</p>
+<h4 id="2-api-management-and-microservices">2. <strong>API Management and Microservices</strong></h4>
+<p>In modern distributed architectures:
+- <strong>API gateway authentication</strong> - centralizing authentication for microservices
+- <strong>Service mesh security</strong> - implementing authentication between microservices
+- <strong>OAuth 2.0 flows</strong> - securing API access through standardized authentication
+- <strong>JWT token validation</strong> - verifying authentication tokens in distributed systems</p>
+<h4 id="3-cloud-and-hybrid-environments">3. <strong>Cloud and Hybrid Environments</strong></h4>
+<p>For cloud integrations:
+- <strong>Identity federation</strong> - sharing authentication across cloud and on-premises systems
+- <strong>SAML authentication</strong> - enabling enterprise single sign-on to cloud services
+- <strong>Cloud service authentication</strong> - verifying identity when accessing cloud APIs
+- <strong>Multi-cloud authentication</strong> - managing authentication across multiple cloud providers</p>
+<h4 id="4-partner-and-b2b-integration">4. <strong>Partner and B2B Integration</strong></h4>
+<p>For external integrations:
+- <strong>Mutual authentication</strong> - verifying identity of both parties in B2B communications
+- <strong>Certificate-based authentication</strong> - using digital certificates for partner verification
+- <strong>API key management</strong> - managing authentication keys for external partners
+- <strong>Federated identity</strong> - sharing authentication across organizational boundaries</p>
+<h2 id="implementation-patterns">Implementation Patterns</h2>
+<h3 id="1-basic-usernamepassword-authentication">1. <strong>Basic Username/Password Authentication</strong></h3>
+<pre><code class="language-java">// Basic authentication implementation with security best practices
+@Service
+public class BasicAuthenticationService {
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private AuthenticationAttemptService attemptService;
+
+    public AuthenticationResult authenticate(String username, String password) {
+        // Check for account lockout
+        if (attemptService.isBlocked(username)) {
+            log.warn(&quot;Authentication attempt for blocked user: {}&quot;, username);
+            return AuthenticationResult.blocked(&quot;Account temporarily locked&quot;);
+        }
+
+        try {
+            // Retrieve user details
+            UserDetails user = userRepository.findByUsername(username)
+                .orElseThrow(() -&gt; new UsernameNotFoundException(&quot;User not found&quot;));
+
+            // Verify password
+            if (passwordEncoder.matches(password, user.getPasswordHash())) {
+                // Reset failed attempts on successful login
+                attemptService.resetFailedAttempts(username);
+
+                // Create authentication session
+                AuthenticationSession session = createAuthenticationSession(user);
+
+                log.info(&quot;Successful authentication for user: {}&quot;, username);
+
+                return AuthenticationResult.success(user, session);
+            } else {
+                // Record failed attempt
+                attemptService.recordFailedAttempt(username);
+
+                log.warn(&quot;Failed authentication for user: {}&quot;, username);
+                return AuthenticationResult.failure(&quot;Invalid credentials&quot;);
+            }
+
+        } catch (Exception e) {
+            log.error(&quot;Authentication error for user: &quot; + username, e);
+            return AuthenticationResult.error(&quot;Authentication service unavailable&quot;);
+        }
+    }
+
+    private AuthenticationSession createAuthenticationSession(UserDetails user) {
+        String sessionToken = generateSecureToken();
+        Instant expirationTime = Instant.now().plus(Duration.ofHours(8));
+
+        AuthenticationSession session = AuthenticationSession.builder()
+            .sessionToken(sessionToken)
+            .userId(user.getId())
+            .username(user.getUsername())
+            .roles(user.getRoles())
+            .createdAt(Instant.now())
+            .expiresAt(expirationTime)
+            .lastAccessedAt(Instant.now())
+            .build();
+
+        // Store session in secure session store
+        sessionStore.save(session);
+
+        return session;
+    }
+
+    private String generateSecureToken() {
+        SecureRandom random = new SecureRandom();
+        byte[] tokenBytes = new byte[32];
+        random.nextBytes(tokenBytes);
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(tokenBytes);
+    }
+}
+
+@Service
+public class AuthenticationAttemptService {
+
+    private final Map&lt;String, AttemptCounter&gt; attemptCache = new ConcurrentHashMap&lt;&gt;();
+    private final int maxFailedAttempts = 5;
+    private final Duration lockoutDuration = Duration.ofMinutes(30);
+
+    public boolean isBlocked(String username) {
+        AttemptCounter counter = attemptCache.get(username);
+        if (counter == null) {
+            return false;
+        }
+
+        if (counter.getFailedAttempts() &gt;= maxFailedAttempts) {
+            if (Instant.now().isBefore(counter.getLockoutUntil())) {
+                return true;
+            } else {
+                // Lockout period expired, reset counter
+                attemptCache.remove(username);
+                return false;
+            }
+        }
+
+        return false;
+    }
+
+    public void recordFailedAttempt(String username) {
+        AttemptCounter counter = attemptCache.computeIfAbsent(username, 
+            k -&gt; new AttemptCounter());
+
+        counter.incrementFailedAttempts();
+
+        if (counter.getFailedAttempts() &gt;= maxFailedAttempts) {
+            counter.setLockoutUntil(Instant.now().plus(lockoutDuration));
+            log.warn(&quot;User {} locked out after {} failed attempts&quot;, username, maxFailedAttempts);
+        }
+    }
+
+    public void resetFailedAttempts(String username) {
+        attemptCache.remove(username);
+    }
+}
+</code></pre>
+<h3 id="2-multi-factor-authentication-mfa_1">2. <strong>Multi-Factor Authentication (MFA)</strong></h3>
+<pre><code class="language-java">// Multi-factor authentication implementation
+@Service
+public class MultiFactorAuthenticationService {
+
+    @Autowired
+    private TOTPService totpService;
+
+    @Autowired
+    private SMSService smsService;
+
+    @Autowired
+    private EmailService emailService;
+
+    @Autowired
+    private DeviceService deviceService;
+
+    public MFAChallenge initiateAuthentication(String username, String password) {
+        // First factor: username/password
+        AuthenticationResult primaryAuth = basicAuthenticationService.authenticate(username, password);
+
+        if (!primaryAuth.isSuccess()) {
+            return MFAChallenge.failed(primaryAuth.getMessage());
+        }
+
+        UserDetails user = primaryAuth.getUser();
+
+        // Determine required second factors
+        List&lt;MFAMethod&gt; availableMethods = getAvailableMFAMethods(user);
+
+        if (availableMethods.isEmpty()) {
+            // No MFA required, complete authentication
+            return MFAChallenge.completed(primaryAuth.getSession());
+        }
+
+        // Create MFA challenge
+        String challengeId = generateChallengeId();
+        MFAChallenge challenge = MFAChallenge.builder()
+            .challengeId(challengeId)
+            .userId(user.getId())
+            .availableMethods(availableMethods)
+            .createdAt(Instant.now())
+            .expiresAt(Instant.now().plus(Duration.ofMinutes(5)))
+            .build();
+
+        // Store challenge
+        challengeStore.save(challenge);
+
+        // Send challenges based on available methods
+        sendMFAChallenges(user, availableMethods, challengeId);
+
+        return challenge;
+    }
+
+    public AuthenticationResult completeMFA(String challengeId, MFAResponse response) {
+        MFAChallenge challenge = challengeStore.findById(challengeId)
+            .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Invalid challenge ID&quot;));
+
+        if (challenge.isExpired()) {
+            challengeStore.delete(challengeId);
+            return AuthenticationResult.failure(&quot;MFA challenge expired&quot;);
+        }
+
+        boolean isValid = false;
+
+        switch (response.getMethod()) {
+            case TOTP:
+                isValid = totpService.validateTOTP(challenge.getUserId(), response.getToken());
+                break;
+
+            case SMS:
+                isValid = smsService.validateSMSCode(challengeId, response.getToken());
+                break;
+
+            case EMAIL:
+                isValid = emailService.validateEmailCode(challengeId, response.getToken());
+                break;
+
+            case PUSH:
+                isValid = pushService.validatePushResponse(challengeId, response.getToken());
+                break;
+
+            default:
+                return AuthenticationResult.failure(&quot;Unsupported MFA method&quot;);
+        }
+
+        if (isValid) {
+            // Complete authentication
+            UserDetails user = userRepository.findById(challenge.getUserId()).orElseThrow();
+            AuthenticationSession session = createAuthenticationSession(user);
+
+            // Clean up challenge
+            challengeStore.delete(challengeId);
+
+            // Record successful MFA
+            auditService.recordMFASuccess(user.getUsername(), response.getMethod());
+
+            return AuthenticationResult.success(user, session);
+        } else {
+            // Record failed attempt
+            challenge.incrementFailedAttempts();
+
+            if (challenge.getFailedAttempts() &gt;= 3) {
+                challengeStore.delete(challengeId);
+                auditService.recordMFAFailure(challenge.getUserId(), response.getMethod(), &quot;Max attempts exceeded&quot;);
+                return AuthenticationResult.failure(&quot;Maximum MFA attempts exceeded&quot;);
+            } else {
+                challengeStore.save(challenge);
+                return AuthenticationResult.failure(&quot;Invalid MFA token&quot;);
+            }
+        }
+    }
+
+    private void sendMFAChallenges(UserDetails user, List&lt;MFAMethod&gt; methods, String challengeId) {
+        for (MFAMethod method : methods) {
+            switch (method) {
+                case SMS:
+                    String smsCode = generateSMSCode();
+                    smsService.sendSMSCode(user.getPhoneNumber(), smsCode, challengeId);
+                    break;
+
+                case EMAIL:
+                    String emailCode = generateEmailCode();
+                    emailService.sendEmailCode(user.getEmail(), emailCode, challengeId);
+                    break;
+
+                case PUSH:
+                    pushService.sendPushNotification(user.getDeviceTokens(), challengeId);
+                    break;
+
+                case TOTP:
+                    // No action needed, user will use their TOTP app
+                    break;
+            }
+        }
+    }
+}
+
+@Service
+public class TOTPService {
+
+    private final TOTPAlgorithm totpAlgorithm = new TOTPAlgorithm();
+
+    public boolean validateTOTP(String userId, String token) {
+        UserTOTPSecret secret = totpSecretRepository.findByUserId(userId)
+            .orElseThrow(() -&gt; new IllegalStateException(&quot;TOTP not configured for user&quot;));
+
+        // Validate current time window
+        long currentTimeStep = System.currentTimeMillis() / 30000; // 30-second windows
+
+        // Check current window and adjacent windows for clock skew tolerance
+        for (int i = -1; i &lt;= 1; i++) {
+            String expectedToken = totpAlgorithm.generateTOTP(
+                secret.getSecretKey(), 
+                currentTimeStep + i
+            );
+
+            if (token.equals(expectedToken)) {
+                // Prevent replay attacks
+                if (secret.getLastUsedTimeStep() != null &amp;&amp; 
+                    currentTimeStep + i &lt;= secret.getLastUsedTimeStep()) {
+                    return false; // Token already used
+                }
+
+                // Update last used time step
+                secret.setLastUsedTimeStep(currentTimeStep + i);
+                totpSecretRepository.save(secret);
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public TOTPSetupResult setupTOTP(String userId) {
+        // Generate secret key
+        SecureRandom random = new SecureRandom();
+        byte[] secretBytes = new byte[20]; // 160-bit secret
+        random.nextBytes(secretBytes);
+        String secretKey = Base32.encode(secretBytes);
+
+        // Create TOTP secret record
+        UserTOTPSecret totpSecret = UserTOTPSecret.builder()
+            .userId(userId)
+            .secretKey(secretKey)
+            .createdAt(Instant.now())
+            .enabled(false) // Will be enabled after verification
+            .build();
+
+        totpSecretRepository.save(totpSecret);
+
+        // Generate QR code for setup
+        String issuer = &quot;Integration Service&quot;;
+        UserDetails user = userRepository.findById(userId).orElseThrow();
+        String qrCodeUrl = String.format(
+            &quot;otpauth://totp/%s:%s?secret=%s&amp;issuer=%s&quot;,
+            issuer, user.getUsername(), secretKey, issuer
+        );
+
+        return TOTPSetupResult.builder()
+            .secretKey(secretKey)
+            .qrCodeUrl(qrCodeUrl)
+            .backupCodes(generateBackupCodes(userId))
+            .build();
+    }
+}
+</code></pre>
+<h3 id="3-jwt-token-authentication">3. <strong>JWT Token Authentication</strong></h3>
+<pre><code class="language-java">// JWT token-based authentication for stateless systems
+@Service
+public class JWTAuthenticationService {
+
+    @Value(&quot;${jwt.secret}&quot;)
+    private String jwtSecret;
+
+    @Value(&quot;${jwt.expiration:3600}&quot;) // Default 1 hour
+    private long jwtExpiration;
+
+    @Value(&quot;${jwt.issuer}&quot;)
+    private String jwtIssuer;
+
+    private final Algorithm algorithm;
+    private final JWTVerifier verifier;
+
+    @PostConstruct
+    public void initialize() {
+        this.algorithm = Algorithm.HMAC256(jwtSecret);
+        this.verifier = JWT.require(algorithm)
+            .withIssuer(jwtIssuer)
+            .build();
+    }
+
+    public JWTAuthenticationResult authenticate(String username, String password) {
+        // Perform basic authentication
+        AuthenticationResult basicAuth = basicAuthenticationService.authenticate(username, password);
+
+        if (!basicAuth.isSuccess()) {
+            return JWTAuthenticationResult.failure(basicAuth.getMessage());
+        }
+
+        UserDetails user = basicAuth.getUser();
+
+        // Generate JWT token
+        String token = generateJWTToken(user);
+
+        // Generate refresh token
+        String refreshToken = generateRefreshToken(user);
+
+        return JWTAuthenticationResult.success(token, refreshToken, user);
+    }
+
+    public String generateJWTToken(UserDetails user) {
+        Instant now = Instant.now();
+        Instant expiration = now.plusSeconds(jwtExpiration);
+
+        return JWT.create()
+            .withIssuer(jwtIssuer)
+            .withSubject(user.getUsername())
+            .withIssuedAt(Date.from(now))
+            .withExpiresAt(Date.from(expiration))
+            .withClaim(&quot;userId&quot;, user.getId())
+            .withClaim(&quot;roles&quot;, user.getRoles().stream()
+                .map(Role::getName)
+                .collect(Collectors.toList()))
+            .withClaim(&quot;permissions&quot;, user.getPermissions())
+            .withClaim(&quot;sessionId&quot;, UUID.randomUUID().toString())
+            .sign(algorithm);
+    }
+
+    public AuthenticationResult validateJWTToken(String token) {
+        try {
+            DecodedJWT decodedJWT = verifier.verify(token);
+
+            String username = decodedJWT.getSubject();
+            String userId = decodedJWT.getClaim(&quot;userId&quot;).asString();
+            List&lt;String&gt; roles = decodedJWT.getClaim(&quot;roles&quot;).asList(String.class);
+            List&lt;String&gt; permissions = decodedJWT.getClaim(&quot;permissions&quot;).asList(String.class);
+            String sessionId = decodedJWT.getClaim(&quot;sessionId&quot;).asString();
+
+            // Check if token is blacklisted
+            if (tokenBlacklistService.isBlacklisted(sessionId)) {
+                return AuthenticationResult.failure(&quot;Token has been revoked&quot;);
+            }
+
+            // Create user context from token claims
+            UserDetails user = UserDetails.builder()
+                .id(userId)
+                .username(username)
+                .roles(roles.stream().map(Role::new).collect(Collectors.toSet()))
+                .permissions(permissions)
+                .build();
+
+            return AuthenticationResult.success(user);
+
+        } catch (TokenExpiredException e) {
+            return AuthenticationResult.failure(&quot;Token has expired&quot;);
+        } catch (JWTVerificationException e) {
+            log.warn(&quot;JWT verification failed: {}&quot;, e.getMessage());
+            return AuthenticationResult.failure(&quot;Invalid token&quot;);
+        }
+    }
+
+    public JWTRefreshResult refreshToken(String refreshToken) {
+        try {
+            // Validate refresh token
+            RefreshTokenDetails tokenDetails = refreshTokenService.validateRefreshToken(refreshToken);
+
+            if (tokenDetails.isExpired()) {
+                refreshTokenService.revokeRefreshToken(refreshToken);
+                return JWTRefreshResult.failure(&quot;Refresh token expired&quot;);
+            }
+
+            // Get user details
+            UserDetails user = userRepository.findById(tokenDetails.getUserId()).orElseThrow();
+
+            // Generate new access token
+            String newAccessToken = generateJWTToken(user);
+
+            // Optionally rotate refresh token
+            String newRefreshToken = null;
+            if (shouldRotateRefreshToken()) {
+                newRefreshToken = generateRefreshToken(user);
+                refreshTokenService.revokeRefreshToken(refreshToken);
+            }
+
+            return JWTRefreshResult.success(newAccessToken, newRefreshToken);
+
+        } catch (Exception e) {
+            log.error(&quot;Refresh token validation failed&quot;, e);
+            return JWTRefreshResult.failure(&quot;Invalid refresh token&quot;);
+        }
+    }
+
+    public void revokeToken(String token) {
+        try {
+            DecodedJWT decodedJWT = JWT.decode(token);
+            String sessionId = decodedJWT.getClaim(&quot;sessionId&quot;).asString();
+            Instant expiration = decodedJWT.getExpiresAt().toInstant();
+
+            // Add to blacklist until expiration
+            tokenBlacklistService.blacklistToken(sessionId, expiration);
+
+            log.info(&quot;Token revoked for session: {}&quot;, sessionId);
+
+        } catch (Exception e) {
+            log.error(&quot;Failed to revoke token&quot;, e);
+        }
+    }
+}
+
+@Service
+public class TokenBlacklistService {
+
+    private final RedisTemplate&lt;String, String&gt; redisTemplate;
+
+    public void blacklistToken(String sessionId, Instant expiration) {
+        long ttlSeconds = Duration.between(Instant.now(), expiration).getSeconds();
+        if (ttlSeconds &gt; 0) {
+            redisTemplate.opsForValue().set(
+                &quot;blacklist:&quot; + sessionId, 
+                &quot;revoked&quot;, 
+                Duration.ofSeconds(ttlSeconds)
+            );
+        }
+    }
+
+    public boolean isBlacklisted(String sessionId) {
+        return redisTemplate.hasKey(&quot;blacklist:&quot; + sessionId);
+    }
+}
+</code></pre>
+<h3 id="4-certificate-based-authentication">4. <strong>Certificate-Based Authentication</strong></h3>
+<pre><code class="language-java">// Mutual TLS certificate authentication for service-to-service communication
+@Service
+public class CertificateAuthenticationService {
+
+    @Autowired
+    private CertificateValidationService validationService;
+
+    @Autowired
+    private CertificateRevocationService revocationService;
+
+    public CertificateAuthenticationResult authenticateClient(X509Certificate clientCertificate) {
+        try {
+            // Basic certificate validation
+            CertificateValidationResult validationResult = validationService.validateCertificate(clientCertificate);
+
+            if (!validationResult.isValid()) {
+                return CertificateAuthenticationResult.failure(
+                    &quot;Certificate validation failed: &quot; + validationResult.getErrorMessage()
+                );
+            }
+
+            // Check certificate revocation status
+            if (revocationService.isRevoked(clientCertificate)) {
+                return CertificateAuthenticationResult.failure(&quot;Certificate has been revoked&quot;);
+            }
+
+            // Extract client identity from certificate
+            ClientIdentity identity = extractClientIdentity(clientCertificate);
+
+            // Check if client is authorized
+            if (!isClientAuthorized(identity)) {
+                return CertificateAuthenticationResult.failure(&quot;Client not authorized&quot;);
+            }
+
+            log.info(&quot;Certificate authentication successful for client: {}&quot;, identity.getCommonName());
+
+            return CertificateAuthenticationResult.success(identity, clientCertificate);
+
+        } catch (Exception e) {
+            log.error(&quot;Certificate authentication error&quot;, e);
+            return CertificateAuthenticationResult.failure(&quot;Certificate authentication failed&quot;);
+        }
+    }
+
+    private ClientIdentity extractClientIdentity(X509Certificate certificate) {
+        X500Principal principal = certificate.getSubjectX500Principal();
+        String dn = principal.getName();
+
+        Map&lt;String, String&gt; attributes = parseDN(dn);
+
+        return ClientIdentity.builder()
+            .commonName(attributes.get(&quot;CN&quot;))
+            .organization(attributes.get(&quot;O&quot;))
+            .organizationalUnit(attributes.get(&quot;OU&quot;))
+            .country(attributes.get(&quot;C&quot;))
+            .serialNumber(certificate.getSerialNumber().toString())
+            .issuer(certificate.getIssuerX500Principal().getName())
+            .notBefore(certificate.getNotBefore().toInstant())
+            .notAfter(certificate.getNotAfter().toInstant())
+            .build();
+    }
+
+    private Map&lt;String, String&gt; parseDN(String dn) {
+        Map&lt;String, String&gt; attributes = new HashMap&lt;&gt;();
+
+        // Parse distinguished name
+        String[] parts = dn.split(&quot;,&quot;);
+        for (String part : parts) {
+            String[] keyValue = part.trim().split(&quot;=&quot;, 2);
+            if (keyValue.length == 2) {
+                attributes.put(keyValue[0].trim(), keyValue[1].trim());
+            }
+        }
+
+        return attributes;
+    }
+
+    private boolean isClientAuthorized(ClientIdentity identity) {
+        // Check against authorized client registry
+        return authorizedClientService.isAuthorized(identity.getCommonName(), identity.getOrganization());
+    }
+}
+
+@Service
+public class CertificateValidationService {
+
+    @Autowired
+    private TrustedCertificateStore trustedStore;
+
+    public CertificateValidationResult validateCertificate(X509Certificate certificate) {
+        List&lt;String&gt; errors = new ArrayList&lt;&gt;();
+
+        try {
+            // Check certificate validity period
+            certificate.checkValidity();
+
+            // Verify certificate chain
+            if (!verifyChainOfTrust(certificate)) {
+                errors.add(&quot;Certificate chain validation failed&quot;);
+            }
+
+            // Check key usage
+            if (!hasRequiredKeyUsage(certificate)) {
+                errors.add(&quot;Certificate does not have required key usage&quot;);
+            }
+
+            // Validate certificate signature
+            if (!validateSignature(certificate)) {
+                errors.add(&quot;Certificate signature validation failed&quot;);
+            }
+
+            // Check certificate policies
+            if (!validateCertificatePolicies(certificate)) {
+                errors.add(&quot;Certificate policies validation failed&quot;);
+            }
+
+        } catch (CertificateExpiredException e) {
+            errors.add(&quot;Certificate has expired&quot;);
+        } catch (CertificateNotYetValidException e) {
+            errors.add(&quot;Certificate is not yet valid&quot;);
+        } catch (Exception e) {
+            errors.add(&quot;Certificate validation error: &quot; + e.getMessage());
+        }
+
+        return CertificateValidationResult.builder()
+            .isValid(errors.isEmpty())
+            .errors(errors)
+            .build();
+    }
+
+    private boolean verifyChainOfTrust(X509Certificate certificate) {
+        try {
+            // Build certificate path
+            CertPathBuilder pathBuilder = CertPathBuilder.getInstance(&quot;PKIX&quot;);
+
+            PKIXBuilderParameters params = new PKIXBuilderParameters(
+                trustedStore.getTrustedCertificates(), 
+                new X509CertSelector()
+            );
+
+            params.setRevocationEnabled(false); // Handled separately
+
+            CertPathBuilderResult result = pathBuilder.build(params);
+
+            return result.getCertPath() != null;
+
+        } catch (Exception e) {
+            log.warn(&quot;Certificate chain validation failed&quot;, e);
+            return false;
+        }
+    }
+}
+</code></pre>
+<h2 id="apache-camel-implementation">Apache Camel Implementation</h2>
+<h3 id="1-basic-authentication-route">1. <strong>Basic Authentication Route</strong></h3>
+<pre><code class="language-java">@Component
+public class BasicAuthenticationRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from(&quot;jetty:http://0.0.0.0:8080/api/secure&quot;)
+            .routeId(&quot;basic-authentication-route&quot;)
+            .process(exchange -&gt; {
+                // Extract Authorization header
+                String authHeader = exchange.getIn().getHeader(&quot;Authorization&quot;, String.class);
+
+                if (authHeader == null || !authHeader.startsWith(&quot;Basic &quot;)) {
+                    throw new UnauthorizedException(&quot;Missing or invalid Authorization header&quot;);
+                }
+
+                // Decode Basic auth credentials
+                String encodedCredentials = authHeader.substring(6);
+                String credentials = new String(Base64.getDecoder().decode(encodedCredentials));
+                String[] parts = credentials.split(&quot;:&quot;, 2);
+
+                if (parts.length != 2) {
+                    throw new UnauthorizedException(&quot;Invalid Basic auth format&quot;);
+                }
+
+                String username = parts[0];
+                String password = parts[1];
+
+                // Authenticate user
+                AuthenticationResult result = authenticationService.authenticate(username, password);
+
+                if (!result.isSuccess()) {
+                    throw new UnauthorizedException(&quot;Authentication failed: &quot; + result.getMessage());
+                }
+
+                // Set user context in headers
+                exchange.getIn().setHeader(&quot;authenticated-user&quot;, result.getUser().getUsername());
+                exchange.getIn().setHeader(&quot;user-roles&quot;, result.getUser().getRoles());
+            })
+            .log(&quot;User authenticated: ${header.authenticated-user}&quot;)
+            .to(&quot;direct:processSecureRequest&quot;);
+    }
+}
+</code></pre>
+<h3 id="2-jwt-authentication-route">2. <strong>JWT Authentication Route</strong></h3>
+<pre><code class="language-java">@Component
+public class JWTAuthenticationRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        // JWT Authentication Route
+        from(&quot;jetty:http://0.0.0.0:8080/api/jwt/secure&quot;)
+            .routeId(&quot;jwt-authentication-route&quot;)
+            .process(exchange -&gt; {
+                String authHeader = exchange.getIn().getHeader(&quot;Authorization&quot;, String.class);
+
+                if (authHeader == null || !authHeader.startsWith(&quot;Bearer &quot;)) {
+                    throw new UnauthorizedException(&quot;Missing or invalid Authorization header&quot;);
+                }
+
+                String token = authHeader.substring(7);
+
+                AuthenticationResult result = jwtAuthenticationService.validateJWTToken(token);
+
+                if (!result.isSuccess()) {
+                    throw new UnauthorizedException(&quot;Token validation failed: &quot; + result.getMessage());
+                }
+
+                // Set authenticated user context
+                exchange.getIn().setHeader(&quot;authenticated-user&quot;, result.getUser().getUsername());
+                exchange.getIn().setHeader(&quot;user-id&quot;, result.getUser().getId());
+                exchange.getIn().setHeader(&quot;user-roles&quot;, result.getUser().getRoles());
+                exchange.getIn().setHeader(&quot;user-permissions&quot;, result.getUser().getPermissions());
+            })
+            .log(&quot;JWT authenticated user: ${header.authenticated-user}&quot;)
+            .to(&quot;direct:processJWTSecureRequest&quot;);
+
+        // JWT Login Route
+        from(&quot;jetty:http://0.0.0.0:8080/api/jwt/login&quot;)
+            .routeId(&quot;jwt-login-route&quot;)
+            .process(exchange -&gt; {
+                LoginRequest request = exchange.getIn().getBody(LoginRequest.class);
+
+                JWTAuthenticationResult result = jwtAuthenticationService.authenticate(
+                    request.getUsername(), 
+                    request.getPassword()
+                );
+
+                if (result.isSuccess()) {
+                    LoginResponse response = LoginResponse.builder()
+                        .accessToken(result.getAccessToken())
+                        .refreshToken(result.getRefreshToken())
+                        .tokenType(&quot;Bearer&quot;)
+                        .expiresIn(3600) // 1 hour
+                        .user(result.getUser())
+                        .build();
+
+                    exchange.getIn().setBody(response);
+                    exchange.getIn().setHeader(Exchange.HTTP_RESPONSE_CODE, 200);
+                } else {
+                    ErrorResponse error = ErrorResponse.builder()
+                        .error(&quot;authentication_failed&quot;)
+                        .message(result.getMessage())
+                        .build();
+
+                    exchange.getIn().setBody(error);
+                    exchange.getIn().setHeader(Exchange.HTTP_RESPONSE_CODE, 401);
+                }
+            })
+            .marshal().json(JsonLibrary.Jackson);
+    }
+}
+</code></pre>
+<h3 id="3-multi-factor-authentication-route">3. <strong>Multi-Factor Authentication Route</strong></h3>
+<pre><code class="language-java">@Component
+public class MFAAuthenticationRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        // MFA Challenge Initiation
+        from(&quot;jetty:http://0.0.0.0:8080/api/auth/mfa/challenge&quot;)
+            .routeId(&quot;mfa-challenge-route&quot;)
+            .unmarshal().json(JsonLibrary.Jackson, LoginRequest.class)
+            .process(exchange -&gt; {
+                LoginRequest request = exchange.getIn().getBody(LoginRequest.class);
+
+                MFAChallenge challenge = mfaService.initiateAuthentication(
+                    request.getUsername(), 
+                    request.getPassword()
+                );
+
+                if (challenge.isCompleted()) {
+                    // Authentication complete without MFA
+                    AuthenticationResponse response = AuthenticationResponse.builder()
+                        .success(true)
+                        .session(challenge.getSession())
+                        .build();
+
+                    exchange.getIn().setBody(response);
+                } else if (challenge.isFailed()) {
+                    ErrorResponse error = ErrorResponse.builder()
+                        .error(&quot;authentication_failed&quot;)
+                        .message(challenge.getMessage())
+                        .build();
+
+                    exchange.getIn().setBody(error);
+                    exchange.getIn().setHeader(Exchange.HTTP_RESPONSE_CODE, 401);
+                } else {
+                    // MFA challenge issued
+                    MFAChallengeResponse response = MFAChallengeResponse.builder()
+                        .challengeId(challenge.getChallengeId())
+                        .availableMethods(challenge.getAvailableMethods())
+                        .expiresAt(challenge.getExpiresAt())
+                        .message(&quot;Multi-factor authentication required&quot;)
+                        .build();
+
+                    exchange.getIn().setBody(response);
+                }
+            })
+            .marshal().json(JsonLibrary.Jackson);
+
+        // MFA Challenge Completion
+        from(&quot;jetty:http://0.0.0.0:8080/api/auth/mfa/verify&quot;)
+            .routeId(&quot;mfa-verify-route&quot;)
+            .unmarshal().json(JsonLibrary.Jackson, MFAVerificationRequest.class)
+            .process(exchange -&gt; {
+                MFAVerificationRequest request = exchange.getIn().getBody(MFAVerificationRequest.class);
+
+                MFAResponse mfaResponse = MFAResponse.builder()
+                    .method(request.getMethod())
+                    .token(request.getToken())
+                    .build();
+
+                AuthenticationResult result = mfaService.completeMFA(
+                    request.getChallengeId(), 
+                    mfaResponse
+                );
+
+                if (result.isSuccess()) {
+                    AuthenticationResponse response = AuthenticationResponse.builder()
+                        .success(true)
+                        .session(result.getSession())
+                        .user(result.getUser())
+                        .build();
+
+                    exchange.getIn().setBody(response);
+                } else {
+                    ErrorResponse error = ErrorResponse.builder()
+                        .error(&quot;mfa_verification_failed&quot;)
+                        .message(result.getMessage())
+                        .build();
+
+                    exchange.getIn().setBody(error);
+                    exchange.getIn().setHeader(Exchange.HTTP_RESPONSE_CODE, 401);
+                }
+            })
+            .marshal().json(JsonLibrary.Jackson);
+    }
+}
+</code></pre>
+<h3 id="4-certificate-authentication-route">4. <strong>Certificate Authentication Route</strong></h3>
+<pre><code class="language-java">@Component
+public class CertificateAuthenticationRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        // Configure Jetty for mutual TLS
+        JettyHttpComponent jetty = getContext().getComponent(&quot;jetty&quot;, JettyHttpComponent.class);
+        jetty.setSslContextParameters(createSSLContextParameters());
+
+        from(&quot;jetty:https://0.0.0.0:8443/api/secure/certificate?sslContextParameters=#sslContextParameters&quot;)
+            .routeId(&quot;certificate-authentication-route&quot;)
+            .process(exchange -&gt; {
+                // Extract client certificate from SSL context
+                X509Certificate clientCert = extractClientCertificate(exchange);
+
+                if (clientCert == null) {
+                    throw new UnauthorizedException(&quot;Client certificate required&quot;);
+                }
+
+                // Authenticate using certificate
+                CertificateAuthenticationResult result = certAuthService.authenticateClient(clientCert);
+
+                if (!result.isSuccess()) {
+                    throw new UnauthorizedException(&quot;Certificate authentication failed: &quot; + result.getMessage());
+                }
+
+                // Set client identity in headers
+                ClientIdentity identity = result.getClientIdentity();
+                exchange.getIn().setHeader(&quot;client-cn&quot;, identity.getCommonName());
+                exchange.getIn().setHeader(&quot;client-org&quot;, identity.getOrganization());
+                exchange.getIn().setHeader(&quot;client-serial&quot;, identity.getSerialNumber());
+            })
+            .log(&quot;Certificate authenticated client: ${header.client-cn}&quot;)
+            .to(&quot;direct:processCertificateSecureRequest&quot;);
+    }
+
+    private SSLContextParameters createSSLContextParameters() {
+        KeyManagersParameters keyManagers = new KeyManagersParameters();
+        keyManagers.setKeyStore(createKeyStoreParameters());
+
+        TrustManagersParameters trustManagers = new TrustManagersParameters();
+        trustManagers.setKeyStore(createTrustStoreParameters());
+
+        SSLContextParameters sslContext = new SSLContextParameters();
+        sslContext.setKeyManagers(keyManagers);
+        sslContext.setTrustManagers(trustManagers);
+        sslContext.setClientAuthentication(&quot;REQUIRE&quot;);
+
+        return sslContext;
+    }
+
+    private X509Certificate extractClientCertificate(Exchange exchange) {
+        // Extract certificate from HTTP request
+        HttpServletRequest request = exchange.getIn(HttpMessage.class).getRequest();
+        X509Certificate[] certificates = (X509Certificate[]) request.getAttribute(&quot;javax.servlet.request.X509Certificate&quot;);
+
+        return (certificates != null &amp;&amp; certificates.length &gt; 0) ? certificates[0] : null;
+    }
+}
+</code></pre>
+<h2 id="best-practices">Best Practices</h2>
+<h3 id="1-security-implementation">1. <strong>Security Implementation</strong></h3>
+<ul>
+<li>Use strong password policies with minimum length, complexity, and expiration requirements</li>
+<li>Implement secure password storage using bcrypt, scrypt, or Argon2 hashing algorithms</li>
+<li>Use HTTPS/TLS for all authentication communications to prevent credential interception</li>
+<li>Implement proper session management with secure tokens and appropriate timeouts</li>
+<li>Never log or expose passwords, tokens, or other sensitive authentication data</li>
+</ul>
+<h3 id="2-multi-factor-authentication">2. <strong>Multi-Factor Authentication</strong></h3>
+<ul>
+<li>Implement MFA for privileged accounts and sensitive operations</li>
+<li>Support multiple MFA methods to accommodate different user preferences and scenarios</li>
+<li>Use time-based one-time passwords (TOTP) following RFC 6238 standards</li>
+<li>Provide backup codes for account recovery when MFA devices are unavailable</li>
+<li>Implement proper MFA challenge timeouts and attempt limiting</li>
+</ul>
+<h3 id="3-token-management">3. <strong>Token Management</strong></h3>
+<ul>
+<li>Use cryptographically secure random number generators for token generation</li>
+<li>Implement proper token expiration and refresh mechanisms</li>
+<li>Use short-lived access tokens with longer-lived refresh tokens for better security</li>
+<li>Implement token blacklisting for immediate revocation capabilities</li>
+<li>Store tokens securely and transmit them only over encrypted channels</li>
+</ul>
+<h3 id="4-certificate-authentication">4. <strong>Certificate Authentication</strong></h3>
+<ul>
+<li>Validate complete certificate chains and check certificate revocation status</li>
+<li>Implement proper certificate validation including expiration, key usage, and policies</li>
+<li>Use mutual TLS for service-to-service authentication in sensitive environments</li>
+<li>Maintain certificate authority trust stores and update them regularly</li>
+<li>Implement certificate rotation and renewal processes</li>
+</ul>
+<h3 id="5-error-handling-and-security">5. <strong>Error Handling and Security</strong></h3>
+<ul>
+<li>Provide generic error messages that don't reveal sensitive information</li>
+<li>Implement proper rate limiting and account lockout mechanisms</li>
+<li>Log authentication attempts and failures for security monitoring</li>
+<li>Use constant-time comparison for passwords and tokens to prevent timing attacks</li>
+<li>Implement security headers and CSRF protection for web-based authentication</li>
+</ul>
+<h3 id="6-monitoring-and-compliance">6. <strong>Monitoring and Compliance</strong></h3>
+<ul>
+<li>Monitor authentication patterns and alert on suspicious activities</li>
+<li>Implement comprehensive audit logging for authentication events</li>
+<li>Regularly review and test authentication mechanisms for vulnerabilities</li>
+<li>Ensure compliance with relevant security standards and regulations</li>
+<li>Implement security monitoring and incident response procedures</li>
+</ul>
+<p>The Authentication pattern is fundamental to enterprise integration security, providing the essential identity verification layer that enables all other security measures and ensures that only authorized entities can access protected resources and services.</p>
+
+      <a href="../index.html" class="back-to-top">← Back to All Patterns</a>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <p>©2026 <a href="https://dataintegrationmastery.com/">Data Integration Mastery™</a> — All Rights Reserved</p>
+  </footer>
+</body>
+</html>

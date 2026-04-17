@@ -1,0 +1,1346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Health Checks — Integration Architecture Patterns | Data Integration Mastery™</title>
+  <meta name="description" content="Health Checks is a proactive monitoring pattern in enterprise integration architectures that systematically verifies the operational status, availability, an...">
+  <meta name="keywords" content="health checks, integration pattern, monitoring & observability patterns, integration architecture, EAI patterns, data integration">
+  <link rel="canonical" href="https://dataintegrationmastery.com/patterns/monitoring-observability-patterns/health-checks.html">
+
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://dataintegrationmastery.com/patterns/monitoring-observability-patterns/health-checks.html">
+  <meta property="og:title" content="Health Checks — Integration Architecture Patterns">
+  <meta property="og:description" content="Health Checks is a proactive monitoring pattern in enterprise integration architectures that systematically verifies the operational status, availability, an...">
+  <meta property="og:image" content="https://dataintegrationmastery.com/assets/images/logo.png">
+  <meta property="og:site_name" content="Data Integration Mastery">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Health Checks — Integration Architecture Patterns">
+  <meta name="twitter:description" content="Health Checks is a proactive monitoring pattern in enterprise integration architectures that systematically verifies the operational status, availability, an...">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/docs.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Health Checks",
+    "description": "Health Checks is a proactive monitoring pattern in enterprise integration architectures that systematically verifies the operational status, availability, an...",
+    "url": "https://dataintegrationmastery.com/patterns/monitoring-observability-patterns/health-checks.html",
+    "author": {
+      "@type": "Person",
+      "name": "Ari Vilkman",
+      "jobTitle": "Integration Architect"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Data Integration Mastery",
+      "url": "https://dataintegrationmastery.com"
+    },
+    "isPartOf": {
+      "@type": "CollectionPage",
+      "name": "Integration Architecture Patterns",
+      "url": "https://dataintegrationmastery.com/patterns/"
+    },
+    "about": {
+      "@type": "Thing",
+      "name": "Health Checks"
+    },
+    "inLanguage": "en",
+    "isAccessibleForFree": true
+  }
+  </script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="https://dataintegrationmastery.com/" class="header-brand">
+        <img src="../../assets/images/dim-icon.png" alt="DIM" width="36" height="36">
+        <span class="header-title">Data Integration Mastery™</span>
+      </a>
+      <nav class="header-nav" aria-label="Main navigation">
+        <a href="https://dataintegrationmastery.com/">Home</a>
+        <a href="../index.html">All Patterns</a>
+        <a href="https://dataintegrationmastery.com/#free-course">Free Course</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="docs-layout">
+    <aside class="docs-sidebar" aria-label="Pattern categories">
+      <div class="sidebar-title">Pattern Categories</div>
+<div class="sidebar-section">
+  <a href="../index.html#resilience" class="sidebar-section-title">🛡️ Resilience Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../resilience-patterns/circuit-breaker.html">Circuit Breaker</a></li>
+    <li><a href="../resilience-patterns/retry-mechanism.html">Retry Mechanism</a></li>
+    <li><a href="../resilience-patterns/timeout.html">Timeout</a></li>
+    <li><a href="../resilience-patterns/dead-letter-queue.html">Dead Letter Queue</a></li>
+    <li><a href="../resilience-patterns/bulkhead.html">Bulkhead</a></li>
+    <li><a href="../resilience-patterns/fallback-graceful-degradation.html">Fallback / Graceful Degradation</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#messaging" class="sidebar-section-title">📨 Messaging Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../messaging-patterns/request-reply.html">Request-Reply</a></li>
+    <li><a href="../messaging-patterns/publish-subscribe.html">Publish-Subscribe</a></li>
+    <li><a href="../messaging-patterns/message-queue.html">Message Queue</a></li>
+    <li><a href="../messaging-patterns/event-streaming.html">Event Streaming</a></li>
+    <li><a href="../messaging-patterns/correlation-id.html">Correlation ID</a></li>
+    <li><a href="../messaging-patterns/message-routing.html">Message Routing</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#data-transformation" class="sidebar-section-title">🔄 Data Transformation Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../data-transformation-patterns/message-translator.html">Message Translator</a></li>
+    <li><a href="../data-transformation-patterns/content-filter.html">Content Filter</a></li>
+    <li><a href="../data-transformation-patterns/message-router.html">Message Router</a></li>
+    <li><a href="../data-transformation-patterns/aggregator.html">Aggregator</a></li>
+    <li><a href="../data-transformation-patterns/splitter.html">Splitter</a></li>
+    <li><a href="../data-transformation-patterns/data-mapper.html">Data Mapper</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#routing" class="sidebar-section-title">🔀 Routing Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../routing-patterns/content-based-router.html">Content-Based Router</a></li>
+    <li><a href="../routing-patterns/recipient-list.html">Recipient List</a></li>
+    <li><a href="../routing-patterns/load-balancer.html">Load Balancer</a></li>
+    <li><a href="../routing-patterns/message-filter.html">Message Filter</a></li>
+    <li><a href="../routing-patterns/dynamic-router.html">Dynamic Router</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#security" class="sidebar-section-title">🔐 Security Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../security-patterns/authentication.html">Authentication</a></li>
+    <li><a href="../security-patterns/authorization.html">Authorization</a></li>
+    <li><a href="../security-patterns/encryption.html">Encryption</a></li>
+    <li><a href="../security-patterns/token-management.html">Token Management</a></li>
+    <li><a href="../security-patterns/api-security.html">API Security</a></li>
+    <li><a href="../security-patterns/secret-management.html">Secret Management</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#orchestration" class="sidebar-section-title">🎭 Orchestration Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../orchestration-patterns/saga-pattern.html">Saga Pattern</a></li>
+    <li><a href="../orchestration-patterns/process-manager.html">Process Manager</a></li>
+    <li><a href="../orchestration-patterns/workflow-engine.html">Workflow Engine</a></li>
+    <li><a href="../orchestration-patterns/choreography.html">Choreography</a></li>
+    <li><a href="../orchestration-patterns/compensation-transactions.html">Compensation Transactions</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#observability" class="sidebar-section-title">📊 Monitoring & Observability Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="distributed-tracing.html">Distributed Tracing</a></li>
+    <li><a href="metrics-collection.html">Metrics Collection</a></li>
+    <li><a href="health-checks.html" class="active">Health Checks</a></li>
+    <li><a href="logging-strategies.html">Logging Strategies</a></li>
+    <li><a href="performance-monitoring.html">Performance Monitoring</a></li>
+    <li><a href="error-tracking.html">Error Tracking</a></li>
+  </ul>
+</div>
+
+    </aside>
+
+    <main id="main-content" class="docs-content">
+      <div class="breadcrumb">
+        <a href="https://dataintegrationmastery.com/">Home</a>
+        <span class="sep">›</span>
+        <a href="../index.html">Patterns</a>
+        <span class="sep">›</span>
+        <a href="../index.html#observability">Monitoring & Observability Patterns</a>
+        <span class="sep">›</span>
+        <strong>Health Checks</strong>
+      </div>
+
+      <h1>Health Checks</h1>
+
+      <h2 id="overview">Overview</h2>
+<p>Health Checks is a proactive monitoring pattern in enterprise integration architectures that systematically verifies the operational status, availability, and functional capability of system components, services, and dependencies through automated diagnostic procedures. Like a comprehensive medical examination that assesses various aspects of patient health from vital signs to organ function, health checks provide continuous assessment of system wellness by evaluating critical indicators of system health, performance, and readiness to serve requests. This pattern is essential for ensuring system reliability, enabling automated failure detection, supporting load balancing decisions, facilitating graceful degradation, and maintaining operational excellence in complex distributed environments where manual monitoring is impractical.</p>
+<h3 id="theoretical-foundation">Theoretical Foundation</h3>
+<p>Health Checks is grounded in <strong>systems monitoring theory</strong>, <strong>fault detection principles</strong>, <strong>availability engineering</strong>, and <strong>proactive maintenance strategies</strong>. It incorporates concepts from <strong>heartbeat monitoring</strong>, <strong>synthetic transaction testing</strong>, <strong>dependency verification</strong>, and <strong>operational readiness assessment</strong> to provide a comprehensive framework for automated system health assessment. The pattern addresses the fundamental need for continuous, automated verification of system operational capability and the early detection of issues that could impact system availability, performance, or functionality.</p>
+<h3 id="core-principles">Core Principles</h3>
+<h4 id="1-multi-level-health-assessment">1. <strong>Multi-Level Health Assessment</strong></h4>
+<p>Comprehensive evaluation of system health at different layers and granularities:
+- <strong>Service-level health</strong> - overall service operational status and readiness
+- <strong>Component-level health</strong> - individual component functionality and performance
+- <strong>Dependency health</strong> - external service and infrastructure dependency status
+- <strong>Business function health</strong> - end-to-end business capability verification</p>
+<h4 id="2-automated-diagnostic-procedures">2. <strong>Automated Diagnostic Procedures</strong></h4>
+<p>Systematic execution of health verification procedures:
+- <strong>Synthetic transactions</strong> - automated execution of representative business transactions
+- <strong>Connectivity testing</strong> - verification of network connectivity and communication paths
+- <strong>Resource availability</strong> - assessment of critical system resources and capacity
+- <strong>Data integrity verification</strong> - validation of data consistency and accessibility</p>
+<h4 id="3-continuous-monitoring-and-assessment">3. <strong>Continuous Monitoring and Assessment</strong></h4>
+<p>Regular, ongoing health evaluation and status reporting:
+- <strong>Periodic health checks</strong> - scheduled execution of health verification procedures
+- <strong>Real-time health monitoring</strong> - continuous assessment of system health indicators
+- <strong>Health status aggregation</strong> - consolidation of multiple health indicators into overall status
+- <strong>Health history tracking</strong> - maintenance of health status history for trend analysis</p>
+<h4 id="4-actionable-health-information">4. <strong>Actionable Health Information</strong></h4>
+<p>Provision of meaningful, actionable health status information:
+- <strong>Health status reporting</strong> - clear communication of current system health state
+- <strong>Failure diagnosis</strong> - detailed information about detected health issues
+- <strong>Recovery guidance</strong> - recommendations for addressing identified health problems
+- <strong>Impact assessment</strong> - evaluation of health issues' impact on system operations</p>
+<h3 id="why-health-checks-are-essential-in-integration-architecture">Why Health Checks are Essential in Integration Architecture</h3>
+<h4 id="1-proactive-issue-detection">1. <strong>Proactive Issue Detection</strong></h4>
+<p>In complex distributed systems, health checks provide:
+- <strong>Early failure detection</strong> - identification of issues before they impact users
+- <strong>Cascade failure prevention</strong> - detection of dependency failures before they spread
+- <strong>Performance degradation alerts</strong> - early warning of performance issues
+- <strong>Capacity threshold monitoring</strong> - alerting when resource limits are approached</p>
+<h4 id="2-operational-automation-support">2. <strong>Operational Automation Support</strong></h4>
+<p>Supporting automated operational procedures and decisions:
+- <strong>Load balancer integration</strong> - informing load balancing decisions about service availability
+- <strong>Auto-scaling triggers</strong> - providing data for automated scaling decisions
+- <strong>Circuit breaker coordination</strong> - supporting circuit breaker pattern implementation
+- <strong>Service mesh integration</strong> - enabling intelligent traffic routing and failure handling</p>
+<h4 id="3-service-level-agreement-sla-management">3. <strong>Service Level Agreement (SLA) Management</strong></h4>
+<p>Ensuring compliance with service level commitments:
+- <strong>Availability monitoring</strong> - tracking service availability against SLA commitments
+- <strong>Performance verification</strong> - ensuring response times meet SLA requirements
+- <strong>Quality assurance</strong> - monitoring service quality characteristics
+- <strong>Compliance reporting</strong> - generating reports for SLA compliance verification</p>
+<h4 id="4-development-and-operations-integration">4. <strong>Development and Operations Integration</strong></h4>
+<p>Supporting DevOps practices and continuous delivery:
+- <strong>Deployment verification</strong> - validating successful deployments through health checks
+- <strong>Rollback triggers</strong> - automatically triggering rollbacks when health checks fail
+- <strong>Environment validation</strong> - verifying environment readiness before deployments
+- <strong>Testing automation</strong> - incorporating health checks into automated testing pipelines</p>
+<h3 id="benefits-in-integration-contexts">Benefits in Integration Contexts</h3>
+<h4 id="1-technical-advantages">1. <strong>Technical Advantages</strong></h4>
+<ul>
+<li><strong>Automated monitoring</strong> - continuous, automated assessment of system health</li>
+<li><strong>Early detection</strong> - identification of issues before they impact operations</li>
+<li><strong>Dependency visibility</strong> - clear understanding of external dependency health</li>
+<li><strong>Integration reliability</strong> - improved reliability through proactive issue detection</li>
+</ul>
+<h4 id="2-operational-benefits">2. <strong>Operational Benefits</strong></h4>
+<ul>
+<li><strong>Reduced downtime</strong> - faster issue detection and resolution</li>
+<li><strong>Operational efficiency</strong> - automated health assessment reducing manual monitoring</li>
+<li><strong>Improved reliability</strong> - better system reliability through proactive monitoring</li>
+<li><strong>Cost optimization</strong> - reduced operational costs through automation and early detection</li>
+</ul>
+<h4 id="3-integration-enablement">3. <strong>Integration Enablement</strong></h4>
+<ul>
+<li><strong>Service discovery</strong> - supporting dynamic service discovery and registration</li>
+<li><strong>Traffic management</strong> - enabling intelligent traffic routing based on health status</li>
+<li><strong>Integration monitoring</strong> - comprehensive monitoring of integration flows and dependencies</li>
+<li><strong>Quality assurance</strong> - ensuring integration quality through systematic health verification</li>
+</ul>
+<h4 id="4-business-value">4. <strong>Business Value</strong></h4>
+<ul>
+<li><strong>Service reliability</strong> - improved service reliability and availability for customers</li>
+<li><strong>Risk mitigation</strong> - reduced business risk through proactive issue detection</li>
+<li><strong>Customer satisfaction</strong> - better customer experience through reliable services</li>
+<li><strong>Compliance assurance</strong> - meeting regulatory and business compliance requirements</li>
+</ul>
+<h3 id="integration-architecture-applications">Integration Architecture Applications</h3>
+<h4 id="1-microservices-health-monitoring">1. <strong>Microservices Health Monitoring</strong></h4>
+<p>Comprehensive health checks for microservices architecture:</p>
+<pre><code class="language-java">// Health Check Configuration
+@Configuration
+@EnableConfigurationProperties(HealthCheckProperties.class)
+public class HealthCheckConfiguration {
+
+    @Bean
+    public HealthIndicatorRegistry healthIndicatorRegistry() {
+        return new DefaultHealthIndicatorRegistry();
+    }
+
+    @Bean
+    public HealthAggregator healthAggregator() {
+        return new OrderedHealthAggregator();
+    }
+
+    @Bean
+    public CompositeHealthIndicator compositeHealthIndicator(
+            HealthAggregator healthAggregator,
+            HealthIndicatorRegistry healthIndicatorRegistry) {
+        return new CompositeHealthIndicator(healthAggregator, healthIndicatorRegistry);
+    }
+
+    @Bean
+    public HealthCheckManager healthCheckManager() {
+        return new HealthCheckManager();
+    }
+}
+
+// Custom Health Indicators
+@Component
+public class DatabaseHealthIndicator implements HealthIndicator {
+
+    @Autowired
+    private DataSource dataSource;
+
+    @Override
+    public Health health() {
+        try {
+            // Test database connectivity
+            try (Connection connection = dataSource.getConnection()) {
+                // Execute a simple query to verify database functionality
+                try (PreparedStatement statement = connection.prepareStatement(&quot;SELECT 1&quot;)) {
+                    ResultSet resultSet = statement.executeQuery();
+
+                    if (resultSet.next()) {
+                        long startTime = System.currentTimeMillis();
+
+                        // Test database performance
+                        try (PreparedStatement perfStatement = connection.prepareStatement(
+                                &quot;SELECT COUNT(*) FROM orders WHERE created_date &gt; ?&quot;)) {
+                            perfStatement.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now().minusMinutes(5)));
+                            ResultSet perfResult = perfStatement.executeQuery();
+
+                            long queryTime = System.currentTimeMillis() - startTime;
+
+                            if (perfResult.next()) {
+                                int recentOrders = perfResult.getInt(1);
+
+                                return Health.up()
+                                    .withDetail(&quot;database&quot;, &quot;PostgreSQL&quot;)
+                                    .withDetail(&quot;connection_pool_active&quot;, getActiveConnections())
+                                    .withDetail(&quot;connection_pool_idle&quot;, getIdleConnections())
+                                    .withDetail(&quot;query_time_ms&quot;, queryTime)
+                                    .withDetail(&quot;recent_orders&quot;, recentOrders)
+                                    .withDetail(&quot;last_check&quot;, LocalDateTime.now())
+                                    .build();
+                            }
+                        }
+                    }
+                }
+            }
+
+            return Health.down()
+                .withDetail(&quot;error&quot;, &quot;Database query failed&quot;)
+                .withDetail(&quot;last_check&quot;, LocalDateTime.now())
+                .build();
+
+        } catch (Exception e) {
+            return Health.down()
+                .withDetail(&quot;error&quot;, e.getMessage())
+                .withDetail(&quot;exception&quot;, e.getClass().getSimpleName())
+                .withDetail(&quot;last_check&quot;, LocalDateTime.now())
+                .build();
+        }
+    }
+
+    private int getActiveConnections() {
+        // Implementation to get active connection count
+        try {
+            if (dataSource instanceof HikariDataSource) {
+                return ((HikariDataSource) dataSource).getHikariPoolMXBean().getActiveConnections();
+            }
+            return -1;
+        } catch (Exception e) {
+            return -1;
+        }
+    }
+
+    private int getIdleConnections() {
+        // Implementation to get idle connection count
+        try {
+            if (dataSource instanceof HikariDataSource) {
+                return ((HikariDataSource) dataSource).getHikariPoolMXBean().getIdleConnections();
+            }
+            return -1;
+        } catch (Exception e) {
+            return -1;
+        }
+    }
+}
+
+@Component
+public class ExternalServiceHealthIndicator implements HealthIndicator {
+
+    @Autowired
+    private RestTemplate restTemplate;
+
+    @Value(&quot;${external.inventory.service.url}&quot;)
+    private String inventoryServiceUrl;
+
+    @Value(&quot;${external.payment.service.url}&quot;)
+    private String paymentServiceUrl;
+
+    @Override
+    public Health health() {
+        Health.Builder health = Health.up();
+
+        // Check inventory service
+        ServiceHealthStatus inventoryHealth = checkService(&quot;inventory&quot;, inventoryServiceUrl + &quot;/health&quot;);
+        health.withDetail(&quot;inventory_service&quot;, inventoryHealth);
+
+        // Check payment service
+        ServiceHealthStatus paymentHealth = checkService(&quot;payment&quot;, paymentServiceUrl + &quot;/health&quot;);
+        health.withDetail(&quot;payment_service&quot;, paymentHealth);
+
+        // Check overall external service health
+        boolean allServicesHealthy = inventoryHealth.isHealthy() &amp;&amp; paymentHealth.isHealthy();
+
+        if (allServicesHealthy) {
+            health.withDetail(&quot;external_services_status&quot;, &quot;ALL_HEALTHY&quot;);
+        } else {
+            health = Health.down();
+            health.withDetail(&quot;external_services_status&quot;, &quot;SOME_UNHEALTHY&quot;);
+        }
+
+        health.withDetail(&quot;last_check&quot;, LocalDateTime.now());
+
+        return health.build();
+    }
+
+    private ServiceHealthStatus checkService(String serviceName, String healthUrl) {
+        try {
+            long startTime = System.currentTimeMillis();
+
+            ResponseEntity&lt;Map&gt; response = restTemplate.getForEntity(healthUrl, Map.class);
+
+            long responseTime = System.currentTimeMillis() - startTime;
+
+            boolean isHealthy = response.getStatusCode().is2xxSuccessful();
+
+            ServiceHealthStatus status = new ServiceHealthStatus();
+            status.setServiceName(serviceName);
+            status.setHealthy(isHealthy);
+            status.setResponseTime(responseTime);
+            status.setStatusCode(response.getStatusCode().value());
+            status.setLastCheck(LocalDateTime.now());
+
+            if (response.getBody() != null) {
+                status.setDetails(response.getBody());
+            }
+
+            return status;
+
+        } catch (Exception e) {
+            ServiceHealthStatus status = new ServiceHealthStatus();
+            status.setServiceName(serviceName);
+            status.setHealthy(false);
+            status.setError(e.getMessage());
+            status.setLastCheck(LocalDateTime.now());
+
+            return status;
+        }
+    }
+}
+
+@Component
+public class CacheHealthIndicator implements HealthIndicator {
+
+    @Autowired
+    private RedisTemplate&lt;String, Object&gt; redisTemplate;
+
+    @Override
+    public Health health() {
+        try {
+            // Test Redis connectivity and performance
+            long startTime = System.currentTimeMillis();
+
+            String testKey = &quot;health-check-&quot; + System.currentTimeMillis();
+            String testValue = &quot;test-value&quot;;
+
+            // Test SET operation
+            redisTemplate.opsForValue().set(testKey, testValue, Duration.ofMinutes(1));
+
+            // Test GET operation
+            String retrievedValue = (String) redisTemplate.opsForValue().get(testKey);
+
+            // Test DELETE operation
+            redisTemplate.delete(testKey);
+
+            long operationTime = System.currentTimeMillis() - startTime;
+
+            if (testValue.equals(retrievedValue)) {
+                // Get Redis info
+                Properties redisInfo = redisTemplate.getConnectionFactory().getConnection().info();
+
+                return Health.up()
+                    .withDetail(&quot;cache_type&quot;, &quot;Redis&quot;)
+                    .withDetail(&quot;operation_time_ms&quot;, operationTime)
+                    .withDetail(&quot;redis_version&quot;, redisInfo.getProperty(&quot;redis_version&quot;))
+                    .withDetail(&quot;connected_clients&quot;, redisInfo.getProperty(&quot;connected_clients&quot;))
+                    .withDetail(&quot;used_memory_human&quot;, redisInfo.getProperty(&quot;used_memory_human&quot;))
+                    .withDetail(&quot;keyspace_hits&quot;, redisInfo.getProperty(&quot;keyspace_hits&quot;))
+                    .withDetail(&quot;keyspace_misses&quot;, redisInfo.getProperty(&quot;keyspace_misses&quot;))
+                    .withDetail(&quot;last_check&quot;, LocalDateTime.now())
+                    .build();
+            } else {
+                return Health.down()
+                    .withDetail(&quot;error&quot;, &quot;Cache operation verification failed&quot;)
+                    .withDetail(&quot;expected&quot;, testValue)
+                    .withDetail(&quot;actual&quot;, retrievedValue)
+                    .withDetail(&quot;last_check&quot;, LocalDateTime.now())
+                    .build();
+            }
+
+        } catch (Exception e) {
+            return Health.down()
+                .withDetail(&quot;error&quot;, e.getMessage())
+                .withDetail(&quot;exception&quot;, e.getClass().getSimpleName())
+                .withDetail(&quot;last_check&quot;, LocalDateTime.now())
+                .build();
+        }
+    }
+}
+
+@Component
+public class BusinessFunctionHealthIndicator implements HealthIndicator {
+
+    @Autowired
+    private OrderService orderService;
+
+    @Autowired
+    private InventoryService inventoryService;
+
+    @Autowired
+    private PaymentService paymentService;
+
+    @Override
+    public Health health() {
+        Health.Builder health = Health.up();
+        Map&lt;String, Object&gt; healthDetails = new HashMap&lt;&gt;();
+
+        // Test order creation functionality
+        boolean orderCreationHealthy = testOrderCreationFunction();
+        healthDetails.put(&quot;order_creation&quot;, orderCreationHealthy ? &quot;HEALTHY&quot; : &quot;UNHEALTHY&quot;);
+
+        // Test inventory check functionality
+        boolean inventoryHealthy = testInventoryFunction();
+        healthDetails.put(&quot;inventory_check&quot;, inventoryHealthy ? &quot;HEALTHY&quot; : &quot;UNHEALTHY&quot;);
+
+        // Test payment processing functionality
+        boolean paymentHealthy = testPaymentFunction();
+        healthDetails.put(&quot;payment_processing&quot;, paymentHealthy ? &quot;HEALTHY&quot; : &quot;UNHEALTHY&quot;);
+
+        // Overall business function health
+        boolean allFunctionsHealthy = orderCreationHealthy &amp;&amp; inventoryHealthy &amp;&amp; paymentHealthy;
+
+        if (allFunctionsHealthy) {
+            healthDetails.put(&quot;business_functions_status&quot;, &quot;ALL_HEALTHY&quot;);
+        } else {
+            health = Health.down();
+            healthDetails.put(&quot;business_functions_status&quot;, &quot;SOME_UNHEALTHY&quot;);
+        }
+
+        healthDetails.put(&quot;last_check&quot;, LocalDateTime.now());
+
+        return health.withDetails(healthDetails).build();
+    }
+
+    private boolean testOrderCreationFunction() {
+        try {
+            // Create a test order validation request
+            CreateOrderRequest testRequest = createTestOrderRequest();
+
+            // Validate the order creation logic (without actually creating the order)
+            OrderValidationResult result = orderService.validateOrder(testRequest);
+
+            return result.isValid();
+
+        } catch (Exception e) {
+            log.warn(&quot;Order creation health check failed&quot;, e);
+            return false;
+        }
+    }
+
+    private boolean testInventoryFunction() {
+        try {
+            // Test inventory availability check
+            List&lt;OrderItem&gt; testItems = createTestOrderItems();
+            InventoryCheckResult result = inventoryService.checkAvailability(testItems);
+
+            return result.isSuccessful();
+
+        } catch (Exception e) {
+            log.warn(&quot;Inventory health check failed&quot;, e);
+            return false;
+        }
+    }
+
+    private boolean testPaymentFunction() {
+        try {
+            // Test payment method validation
+            PaymentMethod testPaymentMethod = createTestPaymentMethod();
+            PaymentValidationResult result = paymentService.validatePaymentMethod(testPaymentMethod);
+
+            return result.isValid();
+
+        } catch (Exception e) {
+            log.warn(&quot;Payment health check failed&quot;, e);
+            return false;
+        }
+    }
+
+    private CreateOrderRequest createTestOrderRequest() {
+        CreateOrderRequest request = new CreateOrderRequest();
+        request.setCustomerId(&quot;health-check-customer&quot;);
+        request.setItems(createTestOrderItems());
+        request.setShippingAddress(createTestShippingAddress());
+        request.setPaymentMethod(createTestPaymentMethod());
+        return request;
+    }
+
+    private List&lt;OrderItem&gt; createTestOrderItems() {
+        OrderItem item = new OrderItem();
+        item.setProductId(&quot;health-check-product&quot;);
+        item.setQuantity(1);
+        return Arrays.asList(item);
+    }
+
+    private ShippingAddress createTestShippingAddress() {
+        ShippingAddress address = new ShippingAddress();
+        address.setStreet(&quot;123 Health Check St&quot;);
+        address.setCity(&quot;Test City&quot;);
+        address.setZipCode(&quot;12345&quot;);
+        return address;
+    }
+
+    private PaymentMethod createTestPaymentMethod() {
+        PaymentMethod method = new PaymentMethod();
+        method.setType(&quot;CREDIT_CARD&quot;);
+        method.setCardNumber(&quot;****-****-****-1234&quot;);
+        return method;
+    }
+}
+</code></pre>
+<h4 id="2-apache-camel-route-health-monitoring">2. <strong>Apache Camel Route Health Monitoring</strong></h4>
+<p>Health checks for Camel integration routes:</p>
+<pre><code class="language-java">@Component
+public class CamelHealthCheckRoute extends RouteBuilder {
+
+    @Autowired
+    private HealthCheckManager healthCheckManager;
+
+    @Override
+    public void configure() throws Exception {
+
+        // Enable Camel health checks
+        getContext().setUseMDCLogging(true);
+        getContext().setMessageHistoryFactory(new MicrometerMessageHistoryFactory());
+
+        // Health check endpoint
+        from(&quot;timer://camel-health-check?period=30000&quot;)
+            .routeId(&quot;camel-health-check&quot;)
+            .process(exchange -&gt; {
+                CamelHealthStatus healthStatus = new CamelHealthStatus();
+                healthStatus.setTimestamp(Instant.now());
+
+                // Check route status
+                List&lt;Route&gt; routes = getContext().getRoutes();
+                int totalRoutes = routes.size();
+                int startedRoutes = 0;
+                List&lt;String&gt; stoppedRoutes = new ArrayList&lt;&gt;();
+
+                for (Route route : routes) {
+                    if (route.getRouteContext().getStatus().isStarted()) {
+                        startedRoutes++;
+                    } else {
+                        stoppedRoutes.add(route.getId());
+                    }
+                }
+
+                healthStatus.setTotalRoutes(totalRoutes);
+                healthStatus.setStartedRoutes(startedRoutes);
+                healthStatus.setStoppedRoutes(stoppedRoutes);
+
+                // Check component status
+                Map&lt;String, Component&gt; components = getContext().getComponentMap();
+                int totalComponents = components.size();
+                int activeComponents = 0;
+                List&lt;String&gt; inactiveComponents = new ArrayList&lt;&gt;();
+
+                for (Map.Entry&lt;String, Component&gt; entry : components.entrySet()) {
+                    try {
+                        ServiceStatus status = entry.getValue().getStatus();
+                        if (status.isStarted()) {
+                            activeComponents++;
+                        } else {
+                            inactiveComponents.add(entry.getKey());
+                        }
+                    } catch (Exception e) {
+                        inactiveComponents.add(entry.getKey());
+                    }
+                }
+
+                healthStatus.setTotalComponents(totalComponents);
+                healthStatus.setActiveComponents(activeComponents);
+                healthStatus.setInactiveComponents(inactiveComponents);
+
+                // Check endpoint connectivity
+                List&lt;EndpointHealthStatus&gt; endpointStatuses = checkEndpoints();
+                healthStatus.setEndpointStatuses(endpointStatuses);
+
+                // Overall health determination
+                boolean isHealthy = startedRoutes == totalRoutes &amp;&amp; 
+                                  activeComponents == totalComponents &amp;&amp;
+                                  endpointStatuses.stream().allMatch(EndpointHealthStatus::isHealthy);
+
+                healthStatus.setOverallHealthy(isHealthy);
+
+                exchange.getIn().setBody(healthStatus);
+
+                log.info(&quot;Camel health check completed - Healthy: {}, Routes: {}/{}, Components: {}/{}&quot;, 
+                        isHealthy, startedRoutes, totalRoutes, activeComponents, totalComponents);
+            })
+            .choice()
+                .when(simple(&quot;${body.overallHealthy} == false&quot;))
+                    .to(&quot;direct:handleCamelHealthIssues&quot;)
+                .otherwise()
+                    .log(&quot;All Camel components healthy&quot;)
+            .end()
+            .marshal().json(JsonLibrary.Jackson)
+            .to(&quot;kafka:camel-health-status&quot;);
+
+        from(&quot;direct:handleCamelHealthIssues&quot;)
+            .routeId(&quot;handle-camel-health-issues&quot;)
+            .log(&quot;Camel health issues detected&quot;)
+            .process(exchange -&gt; {
+                CamelHealthStatus healthStatus = exchange.getIn().getBody(CamelHealthStatus.class);
+
+                CamelHealthAlert alert = new CamelHealthAlert();
+                alert.setTimestamp(Instant.now());
+                alert.setSeverity(AlertSeverity.WARNING);
+                alert.setMessage(&quot;Camel health issues detected&quot;);
+
+                List&lt;String&gt; issues = new ArrayList&lt;&gt;();
+
+                if (!healthStatus.getStoppedRoutes().isEmpty()) {
+                    issues.add(&quot;Stopped routes: &quot; + String.join(&quot;, &quot;, healthStatus.getStoppedRoutes()));
+                }
+
+                if (!healthStatus.getInactiveComponents().isEmpty()) {
+                    issues.add(&quot;Inactive components: &quot; + String.join(&quot;, &quot;, healthStatus.getInactiveComponents()));
+                }
+
+                List&lt;EndpointHealthStatus&gt; unhealthyEndpoints = healthStatus.getEndpointStatuses()
+                    .stream()
+                    .filter(status -&gt; !status.isHealthy())
+                    .collect(Collectors.toList());
+
+                if (!unhealthyEndpoints.isEmpty()) {
+                    issues.add(&quot;Unhealthy endpoints: &quot; + unhealthyEndpoints.stream()
+                        .map(EndpointHealthStatus::getEndpointUri)
+                        .collect(Collectors.joining(&quot;, &quot;)));
+                }
+
+                alert.setIssues(issues);
+
+                exchange.getIn().setBody(alert);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to(&quot;kafka:camel-health-alerts&quot;)
+            .log(&quot;Camel health alert sent: ${body}&quot;);
+
+        // Route-specific health checks
+        from(&quot;timer://route-health-check?period=60000&quot;)
+            .routeId(&quot;route-health-check&quot;)
+            .process(exchange -&gt; {
+                List&lt;RouteHealthStatus&gt; routeStatuses = new ArrayList&lt;&gt;();
+
+                for (Route route : getContext().getRoutes()) {
+                    RouteHealthStatus status = new RouteHealthStatus();
+                    status.setRouteId(route.getId());
+                    status.setStatus(route.getRouteContext().getStatus().name());
+
+                    try {
+                        // Get route statistics
+                        MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+                        ObjectName objectName = new ObjectName(
+                            &quot;org.apache.camel:context=&quot; + getContext().getManagementName() + 
+                            &quot;,type=routes,name=\&quot;&quot; + route.getId() + &quot;\&quot;&quot;);
+
+                        if (server.isRegistered(objectName)) {
+                            Long exchangesTotal = (Long) server.getAttribute(objectName, &quot;ExchangesTotal&quot;);
+                            Long exchangesCompleted = (Long) server.getAttribute(objectName, &quot;ExchangesCompleted&quot;);
+                            Long exchangesFailed = (Long) server.getAttribute(objectName, &quot;ExchangesFailed&quot;);
+                            Long meanProcessingTime = (Long) server.getAttribute(objectName, &quot;MeanProcessingTime&quot;);
+
+                            status.setExchangesTotal(exchangesTotal);
+                            status.setExchangesCompleted(exchangesCompleted);
+                            status.setExchangesFailed(exchangesFailed);
+                            status.setMeanProcessingTime(meanProcessingTime);
+
+                            // Calculate error rate
+                            double errorRate = exchangesTotal &gt; 0 ? 
+                                (double) exchangesFailed / exchangesTotal : 0.0;
+                            status.setErrorRate(errorRate);
+
+                            // Determine health based on error rate and processing time
+                            boolean isHealthy = errorRate &lt; 0.05 &amp;&amp; meanProcessingTime &lt; 5000;
+                            status.setHealthy(isHealthy);
+                        } else {
+                            status.setHealthy(false);
+                            status.setError(&quot;Route statistics not available&quot;);
+                        }
+
+                    } catch (Exception e) {
+                        status.setHealthy(false);
+                        status.setError(&quot;Error retrieving route statistics: &quot; + e.getMessage());
+                    }
+
+                    routeStatuses.add(status);
+                }
+
+                exchange.getIn().setBody(routeStatuses);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to(&quot;kafka:route-health-status&quot;)
+            .log(&quot;Route health status published for ${body.size} routes&quot;);
+
+        // Message queue health check
+        from(&quot;timer://queue-health-check?period=45000&quot;)
+            .routeId(&quot;queue-health-check&quot;)
+            .process(exchange -&gt; {
+                List&lt;QueueHealthStatus&gt; queueStatuses = new ArrayList&lt;&gt;();
+
+                // Check Kafka topic health
+                queueStatuses.add(checkKafkaTopicHealth(&quot;order-events&quot;));
+                queueStatuses.add(checkKafkaTopicHealth(&quot;inventory-updates&quot;));
+                queueStatuses.add(checkKafkaTopicHealth(&quot;payment-notifications&quot;));
+
+                exchange.getIn().setBody(queueStatuses);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to(&quot;kafka:queue-health-status&quot;);
+
+        // Endpoint connectivity health check
+        from(&quot;timer://endpoint-health-check?period=120000&quot;)
+            .routeId(&quot;endpoint-health-check&quot;)
+            .process(exchange -&gt; {
+                List&lt;EndpointHealthStatus&gt; endpointStatuses = checkEndpoints();
+                exchange.getIn().setBody(endpointStatuses);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to(&quot;kafka:endpoint-health-status&quot;);
+    }
+
+    private List&lt;EndpointHealthStatus&gt; checkEndpoints() {
+        List&lt;EndpointHealthStatus&gt; statuses = new ArrayList&lt;&gt;();
+
+        // Check HTTP endpoints
+        statuses.add(checkHttpEndpoint(&quot;customer-service&quot;, &quot;http://customer-service:8080/health&quot;));
+        statuses.add(checkHttpEndpoint(&quot;inventory-service&quot;, &quot;http://inventory-service:8080/health&quot;));
+        statuses.add(checkHttpEndpoint(&quot;payment-service&quot;, &quot;http://payment-service:8080/health&quot;));
+
+        // Check database endpoints
+        statuses.add(checkDatabaseEndpoint(&quot;postgresql&quot;, &quot;jdbc:postgresql://postgres:5432/orders&quot;));
+
+        // Check cache endpoints
+        statuses.add(checkCacheEndpoint(&quot;redis&quot;, &quot;redis://redis:6379&quot;));
+
+        return statuses;
+    }
+
+    private EndpointHealthStatus checkHttpEndpoint(String serviceName, String url) {
+        EndpointHealthStatus status = new EndpointHealthStatus();
+        status.setEndpointName(serviceName);
+        status.setEndpointUri(url);
+        status.setEndpointType(&quot;HTTP&quot;);
+
+        try {
+            long startTime = System.currentTimeMillis();
+
+            HttpClient client = HttpClient.newHttpClient();
+            HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .timeout(Duration.ofSeconds(10))
+                .build();
+
+            HttpResponse&lt;String&gt; response = client.send(request, 
+                HttpResponse.BodyHandlers.ofString());
+
+            long responseTime = System.currentTimeMillis() - startTime;
+
+            status.setHealthy(response.statusCode() &gt;= 200 &amp;&amp; response.statusCode() &lt; 300);
+            status.setResponseTime(responseTime);
+            status.setStatusCode(response.statusCode());
+            status.setLastCheck(LocalDateTime.now());
+
+            if (!status.isHealthy()) {
+                status.setError(&quot;HTTP &quot; + response.statusCode());
+            }
+
+        } catch (Exception e) {
+            status.setHealthy(false);
+            status.setError(e.getMessage());
+            status.setLastCheck(LocalDateTime.now());
+        }
+
+        return status;
+    }
+
+    private EndpointHealthStatus checkDatabaseEndpoint(String dbName, String jdbcUrl) {
+        EndpointHealthStatus status = new EndpointHealthStatus();
+        status.setEndpointName(dbName);
+        status.setEndpointUri(jdbcUrl);
+        status.setEndpointType(&quot;DATABASE&quot;);
+
+        try {
+            long startTime = System.currentTimeMillis();
+
+            try (Connection connection = DriverManager.getConnection(jdbcUrl)) {
+                try (PreparedStatement statement = connection.prepareStatement(&quot;SELECT 1&quot;)) {
+                    statement.executeQuery();
+                }
+            }
+
+            long responseTime = System.currentTimeMillis() - startTime;
+
+            status.setHealthy(true);
+            status.setResponseTime(responseTime);
+            status.setLastCheck(LocalDateTime.now());
+
+        } catch (Exception e) {
+            status.setHealthy(false);
+            status.setError(e.getMessage());
+            status.setLastCheck(LocalDateTime.now());
+        }
+
+        return status;
+    }
+
+    private EndpointHealthStatus checkCacheEndpoint(String cacheName, String redisUrl) {
+        EndpointHealthStatus status = new EndpointHealthStatus();
+        status.setEndpointName(cacheName);
+        status.setEndpointUri(redisUrl);
+        status.setEndpointType(&quot;CACHE&quot;);
+
+        try {
+            long startTime = System.currentTimeMillis();
+
+            // Simple Redis connectivity check
+            Jedis jedis = new Jedis(URI.create(redisUrl));
+            String response = jedis.ping();
+            jedis.close();
+
+            long responseTime = System.currentTimeMillis() - startTime;
+
+            status.setHealthy(&quot;PONG&quot;.equals(response));
+            status.setResponseTime(responseTime);
+            status.setLastCheck(LocalDateTime.now());
+
+            if (!status.isHealthy()) {
+                status.setError(&quot;Unexpected ping response: &quot; + response);
+            }
+
+        } catch (Exception e) {
+            status.setHealthy(false);
+            status.setError(e.getMessage());
+            status.setLastCheck(LocalDateTime.now());
+        }
+
+        return status;
+    }
+
+    private QueueHealthStatus checkKafkaTopicHealth(String topicName) {
+        QueueHealthStatus status = new QueueHealthStatus();
+        status.setQueueName(topicName);
+        status.setQueueType(&quot;KAFKA_TOPIC&quot;);
+
+        try {
+            // Check if topic exists and get partition information
+            Properties props = new Properties();
+            props.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, &quot;kafka:9092&quot;);
+
+            try (AdminClient adminClient = AdminClient.create(props)) {
+                DescribeTopicsResult topicsResult = adminClient.describeTopics(Arrays.asList(topicName));
+                TopicDescription description = topicsResult.values().get(topicName).get(5, TimeUnit.SECONDS);
+
+                status.setHealthy(true);
+                status.setPartitionCount(description.partitions().size());
+                status.setLastCheck(LocalDateTime.now());
+            }
+
+        } catch (Exception e) {
+            status.setHealthy(false);
+            status.setError(e.getMessage());
+            status.setLastCheck(LocalDateTime.now());
+        }
+
+        return status;
+    }
+}
+</code></pre>
+<h4 id="3-health-check-management-and-aggregation">3. <strong>Health Check Management and Aggregation</strong></h4>
+<p>Centralized health check management and reporting:</p>
+<pre><code class="language-java">// Health Check Manager
+@Service
+public class HealthCheckManager {
+
+    @Autowired
+    private HealthIndicatorRegistry healthIndicatorRegistry;
+
+    @Autowired
+    private HealthAggregator healthAggregator;
+
+    private final Map&lt;String, HealthCheckResult&gt; healthCheckHistory = new ConcurrentHashMap&lt;&gt;();
+    private final ScheduledExecutorService executorService = Executors.newScheduledThreadPool(5);
+
+    @PostConstruct
+    public void initializeHealthChecks() {
+        // Schedule periodic health checks
+        executorService.scheduleAtFixedRate(this::performHealthChecks, 0, 30, TimeUnit.SECONDS);
+        executorService.scheduleAtFixedRate(this::publishHealthStatus, 10, 60, TimeUnit.SECONDS);
+        executorService.scheduleAtFixedRate(this::cleanupHealthHistory, 0, 1, TimeUnit.HOURS);
+    }
+
+    public SystemHealthStatus getSystemHealth() {
+        SystemHealthStatus systemHealth = new SystemHealthStatus();
+        systemHealth.setTimestamp(Instant.now());
+
+        Map&lt;String, Health&gt; individualHealths = new HashMap&lt;&gt;();
+
+        // Collect health from all registered indicators
+        for (Map.Entry&lt;String, HealthIndicator&gt; entry : healthIndicatorRegistry.getAll().entrySet()) {
+            try {
+                Health health = entry.getValue().health();
+                individualHealths.put(entry.getKey(), health);
+            } catch (Exception e) {
+                Health errorHealth = Health.down()
+                    .withDetail(&quot;error&quot;, e.getMessage())
+                    .withDetail(&quot;exception&quot;, e.getClass().getSimpleName())
+                    .build();
+                individualHealths.put(entry.getKey(), errorHealth);
+            }
+        }
+
+        // Aggregate overall health
+        Health overallHealth = healthAggregator.aggregate(individualHealths);
+
+        systemHealth.setOverallStatus(overallHealth.getStatus());
+        systemHealth.setIndividualHealths(individualHealths);
+        systemHealth.setHealthScore(calculateHealthScore(individualHealths));
+
+        // Add trending information
+        systemHealth.setHealthTrend(calculateHealthTrend());
+        systemHealth.setIssuesSummary(summarizeHealthIssues(individualHealths));
+
+        return systemHealth;
+    }
+
+    public List&lt;HealthAlert&gt; getHealthAlerts() {
+        List&lt;HealthAlert&gt; alerts = new ArrayList&lt;&gt;();
+        SystemHealthStatus currentHealth = getSystemHealth();
+
+        // Check for critical health issues
+        for (Map.Entry&lt;String, Health&gt; entry : currentHealth.getIndividualHealths().entrySet()) {
+            if (entry.getValue().getStatus() == Status.DOWN) {
+                HealthAlert alert = new HealthAlert();
+                alert.setAlertId(UUID.randomUUID().toString());
+                alert.setComponent(entry.getKey());
+                alert.setSeverity(AlertSeverity.CRITICAL);
+                alert.setTitle(&quot;Component Health Check Failed&quot;);
+                alert.setMessage(&quot;Health check failed for component: &quot; + entry.getKey());
+                alert.setTimestamp(Instant.now());
+                alert.setDetails(entry.getValue().getDetails());
+
+                alerts.add(alert);
+            }
+        }
+
+        // Check for performance degradation
+        if (currentHealth.getHealthScore() &lt; 0.8) {
+            HealthAlert alert = new HealthAlert();
+            alert.setAlertId(UUID.randomUUID().toString());
+            alert.setComponent(&quot;SYSTEM&quot;);
+            alert.setSeverity(AlertSeverity.WARNING);
+            alert.setTitle(&quot;System Health Degradation&quot;);
+            alert.setMessage(&quot;Overall system health score has degraded to &quot; + 
+                           String.format(&quot;%.2f&quot;, currentHealth.getHealthScore()));
+            alert.setTimestamp(Instant.now());
+
+            alerts.add(alert);
+        }
+
+        // Check for health trend issues
+        if (&quot;DECLINING&quot;.equals(currentHealth.getHealthTrend())) {
+            HealthAlert alert = new HealthAlert();
+            alert.setAlertId(UUID.randomUUID().toString());
+            alert.setComponent(&quot;SYSTEM&quot;);
+            alert.setSeverity(AlertSeverity.WARNING);
+            alert.setTitle(&quot;Declining Health Trend&quot;);
+            alert.setMessage(&quot;System health trend is declining over recent checks&quot;);
+            alert.setTimestamp(Instant.now());
+
+            alerts.add(alert);
+        }
+
+        return alerts;
+    }
+
+    public HealthCheckReport generateHealthReport(Duration period) {
+        HealthCheckReport report = new HealthCheckReport();
+        report.setReportPeriod(period);
+        report.setGeneratedAt(Instant.now());
+
+        Instant cutoff = Instant.now().minus(period);
+
+        // Collect health check results from history
+        Map&lt;String, List&lt;HealthCheckResult&gt;&gt; componentHistory = new HashMap&lt;&gt;();
+
+        for (Map.Entry&lt;String, HealthCheckResult&gt; entry : healthCheckHistory.entrySet()) {
+            if (entry.getValue().getTimestamp().isAfter(cutoff)) {
+                String component = entry.getKey().split(&quot;-&quot;)[0]; // Extract component name
+                componentHistory.computeIfAbsent(component, k -&gt; new ArrayList&lt;&gt;()).add(entry.getValue());
+            }
+        }
+
+        // Calculate availability statistics
+        Map&lt;String, AvailabilityStatistics&gt; availabilityStats = new HashMap&lt;&gt;();
+
+        for (Map.Entry&lt;String, List&lt;HealthCheckResult&gt;&gt; entry : componentHistory.entrySet()) {
+            AvailabilityStatistics stats = calculateAvailabilityStatistics(entry.getValue());
+            availabilityStats.put(entry.getKey(), stats);
+        }
+
+        report.setAvailabilityStatistics(availabilityStats);
+
+        // Calculate overall system availability
+        double overallAvailability = availabilityStats.values().stream()
+            .mapToDouble(AvailabilityStatistics::getAvailabilityPercentage)
+            .average()
+            .orElse(0.0);
+
+        report.setOverallAvailability(overallAvailability);
+
+        // Identify top issues
+        List&lt;HealthIssue&gt; topIssues = identifyTopHealthIssues(componentHistory);
+        report.setTopIssues(topIssues);
+
+        return report;
+    }
+
+    private void performHealthChecks() {
+        try {
+            SystemHealthStatus healthStatus = getSystemHealth();
+
+            // Store health check results in history
+            for (Map.Entry&lt;String, Health&gt; entry : healthStatus.getIndividualHealths().entrySet()) {
+                HealthCheckResult result = new HealthCheckResult();
+                result.setComponent(entry.getKey());
+                result.setStatus(entry.getValue().getStatus());
+                result.setDetails(entry.getValue().getDetails());
+                result.setTimestamp(Instant.now());
+
+                String historyKey = entry.getKey() + &quot;-&quot; + System.currentTimeMillis();
+                healthCheckHistory.put(historyKey, result);
+            }
+
+            log.debug(&quot;Health checks completed - Overall status: {}, Score: {}&quot;, 
+                     healthStatus.getOverallStatus(), healthStatus.getHealthScore());
+
+        } catch (Exception e) {
+            log.error(&quot;Error performing health checks&quot;, e);
+        }
+    }
+
+    private void publishHealthStatus() {
+        try {
+            SystemHealthStatus healthStatus = getSystemHealth();
+
+            // Publish to monitoring system
+            publishToMonitoring(healthStatus);
+
+            // Check for alerts
+            List&lt;HealthAlert&gt; alerts = getHealthAlerts();
+            if (!alerts.isEmpty()) {
+                publishHealthAlerts(alerts);
+            }
+
+            log.info(&quot;Health status published - Status: {}, Alerts: {}&quot;, 
+                    healthStatus.getOverallStatus(), alerts.size());
+
+        } catch (Exception e) {
+            log.error(&quot;Error publishing health status&quot;, e);
+        }
+    }
+
+    private double calculateHealthScore(Map&lt;String, Health&gt; healthMap) {
+        if (healthMap.isEmpty()) {
+            return 0.0;
+        }
+
+        int totalComponents = healthMap.size();
+        long healthyComponents = healthMap.values().stream()
+            .mapToLong(health -&gt; health.getStatus() == Status.UP ? 1 : 0)
+            .sum();
+
+        return (double) healthyComponents / totalComponents;
+    }
+
+    private String calculateHealthTrend() {
+        // Analyze recent health scores to determine trend
+        List&lt;Double&gt; recentScores = getRecentHealthScores(Duration.ofMinutes(30));
+
+        if (recentScores.size() &lt; 3) {
+            return &quot;INSUFFICIENT_DATA&quot;;
+        }
+
+        // Simple trend analysis
+        double firstHalf = recentScores.subList(0, recentScores.size() / 2).stream()
+            .mapToDouble(Double::doubleValue)
+            .average()
+            .orElse(0.0);
+
+        double secondHalf = recentScores.subList(recentScores.size() / 2, recentScores.size()).stream()
+            .mapToDouble(Double::doubleValue)
+            .average()
+            .orElse(0.0);
+
+        if (secondHalf &gt; firstHalf + 0.1) {
+            return &quot;IMPROVING&quot;;
+        } else if (secondHalf &lt; firstHalf - 0.1) {
+            return &quot;DECLINING&quot;;
+        } else {
+            return &quot;STABLE&quot;;
+        }
+    }
+
+    private List&lt;String&gt; summarizeHealthIssues(Map&lt;String, Health&gt; healthMap) {
+        return healthMap.entrySet().stream()
+            .filter(entry -&gt; entry.getValue().getStatus() != Status.UP)
+            .map(entry -&gt; entry.getKey() + &quot;: &quot; + entry.getValue().getStatus())
+            .collect(Collectors.toList());
+    }
+}
+
+// Health Check REST Controller
+@RestController
+@RequestMapping(&quot;/health&quot;)
+public class HealthCheckController {
+
+    @Autowired
+    private HealthCheckManager healthCheckManager;
+
+    @GetMapping
+    public ResponseEntity&lt;SystemHealthStatus&gt; getSystemHealth() {
+        SystemHealthStatus health = healthCheckManager.getSystemHealth();
+
+        HttpStatus httpStatus = health.getOverallStatus() == Status.UP ? 
+            HttpStatus.OK : HttpStatus.SERVICE_UNAVAILABLE;
+
+        return ResponseEntity.status(httpStatus).body(health);
+    }
+
+    @GetMapping(&quot;/detailed&quot;)
+    public ResponseEntity&lt;SystemHealthStatus&gt; getDetailedHealth() {
+        SystemHealthStatus health = healthCheckManager.getSystemHealth();
+        return ResponseEntity.ok(health);
+    }
+
+    @GetMapping(&quot;/alerts&quot;)
+    public ResponseEntity&lt;List&lt;HealthAlert&gt;&gt; getHealthAlerts() {
+        List&lt;HealthAlert&gt; alerts = healthCheckManager.getHealthAlerts();
+        return ResponseEntity.ok(alerts);
+    }
+
+    @GetMapping(&quot;/report&quot;)
+    public ResponseEntity&lt;HealthCheckReport&gt; getHealthReport(
+            @RequestParam(defaultValue = &quot;PT24H&quot;) String period) {
+
+        Duration reportPeriod = Duration.parse(period);
+        HealthCheckReport report = healthCheckManager.generateHealthReport(reportPeriod);
+
+        return ResponseEntity.ok(report);
+    }
+
+    @GetMapping(&quot;/readiness&quot;)
+    public ResponseEntity&lt;Map&lt;String, String&gt;&gt; readinessCheck() {
+        SystemHealthStatus health = healthCheckManager.getSystemHealth();
+
+        Map&lt;String, String&gt; response = new HashMap&lt;&gt;();
+        response.put(&quot;status&quot;, health.getOverallStatus().toString());
+        response.put(&quot;ready&quot;, health.getOverallStatus() == Status.UP ? &quot;true&quot; : &quot;false&quot;);
+        response.put(&quot;timestamp&quot;, health.getTimestamp().toString());
+
+        HttpStatus httpStatus = health.getOverallStatus() == Status.UP ? 
+            HttpStatus.OK : HttpStatus.SERVICE_UNAVAILABLE;
+
+        return ResponseEntity.status(httpStatus).body(response);
+    }
+
+    @GetMapping(&quot;/liveness&quot;)
+    public ResponseEntity&lt;Map&lt;String, String&gt;&gt; livenessCheck() {
+        // Liveness check should be simpler - just verify basic application health
+        Map&lt;String, String&gt; response = new HashMap&lt;&gt;();
+        response.put(&quot;status&quot;, &quot;UP&quot;);
+        response.put(&quot;alive&quot;, &quot;true&quot;);
+        response.put(&quot;timestamp&quot;, Instant.now().toString());
+
+        return ResponseEntity.ok(response);
+    }
+}
+</code></pre>
+<h2 id="best-practices">Best Practices</h2>
+<h3 id="1-health-check-design-and-implementation">1. <strong>Health Check Design and Implementation</strong></h3>
+<ul>
+<li>Design health checks to be fast and lightweight to minimize impact on system performance</li>
+<li>Implement different levels of health checks (shallow, medium, deep) for different use cases</li>
+<li>Use meaningful health check names and descriptions for operational clarity</li>
+<li>Implement proper timeout handling for all external dependency checks</li>
+<li>Design health checks to be idempotent and side-effect free</li>
+</ul>
+<h3 id="2-health-check-coverage-and-scope">2. <strong>Health Check Coverage and Scope</strong></h3>
+<ul>
+<li>Implement health checks for all critical system components and dependencies</li>
+<li>Include business function health checks beyond technical component status</li>
+<li>Design health checks to verify end-to-end functionality when appropriate</li>
+<li>Implement synthetic transaction testing for critical business workflows</li>
+<li>Cover all integration points and external dependencies</li>
+</ul>
+<h3 id="3-performance-and-resource-management">3. <strong>Performance and Resource Management</strong></h3>
+<ul>
+<li>Monitor the performance impact of health checks on system resources</li>
+<li>Implement health check caching to avoid excessive resource usage</li>
+<li>Use appropriate health check frequencies based on component criticality</li>
+<li>Implement circuit breakers for health checks that depend on external systems</li>
+<li>Design for graceful degradation when health checks themselves fail</li>
+</ul>
+<h3 id="4-alerting-and-response">4. <strong>Alerting and Response</strong></h3>
+<ul>
+<li>Configure appropriate alerting thresholds and escalation policies</li>
+<li>Implement health check correlation to avoid alert storms</li>
+<li>Design automated responses for common health check failures</li>
+<li>Provide clear guidance for manual intervention when automated response fails</li>
+<li>Implement health check suppression during planned maintenance</li>
+</ul>
+<h3 id="5-integration-and-automation">5. <strong>Integration and Automation</strong></h3>
+<ul>
+<li>Integrate health checks with load balancers and service discovery systems</li>
+<li>Implement health check integration with deployment and rollback automation</li>
+<li>Use health checks for automated scaling decisions and capacity management</li>
+<li>Integrate with monitoring and observability platforms for comprehensive visibility</li>
+<li>Implement health check data retention and historical analysis</li>
+</ul>
+<h3 id="6-security-and-compliance">6. <strong>Security and Compliance</strong></h3>
+<ul>
+<li>Implement appropriate authentication and authorization for health check endpoints</li>
+<li>Avoid exposing sensitive information in health check responses</li>
+<li>Implement audit trails for health check access and modifications</li>
+<li>Ensure compliance with security policies for health check data handling</li>
+<li>Design health checks to detect security-related issues when appropriate</li>
+</ul>
+<p>Health Checks are essential for maintaining system reliability, enabling proactive issue detection, and supporting automated operational procedures in complex distributed enterprise integration architectures, providing the foundation for operational excellence and service reliability.</p>
+
+      <a href="../index.html" class="back-to-top">← Back to All Patterns</a>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <p>©2026 <a href="https://dataintegrationmastery.com/">Data Integration Mastery™</a> — All Rights Reserved</p>
+  </footer>
+</body>
+</html>

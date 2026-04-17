@@ -1,0 +1,1530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Correlation ID Pattern — Integration Architecture Patterns | Data Integration Mastery™</title>
+  <meta name="description" content="The Correlation ID pattern provides a distributed tracing mechanism that enables tracking of requests, messages, and transactions across multiple systems and...">
+  <meta name="keywords" content="correlation id pattern, integration pattern, messaging patterns, integration architecture, EAI patterns, data integration">
+  <link rel="canonical" href="https://dataintegrationmastery.com/patterns/messaging-patterns/correlation-id.html">
+
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://dataintegrationmastery.com/patterns/messaging-patterns/correlation-id.html">
+  <meta property="og:title" content="Correlation ID Pattern — Integration Architecture Patterns">
+  <meta property="og:description" content="The Correlation ID pattern provides a distributed tracing mechanism that enables tracking of requests, messages, and transactions across multiple systems and...">
+  <meta property="og:image" content="https://dataintegrationmastery.com/assets/images/logo.png">
+  <meta property="og:site_name" content="Data Integration Mastery">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Correlation ID Pattern — Integration Architecture Patterns">
+  <meta name="twitter:description" content="The Correlation ID pattern provides a distributed tracing mechanism that enables tracking of requests, messages, and transactions across multiple systems and...">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/docs.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Correlation ID Pattern",
+    "description": "The Correlation ID pattern provides a distributed tracing mechanism that enables tracking of requests, messages, and transactions across multiple systems and...",
+    "url": "https://dataintegrationmastery.com/patterns/messaging-patterns/correlation-id.html",
+    "author": {
+      "@type": "Person",
+      "name": "Ari Vilkman",
+      "jobTitle": "Integration Architect"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Data Integration Mastery",
+      "url": "https://dataintegrationmastery.com"
+    },
+    "isPartOf": {
+      "@type": "CollectionPage",
+      "name": "Integration Architecture Patterns",
+      "url": "https://dataintegrationmastery.com/patterns/"
+    },
+    "about": {
+      "@type": "Thing",
+      "name": "Correlation ID Pattern"
+    },
+    "inLanguage": "en",
+    "isAccessibleForFree": true
+  }
+  </script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="https://dataintegrationmastery.com/" class="header-brand">
+        <img src="../../assets/images/dim-icon.png" alt="DIM" width="36" height="36">
+        <span class="header-title">Data Integration Mastery™</span>
+      </a>
+      <nav class="header-nav" aria-label="Main navigation">
+        <a href="https://dataintegrationmastery.com/">Home</a>
+        <a href="../index.html">All Patterns</a>
+        <a href="https://dataintegrationmastery.com/#free-course">Free Course</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="docs-layout">
+    <aside class="docs-sidebar" aria-label="Pattern categories">
+      <div class="sidebar-title">Pattern Categories</div>
+<div class="sidebar-section">
+  <a href="../index.html#resilience" class="sidebar-section-title">🛡️ Resilience Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../resilience-patterns/circuit-breaker.html">Circuit Breaker</a></li>
+    <li><a href="../resilience-patterns/retry-mechanism.html">Retry Mechanism</a></li>
+    <li><a href="../resilience-patterns/timeout.html">Timeout</a></li>
+    <li><a href="../resilience-patterns/dead-letter-queue.html">Dead Letter Queue</a></li>
+    <li><a href="../resilience-patterns/bulkhead.html">Bulkhead</a></li>
+    <li><a href="../resilience-patterns/fallback-graceful-degradation.html">Fallback / Graceful Degradation</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#messaging" class="sidebar-section-title">📨 Messaging Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="request-reply.html">Request-Reply</a></li>
+    <li><a href="publish-subscribe.html">Publish-Subscribe</a></li>
+    <li><a href="message-queue.html">Message Queue</a></li>
+    <li><a href="event-streaming.html">Event Streaming</a></li>
+    <li><a href="correlation-id.html" class="active">Correlation ID</a></li>
+    <li><a href="message-routing.html">Message Routing</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#data-transformation" class="sidebar-section-title">🔄 Data Transformation Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../data-transformation-patterns/message-translator.html">Message Translator</a></li>
+    <li><a href="../data-transformation-patterns/content-filter.html">Content Filter</a></li>
+    <li><a href="../data-transformation-patterns/message-router.html">Message Router</a></li>
+    <li><a href="../data-transformation-patterns/aggregator.html">Aggregator</a></li>
+    <li><a href="../data-transformation-patterns/splitter.html">Splitter</a></li>
+    <li><a href="../data-transformation-patterns/data-mapper.html">Data Mapper</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#routing" class="sidebar-section-title">🔀 Routing Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../routing-patterns/content-based-router.html">Content-Based Router</a></li>
+    <li><a href="../routing-patterns/recipient-list.html">Recipient List</a></li>
+    <li><a href="../routing-patterns/load-balancer.html">Load Balancer</a></li>
+    <li><a href="../routing-patterns/message-filter.html">Message Filter</a></li>
+    <li><a href="../routing-patterns/dynamic-router.html">Dynamic Router</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#security" class="sidebar-section-title">🔐 Security Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../security-patterns/authentication.html">Authentication</a></li>
+    <li><a href="../security-patterns/authorization.html">Authorization</a></li>
+    <li><a href="../security-patterns/encryption.html">Encryption</a></li>
+    <li><a href="../security-patterns/token-management.html">Token Management</a></li>
+    <li><a href="../security-patterns/api-security.html">API Security</a></li>
+    <li><a href="../security-patterns/secret-management.html">Secret Management</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#orchestration" class="sidebar-section-title">🎭 Orchestration Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../orchestration-patterns/saga-pattern.html">Saga Pattern</a></li>
+    <li><a href="../orchestration-patterns/process-manager.html">Process Manager</a></li>
+    <li><a href="../orchestration-patterns/workflow-engine.html">Workflow Engine</a></li>
+    <li><a href="../orchestration-patterns/choreography.html">Choreography</a></li>
+    <li><a href="../orchestration-patterns/compensation-transactions.html">Compensation Transactions</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#observability" class="sidebar-section-title">📊 Monitoring & Observability Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../monitoring-observability-patterns/distributed-tracing.html">Distributed Tracing</a></li>
+    <li><a href="../monitoring-observability-patterns/metrics-collection.html">Metrics Collection</a></li>
+    <li><a href="../monitoring-observability-patterns/health-checks.html">Health Checks</a></li>
+    <li><a href="../monitoring-observability-patterns/logging-strategies.html">Logging Strategies</a></li>
+    <li><a href="../monitoring-observability-patterns/performance-monitoring.html">Performance Monitoring</a></li>
+    <li><a href="../monitoring-observability-patterns/error-tracking.html">Error Tracking</a></li>
+  </ul>
+</div>
+
+    </aside>
+
+    <main id="main-content" class="docs-content">
+      <div class="breadcrumb">
+        <a href="https://dataintegrationmastery.com/">Home</a>
+        <span class="sep">›</span>
+        <a href="../index.html">Patterns</a>
+        <span class="sep">›</span>
+        <a href="../index.html#messaging">Messaging Patterns</a>
+        <span class="sep">›</span>
+        <strong>Correlation ID Pattern</strong>
+      </div>
+
+      <h1>Correlation ID Pattern</h1>
+
+      <h2 id="overview">Overview</h2>
+<p>The Correlation ID pattern provides a <strong>distributed tracing mechanism</strong> that enables tracking of requests, messages, and transactions across multiple systems and services boundaries. It implements a unique identifier that flows with each request through the entire processing pipeline, enabling comprehensive monitoring, debugging, and audit capabilities in distributed architectures. This pattern is essential for maintaining observability in complex, multi-service environments.</p>
+<h3 id="theoretical-foundation">Theoretical Foundation</h3>
+<p>The Correlation ID pattern is grounded in <strong>distributed systems observability theory</strong> and <strong>causal ordering principles</strong>. It implements the concept of <strong>"request correlation"</strong> where related operations are linked through a shared identifier that maintains <strong>causal relationships</strong> across service boundaries. The pattern embodies <strong>"end-to-end traceability"</strong> enabling comprehensive understanding of distributed transaction flows.</p>
+<h3 id="core-principles">Core Principles</h3>
+<h4 id="1-request-flow-traceability">1. <strong>Request Flow Traceability</strong></h4>
+<p>Every request entering the system receives a unique correlation identifier that accompanies all related processing activities, enabling complete visibility into distributed transaction execution.</p>
+<h4 id="2-service-boundary-preservation">2. <strong>Service Boundary Preservation</strong></h4>
+<p>Correlation IDs are propagated across all service boundaries, maintaining the logical connection between related operations regardless of the underlying communication mechanisms or technology stacks.</p>
+<h4 id="3-hierarchical-context-tracking">3. <strong>Hierarchical Context Tracking</strong></h4>
+<p>The pattern supports hierarchical correlation where parent-child relationships between operations are maintained, enabling detailed understanding of complex processing workflows.</p>
+<h4 id="4-non-intrusive-implementation">4. <strong>Non-Intrusive Implementation</strong></h4>
+<p>Correlation IDs are implemented as metadata that doesn't interfere with business logic while providing comprehensive tracing capabilities across the entire system.</p>
+<h3 id="why-correlation-id-is-essential-in-integration-architecture">Why Correlation ID is Essential in Integration Architecture</h3>
+<h4 id="1-distributed-debugging-and-troubleshooting">1. <strong>Distributed Debugging and Troubleshooting</strong></h4>
+<p>Modern distributed systems require effective debugging capabilities:
+- <strong>Cross-service error tracking</strong> enabling identification of failure points in complex workflows
+- <strong>Performance bottleneck identification</strong> across multiple service calls
+- <strong>Request flow reconstruction</strong> for understanding system behavior
+- <strong>Root cause analysis</strong> in multi-tier architectures</p>
+<h4 id="2-operational-excellence">2. <strong>Operational Excellence</strong></h4>
+<p>Correlation IDs enable superior operational capabilities:
+- <strong>End-to-end monitoring</strong> providing complete visibility into system operations
+- <strong>Service dependency analysis</strong> through request flow tracking
+- <strong>Capacity planning</strong> based on actual request patterns and service utilization
+- <strong>SLA compliance monitoring</strong> with detailed performance tracking</p>
+<h4 id="3-business-process-visibility">3. <strong>Business Process Visibility</strong></h4>
+<p>Understanding business operations across distributed systems:
+- <strong>Business transaction tracking</strong> from initiation to completion
+- <strong>Audit trail maintenance</strong> for compliance and governance requirements
+- <strong>Customer journey analysis</strong> across multiple touchpoints
+- <strong>Process optimization</strong> based on actual execution patterns</p>
+<h4 id="4-development-and-testing-support">4. <strong>Development and Testing Support</strong></h4>
+<p>Enhanced development and testing capabilities:
+- <strong>Integration testing</strong> with comprehensive request tracking
+- <strong>Performance testing</strong> with detailed metrics correlation
+- <strong>System integration validation</strong> ensuring correct cross-service communication
+- <strong>Debugging support</strong> in development and staging environments</p>
+<h3 id="benefits-in-integration-contexts">Benefits in Integration Contexts</h3>
+<h4 id="1-enhanced-observability">1. <strong>Enhanced Observability</strong></h4>
+<ul>
+<li><strong>Comprehensive request tracking</strong> across all system components</li>
+<li><strong>Service interaction visibility</strong> showing actual communication patterns</li>
+<li><strong>Performance correlation</strong> linking metrics across related operations</li>
+<li><strong>Error propagation tracking</strong> showing failure paths through the system</li>
+</ul>
+<h4 id="2-improved-development-productivity">2. <strong>Improved Development Productivity</strong></h4>
+<ul>
+<li><strong>Simplified debugging</strong> with clear request flow visualization</li>
+<li><strong>Faster issue resolution</strong> through detailed transaction tracing</li>
+<li><strong>Better system understanding</strong> enabling more effective development</li>
+<li><strong>Quality assurance</strong> through comprehensive testing support</li>
+</ul>
+<h4 id="3-operational-efficiency">3. <strong>Operational Efficiency</strong></h4>
+<ul>
+<li><strong>Proactive monitoring</strong> with early problem detection</li>
+<li><strong>Reduced mean time to resolution (MTTR)</strong> through better diagnostics</li>
+<li><strong>Capacity optimization</strong> based on actual usage patterns</li>
+<li><strong>Service level management</strong> with detailed performance tracking</li>
+</ul>
+<h4 id="4-compliance-and-governance">4. <strong>Compliance and Governance</strong></h4>
+<ul>
+<li><strong>Audit trail completeness</strong> for regulatory compliance</li>
+<li><strong>Data lineage tracking</strong> showing information flow paths</li>
+<li><strong>Access pattern monitoring</strong> for security analysis</li>
+<li><strong>Regulatory reporting</strong> with detailed transaction histories</li>
+</ul>
+<h3 id="integration-architecture-applications">Integration Architecture Applications</h3>
+<h4 id="1-microservices-request-tracing">1. <strong>Microservices Request Tracing</strong></h4>
+<p>Correlation IDs enable comprehensive microservices observability:
+- <strong>Service-to-service call tracking</strong> showing complete request paths
+- <strong>API gateway integration</strong> with automatic correlation ID injection
+- <strong>Service mesh observability</strong> providing detailed traffic analysis
+- <strong>Cross-cutting concern correlation</strong> linking security, logging, and monitoring</p>
+<h4 id="2-enterprise-service-bus-esb-integration">2. <strong>Enterprise Service Bus (ESB) Integration</strong></h4>
+<p>ESB architectures benefit from correlation-based tracking:
+- <strong>Message routing visibility</strong> showing transformation and routing paths
+- <strong>Protocol bridging tracking</strong> across different communication standards
+- <strong>Enterprise application integration</strong> with end-to-end visibility
+- <strong>B2B transaction tracking</strong> across organizational boundaries</p>
+<h4 id="3-event-driven-architecture-correlation">3. <strong>Event-Driven Architecture Correlation</strong></h4>
+<p>Event processing systems use correlation for flow tracking:
+- <strong>Event chain tracking</strong> showing cause-and-effect relationships
+- <strong>Saga pattern implementation</strong> with distributed transaction correlation
+- <strong>Event sourcing support</strong> linking events to originating transactions
+- <strong>Stream processing correlation</strong> maintaining relationships in data pipelines</p>
+<h4 id="4-legacy-system-integration">4. <strong>Legacy System Integration</strong></h4>
+<p>Modern integration with legacy systems requires correlation:
+- <strong>Mainframe transaction tracking</strong> bridging modern and legacy systems
+- <strong>Batch processing correlation</strong> linking real-time and batch operations
+- <strong>System migration support</strong> tracking operations across old and new systems
+- <strong>Hybrid architecture observability</strong> spanning multiple technology generations</p>
+<h2 id="how-correlation-id-pattern-works">How Correlation ID Pattern Works</h2>
+<p>The Correlation ID pattern operates through identifier propagation across all system boundaries and processing stages:</p>
+<h3 id="basic-correlation-flow">Basic Correlation Flow</h3>
+<pre><code>Client Request ──┐
+                 │ [Generate/Extract Correlation ID]
+                 ▼
+┌─────────────────────────────────────────────────────────┐
+│ Service A (ID: CORR-123)                               │
+│ ├── Log: &quot;Processing request CORR-123&quot;                 │
+│ ├── Call Service B ──────────────┐                     │
+│ └── Log: &quot;Completed request CORR-123&quot;                  │
+└─────────────────────────────────────────────────────────┘
+                                   │
+                                   ▼
+┌─────────────────────────────────────────────────────────┐
+│ Service B (ID: CORR-123)                               │
+│ ├── Log: &quot;Received request CORR-123 from Service A&quot;    │
+│ ├── Database Query ──────────────┐                     │
+│ ├── Call Service C ──────────────┼─────────────┐       │
+│ └── Log: &quot;Response sent for CORR-123&quot;                  │
+└─────────────────────────────────────────────────────────┘
+                                   │             │
+                                   ▼             ▼
+┌─────────────────────────────────┐ ┌─────────────────────────────────┐
+│ Database (ID: CORR-123)         │ │ Service C (ID: CORR-123)        │
+│ └── Log: &quot;Query for CORR-123&quot;   │ │ ├── Log: &quot;Processing CORR-123&quot;  │
+└─────────────────────────────────┘ │ └── Log: &quot;Completed CORR-123&quot;   │
+                                    └─────────────────────────────────┘
+</code></pre>
+<h3 id="correlation-id-lifecycle">Correlation ID Lifecycle</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────┐
+│                Correlation ID Lifecycle                     │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│ 1. [Request Initiated] ──▶ 2. [ID Generated/Extracted] ──▶  │
+│                                      │                     │
+│                                      ▼                     │
+│ 8. [Request Completed] ◀── 7. [Response Aggregated] ◀──    │
+│                                      │                     │
+│                                      ▼                     │
+│                           3. [Context Propagation] ──▶     │
+│                                      │                     │
+│                                      ▼                     │
+│                           4. [Service Processing] ──▶      │
+│                                      │                     │
+│                                      ▼                     │
+│                           5. [Cross-Service Calls] ──▶     │
+│                                      │                     │
+│                                      ▼                     │
+│                           6. [Distributed Logging]         │
+│                                                             │
+│ Context Preservation Features:                              │
+│ • Thread-local storage                                      │
+│ • HTTP header propagation                                   │
+│ • Message header inclusion                                  │
+│ • MDC (Mapped Diagnostic Context) integration               │
+└─────────────────────────────────────────────────────────────┘
+</code></pre>
+<h3 id="hierarchical-correlation-structure">Hierarchical Correlation Structure</h3>
+<pre><code>Root Request: CORR-ROOT-123
+├── Service A: CORR-ROOT-123.A.001
+│   ├── Database Query: CORR-ROOT-123.A.001.DB.001
+│   └── Cache Lookup: CORR-ROOT-123.A.001.CACHE.001
+├── Service B: CORR-ROOT-123.B.001
+│   ├── External API: CORR-ROOT-123.B.001.EXT.001
+│   └── Message Queue: CORR-ROOT-123.B.001.MQ.001
+└── Service C: CORR-ROOT-123.C.001
+    ├── Async Processing: CORR-ROOT-123.C.001.ASYNC.001
+    └── Notification: CORR-ROOT-123.C.001.NOTIF.001
+</code></pre>
+<h2 id="key-components">Key Components</h2>
+<h3 id="1-correlation-context-manager">1. Correlation Context Manager</h3>
+<p>Manages correlation ID lifecycle and propagation:</p>
+<pre><code class="language-java">@Component
+public class CorrelationContextManager {
+    private final ThreadLocal&lt;CorrelationContext&gt; contextHolder = new ThreadLocal&lt;&gt;();
+    private final CorrelationIdGenerator idGenerator;
+    private final ContextPropagationStrategy propagationStrategy;
+
+    public CorrelationContext initializeContext(String correlationId) {
+        if (correlationId == null || correlationId.trim().isEmpty()) {
+            correlationId = idGenerator.generate();
+        }
+
+        CorrelationContext context = CorrelationContext.builder()
+            .correlationId(correlationId)
+            .rootId(extractRootId(correlationId))
+            .parentId(extractParentId(correlationId))
+            .initiatedAt(Instant.now())
+            .threadId(Thread.currentThread().getId())
+            .threadName(Thread.currentThread().getName())
+            .build();
+
+        setContext(context);
+        updateMDC(context);
+
+        return context;
+    }
+
+    public CorrelationContext createChildContext(String operation) {
+        CorrelationContext parentContext = getContext();
+        if (parentContext == null) {
+            throw new IllegalStateException(&quot;No parent correlation context found&quot;);
+        }
+
+        String childId = idGenerator.generateChild(parentContext.getCorrelationId(), operation);
+
+        CorrelationContext childContext = CorrelationContext.builder()
+            .correlationId(childId)
+            .rootId(parentContext.getRootId())
+            .parentId(parentContext.getCorrelationId())
+            .operation(operation)
+            .initiatedAt(Instant.now())
+            .threadId(Thread.currentThread().getId())
+            .threadName(Thread.currentThread().getName())
+            .build();
+
+        setContext(childContext);
+        updateMDC(childContext);
+
+        return childContext;
+    }
+
+    public CorrelationContext getContext() {
+        return contextHolder.get();
+    }
+
+    public void setContext(CorrelationContext context) {
+        contextHolder.set(context);
+    }
+
+    public void clearContext() {
+        contextHolder.remove();
+        MDC.clear();
+    }
+
+    public String getCurrentCorrelationId() {
+        CorrelationContext context = getContext();
+        return context != null ? context.getCorrelationId() : null;
+    }
+
+    public void propagateToHeaders(Map&lt;String, String&gt; headers) {
+        CorrelationContext context = getContext();
+        if (context != null) {
+            propagationStrategy.addToHeaders(context, headers);
+        }
+    }
+
+    public void propagateToMessage(MessageProperties messageProperties) {
+        CorrelationContext context = getContext();
+        if (context != null) {
+            propagationStrategy.addToMessage(context, messageProperties);
+        }
+    }
+
+    public CorrelationContext extractFromHeaders(Map&lt;String, String&gt; headers) {
+        return propagationStrategy.extractFromHeaders(headers);
+    }
+
+    public CorrelationContext extractFromMessage(MessageProperties messageProperties) {
+        return propagationStrategy.extractFromMessage(messageProperties);
+    }
+
+    private void updateMDC(CorrelationContext context) {
+        MDC.put(&quot;correlationId&quot;, context.getCorrelationId());
+        MDC.put(&quot;rootId&quot;, context.getRootId());
+
+        if (context.getParentId() != null) {
+            MDC.put(&quot;parentId&quot;, context.getParentId());
+        }
+
+        if (context.getOperation() != null) {
+            MDC.put(&quot;operation&quot;, context.getOperation());
+        }
+    }
+
+    private String extractRootId(String correlationId) {
+        // Extract root ID from hierarchical correlation ID
+        if (correlationId.contains(&quot;.&quot;)) {
+            return correlationId.split(&quot;\\.&quot;)[0];
+        }
+        return correlationId;
+    }
+
+    private String extractParentId(String correlationId) {
+        // Extract parent ID from hierarchical correlation ID
+        if (correlationId.contains(&quot;.&quot;)) {
+            int lastDotIndex = correlationId.lastIndexOf(&quot;.&quot;);
+            if (lastDotIndex &gt; 0) {
+                return correlationId.substring(0, lastDotIndex);
+            }
+        }
+        return null;
+    }
+}
+</code></pre>
+<h3 id="2-correlation-id-generator">2. Correlation ID Generator</h3>
+<p>Generates unique correlation identifiers:</p>
+<pre><code class="language-java">@Component
+public class CorrelationIdGenerator {
+    private final String instanceId;
+    private final AtomicLong sequenceNumber = new AtomicLong(0);
+    private final Clock clock;
+
+    public CorrelationIdGenerator() {
+        this.instanceId = generateInstanceId();
+        this.clock = Clock.systemUTC();
+    }
+
+    public String generate() {
+        return generate(CorrelationIdFormat.HIERARCHICAL);
+    }
+
+    public String generate(CorrelationIdFormat format) {
+        switch (format) {
+            case UUID:
+                return generateUUID();
+            case TIMESTAMP_BASED:
+                return generateTimestampBased();
+            case HIERARCHICAL:
+                return generateHierarchical();
+            default:
+                return generateDefault();
+        }
+    }
+
+    public String generateChild(String parentId, String operation) {
+        long childSequence = sequenceNumber.incrementAndGet();
+        return String.format(&quot;%s.%s.%03d&quot;, parentId, sanitizeOperation(operation), childSequence);
+    }
+
+    public String generateSpanId(String correlationId) {
+        return String.format(&quot;%s.SPAN.%d&quot;, correlationId, System.nanoTime());
+    }
+
+    private String generateUUID() {
+        return UUID.randomUUID().toString();
+    }
+
+    private String generateTimestampBased() {
+        long timestamp = clock.millis();
+        long sequence = sequenceNumber.incrementAndGet();
+        return String.format(&quot;%s-%d-%06d&quot;, instanceId, timestamp, sequence);
+    }
+
+    private String generateHierarchical() {
+        long timestamp = clock.millis();
+        long sequence = sequenceNumber.incrementAndGet();
+        return String.format(&quot;CORR-%s-%d-%06d&quot;, instanceId, timestamp, sequence);
+    }
+
+    private String generateDefault() {
+        return generateHierarchical();
+    }
+
+    private String generateInstanceId() {
+        try {
+            String hostName = InetAddress.getLocalHost().getHostName();
+            return hostName.substring(0, Math.min(hostName.length(), 8)).toUpperCase();
+        } catch (UnknownHostException e) {
+            return &quot;UNKNOWN&quot; + ThreadLocalRandom.current().nextInt(1000, 9999);
+        }
+    }
+
+    private String sanitizeOperation(String operation) {
+        if (operation == null || operation.trim().isEmpty()) {
+            return &quot;OP&quot;;
+        }
+
+        return operation.replaceAll(&quot;[^A-Za-z0-9]&quot;, &quot;&quot;)
+                       .substring(0, Math.min(operation.length(), 10))
+                       .toUpperCase();
+    }
+
+    public boolean isValidCorrelationId(String correlationId) {
+        if (correlationId == null || correlationId.trim().isEmpty()) {
+            return false;
+        }
+
+        // Validate format and length constraints
+        if (correlationId.length() &gt; 255) {
+            return false;
+        }
+
+        // Check for security concerns
+        if (containsSecurityRisk(correlationId)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private boolean containsSecurityRisk(String correlationId) {
+        // Check for injection patterns, scripts, etc.
+        String lowerCase = correlationId.toLowerCase();
+        return lowerCase.contains(&quot;&lt;script&gt;&quot;) ||
+               lowerCase.contains(&quot;javascript:&quot;) ||
+               lowerCase.contains(&quot;sql&quot;) ||
+               lowerCase.contains(&quot;union&quot;) ||
+               lowerCase.contains(&quot;select&quot;) ||
+               lowerCase.contains(&quot;insert&quot;) ||
+               lowerCase.contains(&quot;update&quot;) ||
+               lowerCase.contains(&quot;delete&quot;);
+    }
+
+    public enum CorrelationIdFormat {
+        UUID, TIMESTAMP_BASED, HIERARCHICAL
+    }
+}
+</code></pre>
+<h3 id="3-context-propagation-strategy">3. Context Propagation Strategy</h3>
+<p>Handles correlation context propagation across different communication channels:</p>
+<pre><code class="language-java">@Component
+public class ContextPropagationStrategy {
+
+    public static final String CORRELATION_ID_HEADER = &quot;X-Correlation-ID&quot;;
+    public static final String ROOT_ID_HEADER = &quot;X-Root-ID&quot;;
+    public static final String PARENT_ID_HEADER = &quot;X-Parent-ID&quot;;
+    public static final String TRACE_ID_HEADER = &quot;X-Trace-ID&quot;;
+    public static final String SPAN_ID_HEADER = &quot;X-Span-ID&quot;;
+
+    public void addToHeaders(CorrelationContext context, Map&lt;String, String&gt; headers) {
+        headers.put(CORRELATION_ID_HEADER, context.getCorrelationId());
+        headers.put(ROOT_ID_HEADER, context.getRootId());
+
+        if (context.getParentId() != null) {
+            headers.put(PARENT_ID_HEADER, context.getParentId());
+        }
+
+        if (context.getTraceId() != null) {
+            headers.put(TRACE_ID_HEADER, context.getTraceId());
+        }
+
+        if (context.getSpanId() != null) {
+            headers.put(SPAN_ID_HEADER, context.getSpanId());
+        }
+    }
+
+    public void addToHttpHeaders(CorrelationContext context, HttpHeaders httpHeaders) {
+        httpHeaders.set(CORRELATION_ID_HEADER, context.getCorrelationId());
+        httpHeaders.set(ROOT_ID_HEADER, context.getRootId());
+
+        if (context.getParentId() != null) {
+            httpHeaders.set(PARENT_ID_HEADER, context.getParentId());
+        }
+    }
+
+    public void addToMessage(CorrelationContext context, MessageProperties messageProperties) {
+        messageProperties.setHeader(CORRELATION_ID_HEADER, context.getCorrelationId());
+        messageProperties.setHeader(ROOT_ID_HEADER, context.getRootId());
+
+        if (context.getParentId() != null) {
+            messageProperties.setHeader(PARENT_ID_HEADER, context.getParentId());
+        }
+
+        // Set standard message correlation ID
+        messageProperties.setCorrelationId(context.getCorrelationId());
+    }
+
+    public CorrelationContext extractFromHeaders(Map&lt;String, String&gt; headers) {
+        String correlationId = headers.get(CORRELATION_ID_HEADER);
+        if (correlationId == null || correlationId.trim().isEmpty()) {
+            return null;
+        }
+
+        return CorrelationContext.builder()
+            .correlationId(correlationId)
+            .rootId(headers.getOrDefault(ROOT_ID_HEADER, correlationId))
+            .parentId(headers.get(PARENT_ID_HEADER))
+            .traceId(headers.get(TRACE_ID_HEADER))
+            .spanId(headers.get(SPAN_ID_HEADER))
+            .extractedAt(Instant.now())
+            .build();
+    }
+
+    public CorrelationContext extractFromHttpHeaders(HttpHeaders httpHeaders) {
+        String correlationId = httpHeaders.getFirst(CORRELATION_ID_HEADER);
+        if (correlationId == null || correlationId.trim().isEmpty()) {
+            return null;
+        }
+
+        return CorrelationContext.builder()
+            .correlationId(correlationId)
+            .rootId(httpHeaders.getFirst(ROOT_ID_HEADER))
+            .parentId(httpHeaders.getFirst(PARENT_ID_HEADER))
+            .extractedAt(Instant.now())
+            .build();
+    }
+
+    public CorrelationContext extractFromMessage(MessageProperties messageProperties) {
+        String correlationId = (String) messageProperties.getHeaders().get(CORRELATION_ID_HEADER);
+
+        // Fallback to standard message correlation ID
+        if (correlationId == null) {
+            correlationId = messageProperties.getCorrelationId();
+        }
+
+        if (correlationId == null || correlationId.trim().isEmpty()) {
+            return null;
+        }
+
+        return CorrelationContext.builder()
+            .correlationId(correlationId)
+            .rootId((String) messageProperties.getHeaders().get(ROOT_ID_HEADER))
+            .parentId((String) messageProperties.getHeaders().get(PARENT_ID_HEADER))
+            .extractedAt(Instant.now())
+            .build();
+    }
+
+    public void propagateToRestTemplate(CorrelationContext context, RestTemplate restTemplate) {
+        restTemplate.setInterceptors(Arrays.asList(
+            new CorrelationIdInterceptor(context)
+        ));
+    }
+
+    public void propagateToWebClient(CorrelationContext context, WebClient.Builder webClientBuilder) {
+        webClientBuilder.filter(new CorrelationIdWebClientFilter(context));
+    }
+
+    // HTTP Client Interceptor
+    public static class CorrelationIdInterceptor implements ClientHttpRequestInterceptor {
+        private final CorrelationContext context;
+
+        public CorrelationIdInterceptor(CorrelationContext context) {
+            this.context = context;
+        }
+
+        @Override
+        public ClientHttpResponse intercept(
+                HttpRequest request,
+                byte[] body,
+                ClientHttpRequestExecution execution) throws IOException {
+
+            HttpHeaders headers = request.getHeaders();
+            headers.set(CORRELATION_ID_HEADER, context.getCorrelationId());
+            headers.set(ROOT_ID_HEADER, context.getRootId());
+
+            if (context.getParentId() != null) {
+                headers.set(PARENT_ID_HEADER, context.getParentId());
+            }
+
+            return execution.execute(request, body);
+        }
+    }
+
+    // WebClient Filter
+    public static class CorrelationIdWebClientFilter implements ExchangeFilterFunction {
+        private final CorrelationContext context;
+
+        public CorrelationIdWebClientFilter(CorrelationContext context) {
+            this.context = context;
+        }
+
+        @Override
+        public Mono&lt;ClientResponse&gt; filter(ClientRequest request, ExchangeFunction next) {
+            ClientRequest modifiedRequest = ClientRequest.from(request)
+                .header(CORRELATION_ID_HEADER, context.getCorrelationId())
+                .header(ROOT_ID_HEADER, context.getRootId())
+                .header(PARENT_ID_HEADER, context.getParentId())
+                .build();
+
+            return next.exchange(modifiedRequest);
+        }
+    }
+}
+</code></pre>
+<h3 id="4-correlation-interceptors-and-filters">4. Correlation Interceptors and Filters</h3>
+<p>Automatic correlation handling for different frameworks:</p>
+<pre><code class="language-java">// Spring MVC Interceptor
+@Component
+public class CorrelationIdHandlerInterceptor implements HandlerInterceptor {
+    private final CorrelationContextManager contextManager;
+    private final ContextPropagationStrategy propagationStrategy;
+
+    @Override
+    public boolean preHandle(HttpServletRequest request, 
+                           HttpServletResponse response, 
+                           Object handler) throws Exception {
+
+        // Extract correlation context from request headers
+        Map&lt;String, String&gt; headers = extractHeaders(request);
+        CorrelationContext context = propagationStrategy.extractFromHeaders(headers);
+
+        if (context == null) {
+            // Generate new correlation ID for new requests
+            context = contextManager.initializeContext(null);
+        } else {
+            // Use existing correlation context
+            contextManager.setContext(context);
+        }
+
+        // Add correlation ID to response headers for debugging
+        response.setHeader(ContextPropagationStrategy.CORRELATION_ID_HEADER, 
+                          context.getCorrelationId());
+
+        return true;
+    }
+
+    @Override
+    public void afterCompletion(HttpServletRequest request, 
+                              HttpServletResponse response, 
+                              Object handler, 
+                              Exception ex) throws Exception {
+        contextManager.clearContext();
+    }
+
+    private Map&lt;String, String&gt; extractHeaders(HttpServletRequest request) {
+        Map&lt;String, String&gt; headers = new HashMap&lt;&gt;();
+
+        Enumeration&lt;String&gt; headerNames = request.getHeaderNames();
+        while (headerNames.hasMoreElements()) {
+            String headerName = headerNames.nextElement();
+            String headerValue = request.getHeader(headerName);
+            headers.put(headerName, headerValue);
+        }
+
+        return headers;
+    }
+}
+
+// Message Listener Aspect for Automatic Correlation Handling
+@Aspect
+@Component
+public class MessageCorrelationAspect {
+    private final CorrelationContextManager contextManager;
+    private final ContextPropagationStrategy propagationStrategy;
+
+    @Around(&quot;@annotation(org.springframework.jms.annotation.JmsListener) || &quot; +
+            &quot;@annotation(org.springframework.kafka.annotation.KafkaListener) || &quot; +
+            &quot;@annotation(org.springframework.amqp.rabbit.annotation.RabbitListener)&quot;)
+    public Object handleMessageCorrelation(ProceedingJoinPoint joinPoint) throws Throwable {
+
+        // Extract correlation context from message
+        CorrelationContext context = extractCorrelationFromMessage(joinPoint);
+
+        if (context == null) {
+            context = contextManager.initializeContext(null);
+        } else {
+            contextManager.setContext(context);
+        }
+
+        try {
+            return joinPoint.proceed();
+        } finally {
+            contextManager.clearContext();
+        }
+    }
+
+    private CorrelationContext extractCorrelationFromMessage(ProceedingJoinPoint joinPoint) {
+        for (Object arg : joinPoint.getArgs()) {
+            if (arg instanceof Message) {
+                Message&lt;?&gt; message = (Message&lt;?&gt;) arg;
+                MessageHeaders headers = message.getHeaders();
+
+                String correlationId = (String) headers.get(ContextPropagationStrategy.CORRELATION_ID_HEADER);
+                if (correlationId != null) {
+                    return CorrelationContext.builder()
+                        .correlationId(correlationId)
+                        .rootId((String) headers.get(ContextPropagationStrategy.ROOT_ID_HEADER))
+                        .parentId((String) headers.get(ContextPropagationStrategy.PARENT_ID_HEADER))
+                        .extractedAt(Instant.now())
+                        .build();
+                }
+            }
+        }
+
+        return null;
+    }
+}
+
+// Servlet Filter for Web Applications
+@Component
+@Order(Ordered.HIGHEST_PRECEDENCE)
+public class CorrelationIdFilter implements Filter {
+    private final CorrelationContextManager contextManager;
+    private final ContextPropagationStrategy propagationStrategy;
+
+    @Override
+    public void doFilter(ServletRequest request, 
+                        ServletResponse response, 
+                        FilterChain chain) throws IOException, ServletException {
+
+        if (request instanceof HttpServletRequest &amp;&amp; response instanceof HttpServletResponse) {
+            HttpServletRequest httpRequest = (HttpServletRequest) request;
+            HttpServletResponse httpResponse = (HttpServletResponse) response;
+
+            // Extract or generate correlation ID
+            String correlationId = httpRequest.getHeader(ContextPropagationStrategy.CORRELATION_ID_HEADER);
+            CorrelationContext context = contextManager.initializeContext(correlationId);
+
+            // Add to response headers
+            httpResponse.setHeader(ContextPropagationStrategy.CORRELATION_ID_HEADER, 
+                                 context.getCorrelationId());
+
+            try {
+                chain.doFilter(request, response);
+            } finally {
+                contextManager.clearContext();
+            }
+        } else {
+            chain.doFilter(request, response);
+        }
+    }
+}
+</code></pre>
+<h2 id="configuration-parameters">Configuration Parameters</h2>
+<h3 id="essential-settings">Essential Settings</h3>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Typical Values</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>ID Format</strong></td>
+<td>Format for correlation ID generation</td>
+<td>UUID/Timestamp/Hierarchical</td>
+</tr>
+<tr>
+<td><strong>Header Names</strong></td>
+<td>HTTP header names for correlation</td>
+<td>X-Correlation-ID</td>
+</tr>
+<tr>
+<td><strong>Context Timeout</strong></td>
+<td>Max time to keep context in cache</td>
+<td>1h-24h</td>
+</tr>
+<tr>
+<td><strong>Propagation Mode</strong></td>
+<td>Automatic vs manual propagation</td>
+<td>auto/manual</td>
+</tr>
+<tr>
+<td><strong>Validation Enabled</strong></td>
+<td>Enable correlation ID validation</td>
+<td>true/false</td>
+</tr>
+<tr>
+<td><strong>Hierarchy Depth</strong></td>
+<td>Maximum depth for hierarchical IDs</td>
+<td>5-20</td>
+</tr>
+</tbody>
+</table>
+<h3 id="example-configuration">Example Configuration</h3>
+<pre><code class="language-properties"># Correlation ID Configuration
+correlation.id.format=HIERARCHICAL
+correlation.id.header-name=X-Correlation-ID
+correlation.id.root-header-name=X-Root-ID
+correlation.id.parent-header-name=X-Parent-ID
+
+# Context Management
+correlation.context.timeout=1h
+correlation.context.cleanup-interval=5m
+correlation.context.max-cache-size=10000
+
+# Propagation Settings
+correlation.propagation.auto-http=true
+correlation.propagation.auto-messaging=true
+correlation.propagation.auto-database=false
+
+# Validation
+correlation.validation.enabled=true
+correlation.validation.max-length=255
+correlation.validation.allowed-chars=[A-Za-z0-9._-]
+
+# Logging Integration
+correlation.logging.mdc-enabled=true
+correlation.logging.include-in-response=true
+correlation.logging.trace-requests=true
+</code></pre>
+<h2 id="implementation-examples">Implementation Examples</h2>
+<h3 id="1-spring-boot-rest-api-implementation">1. Spring Boot REST API Implementation</h3>
+<pre><code class="language-java">@RestController
+@RequestMapping(&quot;/api/contacts&quot;)
+public class ContactController {
+    private final ContactService contactService;
+    private final CorrelationContextManager contextManager;
+
+    @PostMapping
+    public ResponseEntity&lt;ContactResponse&gt; createContact(@RequestBody CreateContactRequest request) {
+        String correlationId = contextManager.getCurrentCorrelationId();
+
+        log.info(&quot;Creating contact request received - correlationId: {}&quot;, correlationId);
+
+        ContactResponse response = contactService.createContact(request);
+
+        return ResponseEntity.ok()
+            .header(&quot;X-Correlation-ID&quot;, correlationId)
+            .body(response);
+    }
+
+    @GetMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;ContactResponse&gt; getContact(@PathVariable String id) {
+        String correlationId = contextManager.getCurrentCorrelationId();
+
+        log.info(&quot;Get contact request for ID: {} - correlationId: {}&quot;, id, correlationId);
+
+        ContactResponse response = contactService.getContact(id);
+
+        return ResponseEntity.ok()
+            .header(&quot;X-Correlation-ID&quot;, correlationId)
+            .body(response);
+    }
+}
+
+@Service
+public class ContactService {
+    private final ContactRepository contactRepository;
+    private final UserServiceClient userServiceClient;
+    private final CorrelationContextManager contextManager;
+
+    public ContactResponse createContact(CreateContactRequest request) {
+        String correlationId = contextManager.getCurrentCorrelationId();
+
+        log.info(&quot;Processing contact creation - correlationId: {}&quot;, correlationId);
+
+        // Create child context for database operation
+        CorrelationContext dbContext = contextManager.createChildContext(&quot;DB-SAVE&quot;);
+
+        Contact contact = Contact.builder()
+            .id(UUID.randomUUID().toString())
+            .firstName(request.getFirstName())
+            .lastName(request.getLastName())
+            .email(request.getEmail())
+            .build();
+
+        contact = contactRepository.save(contact);
+
+        log.info(&quot;Contact saved to database - correlationId: {}&quot;, dbContext.getCorrelationId());
+
+        // Create child context for user service call
+        CorrelationContext userServiceContext = contextManager.createChildContext(&quot;USER-SVC&quot;);
+
+        // Call external user service with correlation propagation
+        UserResponse userResponse = userServiceClient.createUser(
+            CreateUserRequest.builder()
+                .contactId(contact.getId())
+                .email(contact.getEmail())
+                .build());
+
+        log.info(&quot;User service called - correlationId: {}&quot;, userServiceContext.getCorrelationId());
+
+        return ContactResponse.builder()
+            .id(contact.getId())
+            .firstName(contact.getFirstName())
+            .lastName(contact.getLastName())
+            .email(contact.getEmail())
+            .userId(userResponse.getUserId())
+            .build();
+    }
+}
+
+@FeignClient(name = &quot;user-service&quot;, configuration = UserServiceClientConfiguration.class)
+public interface UserServiceClient {
+    @PostMapping(&quot;/users&quot;)
+    UserResponse createUser(@RequestBody CreateUserRequest request);
+}
+
+@Configuration
+public class UserServiceClientConfiguration {
+    private final CorrelationContextManager contextManager;
+
+    @Bean
+    public RequestInterceptor correlationIdRequestInterceptor() {
+        return requestTemplate -&gt; {
+            String correlationId = contextManager.getCurrentCorrelationId();
+            if (correlationId != null) {
+                requestTemplate.header(&quot;X-Correlation-ID&quot;, correlationId);
+            }
+        };
+    }
+}
+</code></pre>
+<h3 id="2-message-processing-with-correlation">2. Message Processing with Correlation</h3>
+<pre><code class="language-java">@RabbitListener(queues = &quot;contact.processing&quot;)
+@Component
+public class ContactMessageProcessor {
+    private final ContactService contactService;
+    private final CorrelationContextManager contextManager;
+
+    public void processContactMessage(ContactMessage message,
+                                    @Header Map&lt;String, Object&gt; headers) {
+
+        // Extract correlation ID from message headers
+        String correlationId = (String) headers.get(&quot;X-Correlation-ID&quot;);
+        CorrelationContext context = contextManager.initializeContext(correlationId);
+
+        try {
+            log.info(&quot;Processing contact message - correlationId: {}, messageId: {}&quot;, 
+                     context.getCorrelationId(), message.getMessageId());
+
+            // Process message with correlation context
+            contactService.processContactMessage(message);
+
+            log.info(&quot;Contact message processed successfully - correlationId: {}&quot;, 
+                     context.getCorrelationId());
+
+        } catch (Exception e) {
+            log.error(&quot;Error processing contact message - correlationId: {}, error: {}&quot;, 
+                     context.getCorrelationId(), e.getMessage(), e);
+            throw e;
+        } finally {
+            contextManager.clearContext();
+        }
+    }
+}
+
+@Service
+public class ContactMessagePublisher {
+    private final RabbitTemplate rabbitTemplate;
+    private final CorrelationContextManager contextManager;
+
+    public void publishContactEvent(ContactEvent event) {
+        String correlationId = contextManager.getCurrentCorrelationId();
+
+        rabbitTemplate.convertAndSend(&quot;contact.events&quot;, event, message -&gt; {
+            message.getMessageProperties().setHeader(&quot;X-Correlation-ID&quot;, correlationId);
+            message.getMessageProperties().setCorrelationId(correlationId);
+            return message;
+        });
+
+        log.info(&quot;Contact event published - correlationId: {}, eventType: {}&quot;, 
+                 correlationId, event.getEventType());
+    }
+}
+</code></pre>
+<h3 id="3-database-integration-with-correlation">3. Database Integration with Correlation</h3>
+<pre><code class="language-java">@Repository
+public class ContactRepository {
+    private final JdbcTemplate jdbcTemplate;
+    private final CorrelationContextManager contextManager;
+
+    public Contact save(Contact contact) {
+        String correlationId = contextManager.getCurrentCorrelationId();
+
+        String sql = &quot;&quot;&quot;
+            INSERT INTO contacts (id, first_name, last_name, email, correlation_id, created_at) 
+            VALUES (?, ?, ?, ?, ?, ?)
+            &quot;&quot;&quot;;
+
+        jdbcTemplate.update(sql,
+            contact.getId(),
+            contact.getFirstName(),
+            contact.getLastName(),
+            contact.getEmail(),
+            correlationId,
+            Instant.now());
+
+        log.info(&quot;Contact saved with correlationId: {}&quot;, correlationId);
+
+        return contact;
+    }
+
+    public Optional&lt;Contact&gt; findById(String id) {
+        String correlationId = contextManager.getCurrentCorrelationId();
+
+        String sql = &quot;SELECT * FROM contacts WHERE id = ?&quot;;
+
+        List&lt;Contact&gt; contacts = jdbcTemplate.query(sql, 
+            (rs, rowNum) -&gt; Contact.builder()
+                .id(rs.getString(&quot;id&quot;))
+                .firstName(rs.getString(&quot;first_name&quot;))
+                .lastName(rs.getString(&quot;last_name&quot;))
+                .email(rs.getString(&quot;email&quot;))
+                .build(),
+            id);
+
+        log.info(&quot;Database query executed - correlationId: {}, found: {}&quot;, 
+                 correlationId, !contacts.isEmpty());
+
+        return contacts.stream().findFirst();
+    }
+}
+
+// Custom JPA Interceptor for automatic correlation logging
+@Component
+public class CorrelationJpaInterceptor implements Interceptor {
+    private final CorrelationContextManager contextManager;
+
+    @Override
+    public boolean onLoad(Object entity, Serializable id, Object[] state, String[] propertyNames, Type[] types) {
+        String correlationId = contextManager.getCurrentCorrelationId();
+        log.debug(&quot;JPA Entity loaded - correlationId: {}, entity: {}, id: {}&quot;, 
+                  correlationId, entity.getClass().getSimpleName(), id);
+        return false;
+    }
+
+    @Override
+    public boolean onSave(Object entity, Serializable id, Object[] state, String[] propertyNames, Type[] types) {
+        String correlationId = contextManager.getCurrentCorrelationId();
+        log.debug(&quot;JPA Entity saved - correlationId: {}, entity: {}, id: {}&quot;, 
+                  correlationId, entity.getClass().getSimpleName(), id);
+        return false;
+    }
+}
+</code></pre>
+<h3 id="4-async-processing-with-correlation-propagation">4. Async Processing with Correlation Propagation</h3>
+<pre><code class="language-java">@Service
+public class AsyncContactProcessor {
+    private final ContactAnalyticsService analyticsService;
+    private final NotificationService notificationService;
+    private final CorrelationContextManager contextManager;
+
+    @Async(&quot;taskExecutor&quot;)
+    public CompletableFuture&lt;Void&gt; processContactAsync(String contactId) {
+        // Capture current correlation context
+        CorrelationContext parentContext = contextManager.getContext();
+
+        return CompletableFuture.runAsync(() -&gt; {
+            // Propagate correlation context to async thread
+            CorrelationContext asyncContext = contextManager.createChildContext(&quot;ASYNC-PROC&quot;);
+
+            try {
+                log.info(&quot;Starting async contact processing - correlationId: {}, contactId: {}&quot;, 
+                         asyncContext.getCorrelationId(), contactId);
+
+                // Perform analytics processing
+                analyticsService.processContactAnalytics(contactId);
+
+                // Send notifications
+                notificationService.sendWelcomeNotification(contactId);
+
+                log.info(&quot;Async contact processing completed - correlationId: {}&quot;, 
+                         asyncContext.getCorrelationId());
+
+            } finally {
+                contextManager.clearContext();
+            }
+        });
+    }
+}
+
+@Configuration
+@EnableAsync
+public class AsyncConfiguration {
+
+    @Bean(name = &quot;taskExecutor&quot;)
+    public TaskExecutor taskExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(4);
+        executor.setMaxPoolSize(10);
+        executor.setQueueCapacity(50);
+        executor.setThreadNamePrefix(&quot;async-&quot;);
+
+        // Set custom task decorator for correlation propagation
+        executor.setTaskDecorator(new CorrelationAwareTaskDecorator());
+
+        executor.initialize();
+        return executor;
+    }
+
+    public static class CorrelationAwareTaskDecorator implements TaskDecorator {
+
+        @Override
+        public Runnable decorate(Runnable runnable) {
+            // Capture correlation context from current thread
+            CorrelationContext context = MDC.getCopyOfContextMap();
+
+            return () -&gt; {
+                try {
+                    // Set correlation context in async thread
+                    if (context != null) {
+                        MDC.setContextMap(context);
+                    }
+                    runnable.run();
+                } finally {
+                    MDC.clear();
+                }
+            };
+        }
+    }
+}
+</code></pre>
+<h2 id="best-practices">Best Practices</h2>
+<h3 id="1-correlation-id-generation-and-validation">1. Correlation ID Generation and Validation</h3>
+<pre><code class="language-java">public class CorrelationIdBestPractices {
+
+    // Use structured format for better debugging
+    public class StructuredCorrelationIdGenerator {
+
+        public String generateStructuredId(String service, String operation) {
+            return String.format(&quot;%s-%s-%s-%d&quot;,
+                service.toUpperCase(),
+                operation.toUpperCase(), 
+                UUID.randomUUID().toString().substring(0, 8),
+                System.currentTimeMillis());
+        }
+
+        // Example: CONTACT-CREATE-A1B2C3D4-1640995200000
+        public CorrelationIdParts parseStructuredId(String correlationId) {
+            String[] parts = correlationId.split(&quot;-&quot;);
+            if (parts.length &gt;= 4) {
+                return CorrelationIdParts.builder()
+                    .service(parts[0])
+                    .operation(parts[1])
+                    .uniqueId(parts[2])
+                    .timestamp(Long.parseLong(parts[3]))
+                    .build();
+            }
+            throw new IllegalArgumentException(&quot;Invalid correlation ID format&quot;);
+        }
+    }
+
+    // Implement size and content validation
+    public boolean validateCorrelationId(String correlationId) {
+        if (correlationId == null || correlationId.trim().isEmpty()) {
+            return false;
+        }
+
+        // Check length constraints
+        if (correlationId.length() &gt; 255) {
+            log.warn(&quot;Correlation ID too long: {}&quot;, correlationId.length());
+            return false;
+        }
+
+        // Check for security risks
+        if (containsSecurityRisks(correlationId)) {
+            log.warn(&quot;Security risk detected in correlation ID&quot;);
+            return false;
+        }
+
+        // Check format compliance
+        if (!matchesAllowedPattern(correlationId)) {
+            log.warn(&quot;Correlation ID format violation: {}&quot;, correlationId);
+            return false;
+        }
+
+        return true;
+    }
+
+    private boolean containsSecurityRisks(String correlationId) {
+        return correlationId.contains(&quot;&lt;&quot;) ||
+               correlationId.contains(&quot;&gt;&quot;) ||
+               correlationId.contains(&quot;'&quot;) ||
+               correlationId.contains(&quot;\&quot;&quot;) ||
+               correlationId.contains(&quot;&amp;&quot;) ||
+               correlationId.toLowerCase().contains(&quot;script&quot;);
+    }
+
+    private boolean matchesAllowedPattern(String correlationId) {
+        return correlationId.matches(&quot;^[A-Za-z0-9._-]+$&quot;);
+    }
+}
+</code></pre>
+<h3 id="2-performance-optimization">2. Performance Optimization</h3>
+<pre><code class="language-java">@Component
+public class CorrelationPerformanceOptimization {
+
+    // Use thread-local caching to avoid repeated context creation
+    private final ThreadLocal&lt;CorrelationContextCache&gt; contextCache = 
+        ThreadLocal.withInitial(CorrelationContextCache::new);
+
+    public CorrelationContext getOrCreateContext(String correlationId) {
+        CorrelationContextCache cache = contextCache.get();
+
+        CorrelationContext context = cache.get(correlationId);
+        if (context == null) {
+            context = createNewContext(correlationId);
+            cache.put(correlationId, context);
+        }
+
+        return context;
+    }
+
+    // Optimize MDC operations
+    public void updateMDCEfficiently(CorrelationContext context) {
+        Map&lt;String, String&gt; mdcMap = new HashMap&lt;&gt;();
+        mdcMap.put(&quot;correlationId&quot;, context.getCorrelationId());
+        mdcMap.put(&quot;rootId&quot;, context.getRootId());
+
+        if (context.getParentId() != null) {
+            mdcMap.put(&quot;parentId&quot;, context.getParentId());
+        }
+
+        // Batch update MDC
+        MDC.setContextMap(mdcMap);
+    }
+
+    // Minimize header copying overhead
+    public Map&lt;String, String&gt; extractCorrelationHeaders(HttpHeaders headers) {
+        Map&lt;String, String&gt; correlationHeaders = new HashMap&lt;&gt;();
+
+        String correlationId = headers.getFirst(&quot;X-Correlation-ID&quot;);
+        if (correlationId != null) {
+            correlationHeaders.put(&quot;X-Correlation-ID&quot;, correlationId);
+
+            String rootId = headers.getFirst(&quot;X-Root-ID&quot;);
+            if (rootId != null) {
+                correlationHeaders.put(&quot;X-Root-ID&quot;, rootId);
+            }
+
+            String parentId = headers.getFirst(&quot;X-Parent-ID&quot;);
+            if (parentId != null) {
+                correlationHeaders.put(&quot;X-Parent-ID&quot;, parentId);
+            }
+        }
+
+        return correlationHeaders;
+    }
+
+    // Context cache implementation
+    private static class CorrelationContextCache {
+        private final Map&lt;String, CorrelationContext&gt; cache = new LRUCache&lt;&gt;(100);
+
+        public CorrelationContext get(String correlationId) {
+            return cache.get(correlationId);
+        }
+
+        public void put(String correlationId, CorrelationContext context) {
+            cache.put(correlationId, context);
+        }
+    }
+}
+</code></pre>
+<h3 id="3-monitoring-and-alerting">3. Monitoring and Alerting</h3>
+<pre><code class="language-java">@Component
+public class CorrelationMonitoring {
+    private final MeterRegistry meterRegistry;
+    private final AlertingService alertingService;
+
+    @EventListener
+    public void handleCorrelationEvent(CorrelationEvent event) {
+        recordCorrelationMetrics(event);
+        checkCorrelationAlerts(event);
+    }
+
+    private void recordCorrelationMetrics(CorrelationEvent event) {
+        String service = event.getServiceName();
+
+        // Record correlation propagation
+        meterRegistry.counter(&quot;correlation.propagated&quot;, 
+                            &quot;service&quot;, service,
+                            &quot;type&quot;, event.getEventType().name())
+                    .increment();
+
+        // Record context creation time
+        meterRegistry.timer(&quot;correlation.context.creation&quot;, &quot;service&quot;, service)
+                   .record(event.getContextCreationTime());
+
+        // Record hierarchy depth
+        meterRegistry.histogram(&quot;correlation.hierarchy.depth&quot;, &quot;service&quot;, service)
+                   .update(event.getHierarchyDepth());
+    }
+
+    private void checkCorrelationAlerts(CorrelationEvent event) {
+        // Alert on missing correlation IDs
+        if (event.getEventType() == CorrelationEventType.MISSING_CORRELATION_ID) {
+            alertingService.sendAlert(AlertLevel.WARNING,
+                &quot;Missing correlation ID in service: &quot; + event.getServiceName());
+        }
+
+        // Alert on correlation hierarchy too deep
+        if (event.getHierarchyDepth() &gt; 10) {
+            alertingService.sendAlert(AlertLevel.WARNING,
+                &quot;Deep correlation hierarchy detected: &quot; + event.getHierarchyDepth());
+        }
+
+        // Alert on correlation propagation failures
+        if (event.getEventType() == CorrelationEventType.PROPAGATION_FAILED) {
+            alertingService.sendAlert(AlertLevel.CRITICAL,
+                &quot;Correlation propagation failed in service: &quot; + event.getServiceName());
+        }
+    }
+
+    @Scheduled(fixedRate = 60000) // Every minute
+    public void collectCorrelationMetrics() {
+        // Collect active correlation contexts count
+        long activeContexts = getActiveContextsCount();
+        meterRegistry.gauge(&quot;correlation.contexts.active&quot;, activeContexts);
+
+        // Collect correlation cache hit ratio
+        double cacheHitRatio = getCorrelationCacheHitRatio();
+        meterRegistry.gauge(&quot;correlation.cache.hit.ratio&quot;, cacheHitRatio);
+
+        // Collect orphaned correlations (no activity in last hour)
+        long orphanedCorrelations = getOrphanedCorrelationsCount();
+        meterRegistry.gauge(&quot;correlation.orphaned&quot;, orphanedCorrelations);
+    }
+}
+</code></pre>
+<h2 id="common-pitfalls">Common Pitfalls</h2>
+<h3 id="1-context-leakage">1. <strong>Context Leakage</strong></h3>
+<p><strong>Problem</strong>: Correlation context not properly cleaned up leading to memory leaks<br />
+<strong>Solution</strong>: Use try-finally blocks and automatic cleanup mechanisms</p>
+<h3 id="2-header-size-explosion">2. <strong>Header Size Explosion</strong></h3>
+<p><strong>Problem</strong>: Too many correlation headers causing HTTP header size limits<br />
+<strong>Solution</strong>: Use compact correlation formats and limit hierarchy depth</p>
+<h3 id="3-performance-overhead">3. <strong>Performance Overhead</strong></h3>
+<p><strong>Problem</strong>: Excessive correlation processing affecting application performance<br />
+<strong>Solution</strong>: Optimize context operations and use caching strategies</p>
+<h3 id="4-correlation-id-collisions">4. <strong>Correlation ID Collisions</strong></h3>
+<p><strong>Problem</strong>: Non-unique correlation IDs causing tracking confusion<br />
+<strong>Solution</strong>: Use proper UUID generation or instance-specific prefixes</p>
+<h3 id="5-missing-propagation">5. <strong>Missing Propagation</strong></h3>
+<p><strong>Problem</strong>: Correlation IDs lost at service boundaries<br />
+<strong>Solution</strong>: Implement comprehensive propagation strategies and monitoring</p>
+<h2 id="integration-in-distributed-systems">Integration in Distributed Systems</h2>
+<h3 id="microservices-correlation">Microservices Correlation</h3>
+<pre><code class="language-java">@Service
+public class DistributedOrderService {
+
+    public OrderResponse processOrder(OrderRequest request) {
+        String correlationId = contextManager.getCurrentCorrelationId();
+
+        // Call inventory service
+        InventoryResponse inventory = inventoryClient.reserveInventory(request.getItems());
+
+        // Call payment service
+        PaymentResponse payment = paymentClient.processPayment(request.getPayment());
+
+        // Call shipping service  
+        ShippingResponse shipping = shippingClient.scheduleShipping(request.getShipping());
+
+        return OrderResponse.builder()
+            .correlationId(correlationId)
+            .orderStatus(&quot;COMPLETED&quot;)
+            .build();
+    }
+}
+</code></pre>
+<h3 id="event-sourcing-integration">Event Sourcing Integration</h3>
+<pre><code class="language-java">@Service
+public class EventSourcedService {
+
+    public void handleCommand(Command command) {
+        String correlationId = contextManager.getCurrentCorrelationId();
+
+        Event event = Event.builder()
+            .correlationId(correlationId)
+            .causationId(command.getId())
+            .aggregateId(command.getAggregateId())
+            .eventType(command.getEventType())
+            .eventData(command.getData())
+            .build();
+
+        eventStore.append(event);
+    }
+}
+</code></pre>
+<h2 id="conclusion">Conclusion</h2>
+<p>The Correlation ID pattern is essential for observability in distributed systems. It provides:</p>
+<ul>
+<li><strong>End-to-End Traceability</strong>: Complete visibility into distributed request flows</li>
+<li><strong>Enhanced Debugging</strong>: Simplified troubleshooting across service boundaries  </li>
+<li><strong>Operational Excellence</strong>: Comprehensive monitoring and alerting capabilities</li>
+<li><strong>Audit Compliance</strong>: Complete transaction history for regulatory requirements</li>
+</ul>
+<p>When properly implemented with automatic propagation, performance optimization, and comprehensive monitoring, the Correlation ID pattern enables robust observability that scales with system complexity while maintaining minimal performance overhead.</p>
+<h2 id="references">References</h2>
+<ul>
+<li><a href="https://opentracing.io/docs/best-practices/">Distributed Tracing Best Practices</a></li>
+<li><a href="https://spring.io/projects/spring-cloud-sleuth">Spring Cloud Sleuth Documentation</a></li>
+<li><a href="https://opentelemetry.io/docs/specification/">OpenTelemetry Specification</a></li>
+<li><a href="https://microservices.io/patterns/observability/distributed-tracing.html">Microservices Patterns - Distributed Tracing</a></li>
+</ul>
+
+      <a href="../index.html" class="back-to-top">← Back to All Patterns</a>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <p>©2026 <a href="https://dataintegrationmastery.com/">Data Integration Mastery™</a> — All Rights Reserved</p>
+  </footer>
+</body>
+</html>

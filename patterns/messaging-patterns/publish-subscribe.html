@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Publish-Subscribe Pattern — Integration Architecture Patterns | Data Integration Mastery™</title>
+  <meta name="description" content="The Publish-Subscribe (Pub-Sub) pattern is a fundamental messaging paradigm that enables one-to-many communication through asynchronous message distribution....">
+  <meta name="keywords" content="publish-subscribe pattern, integration pattern, messaging patterns, integration architecture, EAI patterns, data integration">
+  <link rel="canonical" href="https://dataintegrationmastery.com/patterns/messaging-patterns/publish-subscribe.html">
+
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://dataintegrationmastery.com/patterns/messaging-patterns/publish-subscribe.html">
+  <meta property="og:title" content="Publish-Subscribe Pattern — Integration Architecture Patterns">
+  <meta property="og:description" content="The Publish-Subscribe (Pub-Sub) pattern is a fundamental messaging paradigm that enables one-to-many communication through asynchronous message distribution....">
+  <meta property="og:image" content="https://dataintegrationmastery.com/assets/images/logo.png">
+  <meta property="og:site_name" content="Data Integration Mastery">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Publish-Subscribe Pattern — Integration Architecture Patterns">
+  <meta name="twitter:description" content="The Publish-Subscribe (Pub-Sub) pattern is a fundamental messaging paradigm that enables one-to-many communication through asynchronous message distribution....">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/docs.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Publish-Subscribe Pattern",
+    "description": "The Publish-Subscribe (Pub-Sub) pattern is a fundamental messaging paradigm that enables one-to-many communication through asynchronous message distribution....",
+    "url": "https://dataintegrationmastery.com/patterns/messaging-patterns/publish-subscribe.html",
+    "author": {
+      "@type": "Person",
+      "name": "Ari Vilkman",
+      "jobTitle": "Integration Architect"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Data Integration Mastery",
+      "url": "https://dataintegrationmastery.com"
+    },
+    "isPartOf": {
+      "@type": "CollectionPage",
+      "name": "Integration Architecture Patterns",
+      "url": "https://dataintegrationmastery.com/patterns/"
+    },
+    "about": {
+      "@type": "Thing",
+      "name": "Publish-Subscribe Pattern"
+    },
+    "inLanguage": "en",
+    "isAccessibleForFree": true
+  }
+  </script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="https://dataintegrationmastery.com/" class="header-brand">
+        <img src="../../assets/images/dim-icon.png" alt="DIM" width="36" height="36">
+        <span class="header-title">Data Integration Mastery™</span>
+      </a>
+      <nav class="header-nav" aria-label="Main navigation">
+        <a href="https://dataintegrationmastery.com/">Home</a>
+        <a href="../index.html">All Patterns</a>
+        <a href="https://dataintegrationmastery.com/#free-course">Free Course</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="docs-layout">
+    <aside class="docs-sidebar" aria-label="Pattern categories">
+      <div class="sidebar-title">Pattern Categories</div>
+<div class="sidebar-section">
+  <a href="../index.html#resilience" class="sidebar-section-title">🛡️ Resilience Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../resilience-patterns/circuit-breaker.html">Circuit Breaker</a></li>
+    <li><a href="../resilience-patterns/retry-mechanism.html">Retry Mechanism</a></li>
+    <li><a href="../resilience-patterns/timeout.html">Timeout</a></li>
+    <li><a href="../resilience-patterns/dead-letter-queue.html">Dead Letter Queue</a></li>
+    <li><a href="../resilience-patterns/bulkhead.html">Bulkhead</a></li>
+    <li><a href="../resilience-patterns/fallback-graceful-degradation.html">Fallback / Graceful Degradation</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#messaging" class="sidebar-section-title">📨 Messaging Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="request-reply.html">Request-Reply</a></li>
+    <li><a href="publish-subscribe.html" class="active">Publish-Subscribe</a></li>
+    <li><a href="message-queue.html">Message Queue</a></li>
+    <li><a href="event-streaming.html">Event Streaming</a></li>
+    <li><a href="correlation-id.html">Correlation ID</a></li>
+    <li><a href="message-routing.html">Message Routing</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#data-transformation" class="sidebar-section-title">🔄 Data Transformation Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../data-transformation-patterns/message-translator.html">Message Translator</a></li>
+    <li><a href="../data-transformation-patterns/content-filter.html">Content Filter</a></li>
+    <li><a href="../data-transformation-patterns/message-router.html">Message Router</a></li>
+    <li><a href="../data-transformation-patterns/aggregator.html">Aggregator</a></li>
+    <li><a href="../data-transformation-patterns/splitter.html">Splitter</a></li>
+    <li><a href="../data-transformation-patterns/data-mapper.html">Data Mapper</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#routing" class="sidebar-section-title">🔀 Routing Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../routing-patterns/content-based-router.html">Content-Based Router</a></li>
+    <li><a href="../routing-patterns/recipient-list.html">Recipient List</a></li>
+    <li><a href="../routing-patterns/load-balancer.html">Load Balancer</a></li>
+    <li><a href="../routing-patterns/message-filter.html">Message Filter</a></li>
+    <li><a href="../routing-patterns/dynamic-router.html">Dynamic Router</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#security" class="sidebar-section-title">🔐 Security Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../security-patterns/authentication.html">Authentication</a></li>
+    <li><a href="../security-patterns/authorization.html">Authorization</a></li>
+    <li><a href="../security-patterns/encryption.html">Encryption</a></li>
+    <li><a href="../security-patterns/token-management.html">Token Management</a></li>
+    <li><a href="../security-patterns/api-security.html">API Security</a></li>
+    <li><a href="../security-patterns/secret-management.html">Secret Management</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#orchestration" class="sidebar-section-title">🎭 Orchestration Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../orchestration-patterns/saga-pattern.html">Saga Pattern</a></li>
+    <li><a href="../orchestration-patterns/process-manager.html">Process Manager</a></li>
+    <li><a href="../orchestration-patterns/workflow-engine.html">Workflow Engine</a></li>
+    <li><a href="../orchestration-patterns/choreography.html">Choreography</a></li>
+    <li><a href="../orchestration-patterns/compensation-transactions.html">Compensation Transactions</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#observability" class="sidebar-section-title">📊 Monitoring & Observability Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../monitoring-observability-patterns/distributed-tracing.html">Distributed Tracing</a></li>
+    <li><a href="../monitoring-observability-patterns/metrics-collection.html">Metrics Collection</a></li>
+    <li><a href="../monitoring-observability-patterns/health-checks.html">Health Checks</a></li>
+    <li><a href="../monitoring-observability-patterns/logging-strategies.html">Logging Strategies</a></li>
+    <li><a href="../monitoring-observability-patterns/performance-monitoring.html">Performance Monitoring</a></li>
+    <li><a href="../monitoring-observability-patterns/error-tracking.html">Error Tracking</a></li>
+  </ul>
+</div>
+
+    </aside>
+
+    <main id="main-content" class="docs-content">
+      <div class="breadcrumb">
+        <a href="https://dataintegrationmastery.com/">Home</a>
+        <span class="sep">›</span>
+        <a href="../index.html">Patterns</a>
+        <span class="sep">›</span>
+        <a href="../index.html#messaging">Messaging Patterns</a>
+        <span class="sep">›</span>
+        <strong>Publish-Subscribe Pattern</strong>
+      </div>
+
+      <h1>Publish-Subscribe Pattern</h1>
+
+      <h2 id="overview">Overview</h2>
+<p>The Publish-Subscribe (Pub-Sub) pattern is a fundamental messaging paradigm that enables <strong>one-to-many communication</strong> through asynchronous message distribution. It establishes a decoupled communication model where message producers (publishers) send messages to topics or channels without knowledge of message consumers (subscribers), while subscribers express interest in specific message types without awareness of publishers. This pattern forms the foundation for scalable, event-driven architectures.</p>
+<h3 id="theoretical-foundation">Theoretical Foundation</h3>
+<p>The Publish-Subscribe pattern is grounded in <strong>observer pattern theory</strong> and <strong>event-driven architecture principles</strong>. It implements the <strong>"Law of Demeter"</strong> at the messaging level, ensuring loose coupling between system components. The pattern embodies <strong>"publish-subscribe semantics"</strong> where message delivery is based on content filtering and subscription matching rather than explicit addressing.</p>
+<h3 id="core-principles">Core Principles</h3>
+<h4 id="1-topic-based-message-distribution">1. <strong>Topic-Based Message Distribution</strong></h4>
+<p>Messages are published to logical channels (topics) rather than specific destinations, enabling dynamic subscriber registration and flexible message routing based on content classification.</p>
+<h4 id="2-temporal-and-spatial-decoupling">2. <strong>Temporal and Spatial Decoupling</strong></h4>
+<p>Publishers and subscribers operate independently in both time and space - they don't need to be active simultaneously, nor do they need knowledge of each other's location or existence.</p>
+<h4 id="3-content-based-filtering">3. <strong>Content-Based Filtering</strong></h4>
+<p>Subscribers receive only messages matching their subscription criteria, enabling fine-grained message filtering and reducing unnecessary message processing overhead.</p>
+<h4 id="4-dynamic-subscription-management">4. <strong>Dynamic Subscription Management</strong></h4>
+<p>Subscribers can dynamically register and unregister interest in topics at runtime, enabling adaptive system behavior and efficient resource utilization.</p>
+<h3 id="why-publish-subscribe-is-essential-in-integration-architecture">Why Publish-Subscribe is Essential in Integration Architecture</h3>
+<h4 id="1-event-driven-integration">1. <strong>Event-Driven Integration</strong></h4>
+<p>Modern distributed systems require responsive, real-time integration:
+- <strong>Business event propagation</strong> across multiple interested systems
+- <strong>Data synchronization</strong> between distributed databases and caches
+- <strong>Real-time notifications</strong> for user interfaces and external systems
+- <strong>Audit trail distribution</strong> for compliance and monitoring systems</p>
+<h4 id="2-system-decoupling">2. <strong>System Decoupling</strong></h4>
+<p>Pub-Sub enables architectural flexibility and maintainability:
+- <strong>Service independence</strong> allowing systems to evolve independently
+- <strong>Dynamic service discovery</strong> through topic-based communication
+- <strong>Reduced integration complexity</strong> by eliminating point-to-point connections
+- <strong>Simplified testing</strong> through isolation of publishers and subscribers</p>
+<h4 id="3-scalability-and-performance">3. <strong>Scalability and Performance</strong></h4>
+<p>The pattern supports horizontal scaling and performance optimization:
+- <strong>Fan-out messaging</strong> distributing load across multiple consumers
+- <strong>Parallel processing</strong> enabling concurrent message handling
+- <strong>Load balancing</strong> through consumer group partitioning
+- <strong>Elastic scaling</strong> by adding or removing subscribers dynamically</p>
+<h4 id="4-business-agility">4. <strong>Business Agility</strong></h4>
+<p>Pub-Sub supports rapid business adaptation and feature development:
+- <strong>New subscriber integration</strong> without modifying existing publishers
+- <strong>A/B testing</strong> through selective message routing to test subscribers
+- <strong>Feature rollout</strong> using gradual subscription activation
+- <strong>Business process flexibility</strong> through configurable event flows</p>
+<h3 id="benefits-in-integration-contexts">Benefits in Integration Contexts</h3>
+<h4 id="1-architectural-flexibility">1. <strong>Architectural Flexibility</strong></h4>
+<ul>
+<li><strong>Loose coupling</strong> between event producers and consumers</li>
+<li><strong>Dynamic composition</strong> of business processes through subscription management</li>
+<li><strong>Service mesh integration</strong> with topic-based service discovery</li>
+<li><strong>Multi-tenant architectures</strong> through topic segmentation and access control</li>
+</ul>
+<h4 id="2-operational-excellence">2. <strong>Operational Excellence</strong></h4>
+<ul>
+<li><strong>Fault isolation</strong> preventing subscriber failures from affecting publishers</li>
+<li><strong>Monitoring simplification</strong> through centralized topic metrics</li>
+<li><strong>Capacity planning</strong> based on topic volume and subscriber performance</li>
+<li><strong>Deployment flexibility</strong> enabling independent service updates</li>
+</ul>
+<h4 id="3-development-productivity">3. <strong>Development Productivity</strong></h4>
+<ul>
+<li><strong>Parallel development</strong> of publishers and subscribers</li>
+<li><strong>Simplified testing</strong> through message replay and subscription mocking</li>
+<li><strong>Code reusability</strong> through standardized topic interfaces</li>
+<li><strong>Rapid prototyping</strong> by subscribing to existing event streams</li>
+</ul>
+<h4 id="4-business-intelligence">4. <strong>Business Intelligence</strong></h4>
+<ul>
+<li><strong>Real-time analytics</strong> through event stream processing</li>
+<li><strong>Business activity monitoring</strong> via comprehensive event capture</li>
+<li><strong>Compliance reporting</strong> through audit event subscription</li>
+<li><strong>Performance optimization</strong> through behavioral event analysis</li>
+</ul>
+<h3 id="integration-architecture-applications">Integration Architecture Applications</h3>
+<h4 id="1-microservices-event-choreography">1. <strong>Microservices Event Choreography</strong></h4>
+<p>Coordinates distributed business processes through event flows:
+- <strong>Order processing workflows</strong> triggering inventory, payment, and shipping events
+- <strong>User account lifecycle management</strong> propagating registration, verification, and deletion events
+- <strong>Data consistency maintenance</strong> through eventual consistency event patterns
+- <strong>Service dependency management</strong> via event-driven state synchronization</p>
+<h4 id="2-enterprise-application-integration-eai">2. <strong>Enterprise Application Integration (EAI)</strong></h4>
+<p>Enables integration of heterogeneous enterprise systems:
+- <strong>ERP system integration</strong> broadcasting financial and operational events
+- <strong>CRM data synchronization</strong> sharing customer events across systems
+- <strong>Master data management</strong> propagating reference data changes
+- <strong>Legacy system modernization</strong> through event-driven API exposure</p>
+<h4 id="3-iot-and-real-time-systems">3. <strong>IoT and Real-Time Systems</strong></h4>
+<p>Supports massive-scale device integration and real-time processing:
+- <strong>Sensor data distribution</strong> from IoT devices to multiple processing systems
+- <strong>Device lifecycle management</strong> through device status and configuration events
+- <strong>Real-time alerting</strong> based on sensor threshold breaches
+- <strong>Telemetry data aggregation</strong> for analytics and monitoring systems</p>
+<h4 id="4-multi-channel-user-experience">4. <strong>Multi-Channel User Experience</strong></h4>
+<p>Coordinates user interactions across different channels and devices:
+- <strong>User activity synchronization</strong> across web, mobile, and desktop applications
+- <strong>Notification delivery</strong> to multiple communication channels (email, SMS, push)
+- <strong>Personalization engines</strong> consuming user behavior events
+- <strong>Content management</strong> distributing updates across multiple presentation layers</p>
+<h2 id="how-publish-subscribe-pattern-works">How Publish-Subscribe Pattern Works</h2>
+<p>The Publish-Subscribe pattern operates through a message broker that manages topics and handles message distribution to subscribers:</p>
+<h3 id="basic-pub-sub-flow">Basic Pub-Sub Flow</h3>
+<pre><code>Publisher A ────┐                    ┌──→ Subscriber X
+                │                    │
+Publisher B ────┼─→ [Topic: Orders] ─┼──→ Subscriber Y
+                │                    │
+Publisher C ────┘                    └──→ Subscriber Z
+
+Publisher D ────┐                    ┌──→ Subscriber P
+                │                    │
+Publisher E ────┼─→ [Topic: Events] ─┼──→ Subscriber Q
+                │                    │
+Publisher F ────┘                    └──→ Subscriber R
+</code></pre>
+<h3 id="message-broker-architecture">Message Broker Architecture</h3>
+<pre><code>┌─────────────────────────────────────────────────────────┐
+│                 Message Broker                          │
+├─────────────────────────────────────────────────────────┤
+│  Topic Manager              │  Subscription Manager     │
+│  ┌─────────────┐             │  ┌──────────────────────┐ │
+│  │ Topic A     │             │  │ Active Subscriptions │ │
+│  │ Topic B     │             │  │ - Subscriber 1       │ │
+│  │ Topic C     │             │  │ - Subscriber 2       │ │
+│  └─────────────┘             │  │ - Subscriber 3       │ │
+│                               │  └──────────────────────┘ │
+├─────────────────────────────────────────────────────────┤
+│  Message Routing Engine                                 │
+│  ┌─────────────┐  ┌──────────────┐  ┌────────────────┐  │
+│  │ Filter      │  │ Transform    │  │ Delivery       │  │
+│  │ Engine      │  │ Engine       │  │ Manager        │  │
+│  └─────────────┘  └──────────────┘  └────────────────┘  │
+├─────────────────────────────────────────────────────────┤
+│  Persistence &amp; Recovery                                 │
+│  ┌─────────────┐  ┌──────────────┐  ┌────────────────┐  │
+│  │ Message     │  │ Offset       │  │ Dead Letter    │  │
+│  │ Storage     │  │ Management   │  │ Queue          │  │
+│  └─────────────┘  └──────────────┘  └────────────────┘  │
+└─────────────────────────────────────────────────────────┘
+</code></pre>
+<h3 id="subscription-types-and-message-delivery">Subscription Types and Message Delivery</h3>
+<h4 id="1-topic-subscription">1. <strong>Topic Subscription</strong></h4>
+<pre><code>Subscriber registers for: Topic = &quot;order.created&quot;
+Message matches if: topic == &quot;order.created&quot;
+
+┌─────────────────────────────────────┐
+│ Subscription Registration           │
+├─────────────────────────────────────┤
+│ Subscriber ID: service-001          │
+│ Topic: order.created                │
+│ Filter: null                        │
+│ Delivery Mode: At-Least-Once        │
+│ Consumer Group: order-processors    │
+└─────────────────────────────────────┘
+</code></pre>
+<h4 id="2-pattern-based-subscription">2. <strong>Pattern-Based Subscription</strong></h4>
+<pre><code>Subscriber registers for: Pattern = &quot;order.*&quot;
+Message matches if: topic matches pattern
+
+┌─────────────────────────────────────┐
+│ Pattern Subscription                │
+├─────────────────────────────────────┤
+│ Subscriber ID: audit-service        │
+│ Pattern: order.*                    │
+│ Matches:                            │
+│ - order.created                     │
+│ - order.updated                     │
+│ - order.cancelled                   │
+└─────────────────────────────────────┘
+</code></pre>
+<h4 id="3-content-based-subscription">3. <strong>Content-Based Subscription</strong></h4>
+<pre><code>Subscriber registers for: Topic + Content Filter
+Message matches if: topic == &quot;order.created&quot; AND order.amount &gt; 1000
+
+┌─────────────────────────────────────┐
+│ Content Filter Subscription         │
+├─────────────────────────────────────┤
+│ Subscriber ID: risk-analysis        │
+│ Topic: order.created                │
+│ Filter: amount &gt; 1000 AND           │
+│         category != 'internal'      │
+│ Delivery: Push                      │
+└─────────────────────────────────────┘
+</code></pre>
+<h2 id="key-components">Key Components</h2>
+<h3 id="1-topic-manager">1. Topic Manager</h3>
+<p>Manages topic creation, configuration, and lifecycle:</p>
+<pre><code class="language-java">@Component
+public class TopicManager {
+    private final Map&lt;String, Topic&gt; topics = new ConcurrentHashMap&lt;&gt;();
+    private final TopicConfigurationService configService;
+    private final MetricRegistry metricRegistry;
+
+    public Topic createTopic(TopicConfiguration config) {
+        validateTopicConfiguration(config);
+
+        Topic topic = Topic.builder()
+            .name(config.getName())
+            .partitions(config.getPartitions())
+            .replicationFactor(config.getReplicationFactor())
+            .retentionPolicy(config.getRetentionPolicy())
+            .compressionType(config.getCompressionType())
+            .maxMessageSize(config.getMaxMessageSize())
+            .build();
+
+        topics.put(config.getName(), topic);
+
+        // Create metrics for the topic
+        metricRegistry.counter(&quot;topic.messages.published&quot;, &quot;topic&quot;, topic.getName());
+        metricRegistry.counter(&quot;topic.messages.consumed&quot;, &quot;topic&quot;, topic.getName());
+        metricRegistry.gauge(&quot;topic.subscribers.count&quot;, &quot;topic&quot;, topic.getName(), 
+                           () -&gt; getSubscriberCount(topic.getName()));
+
+        log.info(&quot;Created topic: {} with {} partitions&quot;, topic.getName(), topic.getPartitions());
+        return topic;
+    }
+
+    public Optional&lt;Topic&gt; getTopic(String topicName) {
+        return Optional.ofNullable(topics.get(topicName));
+    }
+
+    public List&lt;Topic&gt; getTopicsByPattern(String pattern) {
+        Pattern compiledPattern = Pattern.compile(pattern);
+        return topics.values().stream()
+            .filter(topic -&gt; compiledPattern.matcher(topic.getName()).matches())
+            .collect(Collectors.toList());
+    }
+
+    private void validateTopicConfiguration(TopicConfiguration config) {
+        if (config.getName() == null || config.getName().trim().isEmpty()) {
+            throw new IllegalArgumentException(&quot;Topic name cannot be null or empty&quot;);
+        }
+
+        if (config.getName().contains(&quot;..&quot;) || config.getName().startsWith(&quot;.&quot;)) {
+            throw new IllegalArgumentException(&quot;Invalid topic name format&quot;);
+        }
+
+        if (config.getPartitions() &lt;= 0) {
+            throw new IllegalArgumentException(&quot;Partition count must be positive&quot;);
+        }
+
+        if (config.getReplicationFactor() &lt;= 0) {
+            throw new IllegalArgumentException(&quot;Replication factor must be positive&quot;);
+        }
+    }
+}
+</code></pre>
+<h3 id="2-subscription-manager">2. Subscription Manager</h3>
+<p>Manages subscriber registrations and message routing:</p>
+<pre><code class="language-java">@Component
+public class SubscriptionManager {
+    private final Map&lt;String, Set&lt;Subscription&gt;&gt; topicSubscriptions = new ConcurrentHashMap&lt;&gt;();
+    private final Map&lt;String, Subscription&gt; activeSubscriptions = new ConcurrentHashMap&lt;&gt;();
+    private final MessageMatcher messageMatcher;
+
+    public Subscription subscribe(SubscriptionRequest request) {
+        validateSubscriptionRequest(request);
+
+        Subscription subscription = Subscription.builder()
+            .id(generateSubscriptionId())
+            .subscriberId(request.getSubscriberId())
+            .topicPattern(request.getTopicPattern())
+            .contentFilter(request.getContentFilter())
+            .deliveryMode(request.getDeliveryMode())
+            .consumerGroup(request.getConsumerGroup())
+            .createdAt(Instant.now())
+            .build();
+
+        // Register subscription for all matching topics
+        if (request.isPatternBased()) {
+            registerPatternSubscription(subscription);
+        } else {
+            registerTopicSubscription(subscription, request.getTopic());
+        }
+
+        activeSubscriptions.put(subscription.getId(), subscription);
+
+        log.info(&quot;Created subscription {} for subscriber {} on topic/pattern: {}&quot;, 
+                 subscription.getId(), 
+                 subscription.getSubscriberId(), 
+                 subscription.getTopicPattern());
+
+        return subscription;
+    }
+
+    public void unsubscribe(String subscriptionId) {
+        Subscription subscription = activeSubscriptions.remove(subscriptionId);
+
+        if (subscription != null) {
+            // Remove from topic-specific subscriptions
+            topicSubscriptions.values().forEach(subscriptions -&gt; 
+                subscriptions.removeIf(s -&gt; s.getId().equals(subscriptionId)));
+
+            log.info(&quot;Removed subscription {} for subscriber {}&quot;, 
+                     subscriptionId, 
+                     subscription.getSubscriberId());
+        }
+    }
+
+    public Set&lt;Subscription&gt; getMatchingSubscriptions(String topic, Message message) {
+        Set&lt;Subscription&gt; matchingSubscriptions = new HashSet&lt;&gt;();
+
+        // Get direct topic subscriptions
+        Set&lt;Subscription&gt; topicSubs = topicSubscriptions.getOrDefault(topic, Collections.emptySet());
+
+        for (Subscription subscription : topicSubs) {
+            if (messageMatcher.matches(subscription, topic, message)) {
+                matchingSubscriptions.add(subscription);
+            }
+        }
+
+        return matchingSubscriptions;
+    }
+
+    private void registerTopicSubscription(Subscription subscription, String topic) {
+        topicSubscriptions.computeIfAbsent(topic, k -&gt; new ConcurrentHashMap&lt;&gt;().newKeySet())
+                          .add(subscription);
+    }
+
+    private void registerPatternSubscription(Subscription subscription) {
+        // For pattern subscriptions, check against all existing topics
+        topicSubscriptions.keySet().stream()
+            .filter(topic -&gt; matchesPattern(topic, subscription.getTopicPattern()))
+            .forEach(topic -&gt; registerTopicSubscription(subscription, topic));
+    }
+
+    private boolean matchesPattern(String topic, String pattern) {
+        try {
+            return Pattern.compile(pattern).matcher(topic).matches();
+        } catch (PatternSyntaxException e) {
+            log.warn(&quot;Invalid topic pattern: {}&quot;, pattern, e);
+            return false;
+        }
+    }
+}
+</code></pre>
+<h3 id="3-message-publisher">3. Message Publisher</h3>
+<p>Handles message publishing and distribution:</p>
+<pre><code class="language-java">@Component
+public class MessagePublisher {
+    private final TopicManager topicManager;
+    private final SubscriptionManager subscriptionManager;
+    private final MessageDistributor messageDistributor;
+    private final MessagePersistence messagePersistence;
+
+    public PublishResult publish(String topicName, Message message) {
+        return publish(topicName, message, PublishOptions.defaultOptions());
+    }
+
+    public PublishResult publish(String topicName, Message message, PublishOptions options) {
+        validatePublishRequest(topicName, message);
+
+        Optional&lt;Topic&gt; topicOpt = topicManager.getTopic(topicName);
+        if (!topicOpt.isPresent() &amp;&amp; !options.isAutoCreateTopic()) {
+            throw new TopicNotFoundException(&quot;Topic not found: &quot; + topicName);
+        }
+
+        Topic topic = topicOpt.orElseGet(() -&gt; createTopicIfAllowed(topicName, options));
+
+        // Enrich message with metadata
+        Message enrichedMessage = enrichMessage(message, topicName, options);
+
+        try {
+            // Persist message if required
+            if (topic.isPersistent()) {
+                messagePersistence.store(topicName, enrichedMessage);
+            }
+
+            // Get matching subscriptions
+            Set&lt;Subscription&gt; subscriptions = subscriptionManager.getMatchingSubscriptions(
+                topicName, enrichedMessage);
+
+            // Distribute message to subscribers
+            PublishResult result = messageDistributor.distribute(
+                topic, enrichedMessage, subscriptions, options);
+
+            // Record metrics
+            recordPublishMetrics(topicName, enrichedMessage, result);
+
+            log.debug(&quot;Published message {} to topic {} - delivered to {} subscribers&quot;, 
+                     enrichedMessage.getId(), topicName, result.getDeliveredCount());
+
+            return result;
+
+        } catch (Exception e) {
+            log.error(&quot;Failed to publish message to topic {}: {}&quot;, topicName, e.getMessage(), e);
+            throw new PublishException(&quot;Failed to publish message&quot;, e);
+        }
+    }
+
+    public CompletableFuture&lt;PublishResult&gt; publishAsync(String topicName, 
+                                                       Message message, 
+                                                       PublishOptions options) {
+        return CompletableFuture.supplyAsync(() -&gt; publish(topicName, message, options));
+    }
+
+    private Message enrichMessage(Message message, String topicName, PublishOptions options) {
+        return message.toBuilder()
+            .id(message.getId() != null ? message.getId() : UUID.randomUUID().toString())
+            .topic(topicName)
+            .timestamp(message.getTimestamp() != null ? message.getTimestamp() : Instant.now())
+            .publisher(options.getPublisherId())
+            .correlationId(options.getCorrelationId())
+            .build();
+    }
+
+    private void recordPublishMetrics(String topicName, Message message, PublishResult result) {
+        metricRegistry.counter(&quot;messages.published&quot;, &quot;topic&quot;, topicName).increment();
+        metricRegistry.counter(&quot;messages.delivered&quot;, &quot;topic&quot;, topicName)
+                     .increment(result.getDeliveredCount());
+        metricRegistry.histogram(&quot;message.size&quot;, &quot;topic&quot;, topicName)
+                     .update(message.getPayload().length);
+    }
+}
+</code></pre>
+<h3 id="4-message-subscriber">4. Message Subscriber</h3>
+<p>Handles subscription management and message consumption:</p>
+<pre><code class="language-java">@Component
+public abstract class MessageSubscriber {
+    private final SubscriptionManager subscriptionManager;
+    private final MessageDeserializer messageDeserializer;
+    private Subscription subscription;
+
+    public void start() {
+        SubscriptionRequest request = createSubscriptionRequest();
+        this.subscription = subscriptionManager.subscribe(request);
+
+        log.info(&quot;Started subscriber {} with subscription {}&quot;, 
+                 getSubscriberId(), subscription.getId());
+    }
+
+    public void stop() {
+        if (subscription != null) {
+            subscriptionManager.unsubscribe(subscription.getId());
+            subscription = null;
+            log.info(&quot;Stopped subscriber {}&quot;, getSubscriberId());
+        }
+    }
+
+    public void handleMessage(String topic, Message message) {
+        try {
+            // Deserialize message payload
+            Object payload = messageDeserializer.deserialize(
+                message.getPayload(), getExpectedPayloadType());
+
+            // Process message
+            MessageContext context = MessageContext.builder()
+                .topic(topic)
+                .message(message)
+                .payload(payload)
+                .subscription(subscription)
+                .receivedAt(Instant.now())
+                .build();
+
+            processMessage(context);
+
+            // Acknowledge message processing
+            acknowledgeMessage(message);
+
+        } catch (Exception e) {
+            log.error(&quot;Error processing message {} from topic {}: {}&quot;, 
+                     message.getId(), topic, e.getMessage(), e);
+
+            handleProcessingError(topic, message, e);
+        }
+    }
+
+    protected abstract void processMessage(MessageContext context);
+    protected abstract String getSubscriberId();
+    protected abstract Class&lt;?&gt; getExpectedPayloadType();
+    protected abstract SubscriptionRequest createSubscriptionRequest();
+
+    protected void acknowledgeMessage(Message message) {
+        // Default implementation - can be overridden for specific acknowledgment strategies
+        log.debug(&quot;Acknowledged message: {}&quot;, message.getId());
+    }
+
+    protected void handleProcessingError(String topic, Message message, Exception error) {
+        // Default error handling - can be overridden for custom error strategies
+        log.error(&quot;Message processing failed for message {} on topic {}&quot;, 
+                 message.getId(), topic);
+    }
+}
+
+// Example concrete subscriber implementation
+@Component
+public class OrderEventSubscriber extends MessageSubscriber {
+    private final OrderService orderService;
+
+    @Override
+    protected void processMessage(MessageContext context) {
+        OrderEvent orderEvent = (OrderEvent) context.getPayload();
+
+        switch (orderEvent.getType()) {
+            case CREATED:
+                orderService.handleOrderCreated(orderEvent);
+                break;
+            case UPDATED:
+                orderService.handleOrderUpdated(orderEvent);
+                break;
+            case CANCELLED:
+                orderService.handleOrderCancelled(orderEvent);
+                break;
+            default:
+                log.warn(&quot;Unknown order event type: {}&quot;, orderEvent.getType());
+        }
+    }
+
+    @Override
+    protected String getSubscriberId() {
+        return &quot;order-event-subscriber&quot;;
+    }
+
+    @Override
+    protected Class&lt;?&gt; getExpectedPayloadType() {
+        return OrderEvent.class;
+    }
+
+    @Override
+    protected SubscriptionRequest createSubscriptionRequest() {
+        return SubscriptionRequest.builder()
+            .subscriberId(getSubscriberId())
+            .topic(&quot;order.*&quot;)
+            .deliveryMode(DeliveryMode.AT_LEAST_ONCE)
+            .consumerGroup(&quot;order-processors&quot;)
+            .contentFilter(&quot;eventType IN ['CREATED', 'UPDATED', 'CANCELLED']&quot;)
+            .build();
+    }
+}
+</code></pre>
+<h2 id="configuration-parameters">Configuration Parameters</h2>
+<h3 id="essential-settings">Essential Settings</h3>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Typical Values</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Topic Partitions</strong></td>
+<td>Number of partitions per topic</td>
+<td>1-100</td>
+</tr>
+<tr>
+<td><strong>Replication Factor</strong></td>
+<td>Number of message replicas</td>
+<td>1-5</td>
+</tr>
+<tr>
+<td><strong>Message Retention</strong></td>
+<td>How long to keep messages</td>
+<td>1h-30d</td>
+</tr>
+<tr>
+<td><strong>Subscriber Timeout</strong></td>
+<td>Max time for message processing</td>
+<td>30s-300s</td>
+</tr>
+<tr>
+<td><strong>Batch Size</strong></td>
+<td>Messages per batch delivery</td>
+<td>1-1000</td>
+</tr>
+<tr>
+<td><strong>Buffer Size</strong></td>
+<td>Publisher message buffer size</td>
+<td>1MB-100MB</td>
+</tr>
+</tbody>
+</table>
+<h3 id="example-configuration">Example Configuration</h3>
+<pre><code class="language-properties"># Topic Configuration
+pub-sub.topic.default-partitions=10
+pub-sub.topic.default-replication-factor=3
+pub-sub.topic.default-retention=24h
+pub-sub.topic.auto-create=false
+pub-sub.topic.max-message-size=1MB
+
+# Publisher Configuration
+pub-sub.publisher.batch-size=100
+pub-sub.publisher.linger-ms=10
+pub-sub.publisher.buffer-memory=32MB
+pub-sub.publisher.compression-type=lz4
+pub-sub.publisher.retries=3
+pub-sub.publisher.retry-delay=1s
+
+# Subscriber Configuration
+pub-sub.subscriber.fetch-min-bytes=1KB
+pub-sub.subscriber.fetch-max-wait=500ms
+pub-sub.subscriber.max-poll-records=500
+pub-sub.subscriber.session-timeout=30s
+pub-sub.subscriber.heartbeat-interval=3s
+
+# Consumer Group Configuration
+pub-sub.consumer-group.rebalance-timeout=60s
+pub-sub.consumer-group.offset-retention=7d
+pub-sub.consumer-group.auto-commit=true
+pub-sub.consumer-group.auto-commit-interval=5s
+</code></pre>
+<h2 id="implementation-examples">Implementation Examples</h2>
+<h3 id="1-apache-kafka-publish-subscribe-implementation">1. Apache Kafka Publish-Subscribe Implementation</h3>
+<pre><code class="language-java">@Configuration
+public class KafkaPublishSubscribeConfiguration {
+
+    @Bean
+    public ProducerFactory&lt;String, Object&gt; producerFactory() {
+        Map&lt;String, Object&gt; configProps = new HashMap&lt;&gt;();
+        configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, &quot;localhost:9092&quot;);
+        configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+        configProps.put(ProducerConfig.BATCH_SIZE_CONFIG, 16384);
+        configProps.put(ProducerConfig.LINGER_MS_CONFIG, 10);
+        configProps.put(ProducerConfig.COMPRESSION_TYPE_CONFIG, &quot;lz4&quot;);
+        return new DefaultKafkaProducerFactory&lt;&gt;(configProps);
+    }
+
+    @Bean
+    public KafkaTemplate&lt;String, Object&gt; kafkaTemplate() {
+        return new KafkaTemplate&lt;&gt;(producerFactory());
+    }
+
+    @Bean
+    public ConsumerFactory&lt;String, Object&gt; consumerFactory() {
+        Map&lt;String, Object&gt; props = new HashMap&lt;&gt;();
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, &quot;localhost:9092&quot;);
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, &quot;contact-service-group&quot;);
+        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
+        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, &quot;earliest&quot;);
+        props.put(JsonDeserializer.TRUSTED_PACKAGES, &quot;*&quot;);
+        return new DefaultKafkaConsumerFactory&lt;&gt;(props);
+    }
+}
+
+@Service
+public class ContactEventPublisher {
+    private final KafkaTemplate&lt;String, Object&gt; kafkaTemplate;
+
+    public void publishContactCreated(ContactCreatedEvent event) {
+        kafkaTemplate.send(&quot;contact.events&quot;, &quot;contact.created&quot;, event)
+            .whenComplete((result, ex) -&gt; {
+                if (ex != null) {
+                    log.error(&quot;Failed to publish contact created event: {}&quot;, ex.getMessage(), ex);
+                } else {
+                    log.info(&quot;Contact created event published successfully: {}&quot;, 
+                             event.getContactId());
+                }
+            });
+    }
+
+    public void publishContactUpdated(ContactUpdatedEvent event) {
+        kafkaTemplate.send(&quot;contact.events&quot;, &quot;contact.updated&quot;, event);
+    }
+
+    public void publishContactDeleted(ContactDeletedEvent event) {
+        kafkaTemplate.send(&quot;contact.events&quot;, &quot;contact.deleted&quot;, event);
+    }
+}
+
+@Component
+public class ContactEventSubscriber {
+    private final ContactEventHandler contactEventHandler;
+
+    @KafkaListener(topics = &quot;contact.events&quot;, groupId = &quot;notification-service&quot;)
+    public void handleContactEvent(@Payload ContactEvent event, 
+                                 @Header(&quot;kafka_receivedTopic&quot;) String topic,
+                                 @Header(&quot;kafka_receivedPartition&quot;) int partition,
+                                 @Header(&quot;kafka_offset&quot;) long offset) {
+
+        log.info(&quot;Received contact event: {} from topic: {}, partition: {}, offset: {}&quot;, 
+                 event.getEventType(), topic, partition, offset);
+
+        try {
+            contactEventHandler.handleEvent(event);
+        } catch (Exception e) {
+            log.error(&quot;Error processing contact event: {}&quot;, e.getMessage(), e);
+            throw e; // Will trigger retry or DLQ based on configuration
+        }
+    }
+
+    @KafkaListener(topics = &quot;contact.events&quot;, 
+                  groupId = &quot;audit-service&quot;,
+                  topicPattern = &quot;contact\\..*&quot;)
+    public void handleContactAuditEvent(@Payload ContactEvent event) {
+        auditService.recordContactEvent(event);
+    }
+}
+</code></pre>
+<h3 id="2-rabbitmq-topic-exchange-implementation">2. RabbitMQ Topic Exchange Implementation</h3>
+<pre><code class="language-java">@Configuration
+public class RabbitMQPubSubConfiguration {
+
+    @Bean
+    public TopicExchange contactExchange() {
+        return new TopicExchange(&quot;contact.exchange&quot;, true, false);
+    }
+
+    @Bean
+    public Queue contactNotificationQueue() {
+        return QueueBuilder.durable(&quot;contact.notifications&quot;).build();
+    }
+
+    @Bean
+    public Queue contactAuditQueue() {
+        return QueueBuilder.durable(&quot;contact.audit&quot;).build();
+    }
+
+    @Bean
+    public Binding contactCreatedBinding() {
+        return BindingBuilder.bind(contactNotificationQueue())
+                           .to(contactExchange())
+                           .with(&quot;contact.created&quot;);
+    }
+
+    @Bean
+    public Binding contactUpdatedBinding() {
+        return BindingBuilder.bind(contactNotificationQueue())
+                           .to(contactExchange())
+                           .with(&quot;contact.updated&quot;);
+    }
+
+    @Bean
+    public Binding allContactEventsAuditBinding() {
+        return BindingBuilder.bind(contactAuditQueue())
+                           .to(contactExchange())
+                           .with(&quot;contact.*&quot;);
+    }
+
+    @Bean
+    public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
+        RabbitTemplate template = new RabbitTemplate(connectionFactory);
+        template.setMessageConverter(new Jackson2JsonMessageConverter());
+        return template;
+    }
+}
+
+@Service
+public class RabbitMQContactEventPublisher {
+    private final RabbitTemplate rabbitTemplate;
+    private final String exchangeName = &quot;contact.exchange&quot;;
+
+    public void publishEvent(String routingKey, ContactEvent event) {
+        try {
+            rabbitTemplate.convertAndSend(exchangeName, routingKey, event, message -&gt; {
+                message.getMessageProperties().setHeader(&quot;eventId&quot;, event.getEventId());
+                message.getMessageProperties().setHeader(&quot;eventType&quot;, event.getEventType());
+                message.getMessageProperties().setTimestamp(Date.from(event.getTimestamp()));
+                return message;
+            });
+
+            log.info(&quot;Published event {} with routing key: {}&quot;, event.getEventId(), routingKey);
+        } catch (Exception e) {
+            log.error(&quot;Failed to publish event {}: {}&quot;, event.getEventId(), e.getMessage(), e);
+            throw new EventPublishException(&quot;Failed to publish event&quot;, e);
+        }
+    }
+}
+
+@RabbitListener(queues = &quot;contact.notifications&quot;)
+@Component
+public class ContactNotificationSubscriber {
+    private final NotificationService notificationService;
+
+    public void handleContactEvent(ContactEvent event) {
+        log.info(&quot;Processing notification for contact event: {}&quot;, event.getEventType());
+
+        switch (event.getEventType()) {
+            case CREATED:
+                notificationService.sendWelcomeNotification(event.getContactId());
+                break;
+            case UPDATED:
+                notificationService.sendUpdateNotification(event.getContactId());
+                break;
+            case DELETED:
+                notificationService.sendGoodbyeNotification(event.getContactId());
+                break;
+        }
+    }
+}
+</code></pre>
+<h3 id="3-redis-pub-sub-implementation">3. Redis Pub-Sub Implementation</h3>
+<pre><code class="language-java">@Configuration
+public class RedisPublishSubscribeConfiguration {
+
+    @Bean
+    public RedisConnectionFactory connectionFactory() {
+        LettuceConnectionFactory factory = new LettuceConnectionFactory();
+        factory.setHostName(&quot;localhost&quot;);
+        factory.setPort(6379);
+        return factory;
+    }
+
+    @Bean
+    public RedisTemplate&lt;String, Object&gt; redisTemplate() {
+        RedisTemplate&lt;String, Object&gt; template = new RedisTemplate&lt;&gt;();
+        template.setConnectionFactory(connectionFactory());
+        template.setDefaultSerializer(new Jackson2JsonRedisSerializer&lt;&gt;(Object.class));
+        return template;
+    }
+
+    @Bean
+    public RedisMessageListenerContainer messageListenerContainer() {
+        RedisMessageListenerContainer container = new RedisMessageListenerContainer();
+        container.setConnectionFactory(connectionFactory());
+        return container;
+    }
+}
+
+@Service
+public class RedisEventPublisher {
+    private final RedisTemplate&lt;String, Object&gt; redisTemplate;
+
+    public void publishContactEvent(String channel, ContactEvent event) {
+        try {
+            redisTemplate.convertAndSend(channel, event);
+            log.info(&quot;Published event {} to channel: {}&quot;, event.getEventId(), channel);
+        } catch (Exception e) {
+            log.error(&quot;Failed to publish event to Redis: {}&quot;, e.getMessage(), e);
+            throw new EventPublishException(&quot;Failed to publish to Redis&quot;, e);
+        }
+    }
+}
+
+@Component
+public class RedisEventSubscriber implements MessageListener {
+    private final ObjectMapper objectMapper;
+    private final ContactEventHandler eventHandler;
+
+    @PostConstruct
+    public void subscribeToChannels() {
+        messageListenerContainer.addMessageListener(this, 
+            Arrays.asList(
+                new PatternTopic(&quot;contact.*&quot;),
+                new ChannelTopic(&quot;system.alerts&quot;)
+            ));
+    }
+
+    @Override
+    public void onMessage(Message message, byte[] pattern) {
+        try {
+            String channel = new String(message.getChannel());
+            String body = new String(message.getBody());
+
+            ContactEvent event = objectMapper.readValue(body, ContactEvent.class);
+
+            log.info(&quot;Received event {} from channel: {}&quot;, event.getEventId(), channel);
+            eventHandler.handleEvent(event);
+
+        } catch (Exception e) {
+            log.error(&quot;Error processing Redis message: {}&quot;, e.getMessage(), e);
+        }
+    }
+}
+</code></pre>
+<h3 id="4-event-driven-microservices-integration">4. Event-Driven Microservices Integration</h3>
+<pre><code class="language-java">@Service
+public class ContactServiceEventIntegration {
+    private final ContactEventPublisher eventPublisher;
+
+    @EventListener
+    @Async
+    public void handleContactCreated(ContactCreatedEvent event) {
+        // Publish to multiple subscribers
+        eventPublisher.publishContactCreated(event);
+
+        // Trigger related events
+        UserAccountCreationEvent accountEvent = UserAccountCreationEvent.builder()
+            .contactId(event.getContactId())
+            .email(event.getEmail())
+            .firstName(event.getFirstName())
+            .lastName(event.getLastName())
+            .build();
+
+        eventPublisher.publishUserAccountCreation(accountEvent);
+    }
+
+    @KafkaListener(topics = &quot;user.account.created&quot;)
+    public void handleUserAccountCreated(UserAccountCreatedEvent event) {
+        // Update contact with user account information
+        contactService.linkUserAccount(event.getContactId(), event.getUserId());
+
+        // Publish contact linked event
+        ContactLinkedEvent linkedEvent = ContactLinkedEvent.builder()
+            .contactId(event.getContactId())
+            .userId(event.getUserId())
+            .linkedAt(Instant.now())
+            .build();
+
+        eventPublisher.publishContactLinked(linkedEvent);
+    }
+}
+</code></pre>
+<h2 id="best-practices">Best Practices</h2>
+<h3 id="1-message-schema-design">1. Message Schema Design</h3>
+<pre><code class="language-java">public class ContactEventSchema {
+
+    // Use versioned schemas for backward compatibility
+    @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = &quot;version&quot;)
+    @JsonSubTypes({
+        @JsonSubTypes.Type(value = ContactEventV1.class, name = &quot;v1&quot;),
+        @JsonSubTypes.Type(value = ContactEventV2.class, name = &quot;v2&quot;)
+    })
+    public abstract class ContactEvent {
+        public abstract String getEventId();
+        public abstract String getEventType();
+        public abstract Instant getTimestamp();
+        public abstract String getVersion();
+    }
+
+    // Include event metadata for traceability
+    public class ContactEventEnvelope {
+        private String eventId;
+        private String eventType;
+        private String source;
+        private String specVersion;
+        private Instant timestamp;
+        private String correlationId;
+        private String causationId;
+        private ContactEvent data;
+
+        // CloudEvents specification compliance
+        public static ContactEventEnvelope createCloudEvent(ContactEvent event, String source) {
+            return ContactEventEnvelope.builder()
+                .eventId(UUID.randomUUID().toString())
+                .eventType(event.getEventType())
+                .source(source)
+                .specVersion(&quot;1.0&quot;)
+                .timestamp(Instant.now())
+                .data(event)
+                .build();
+        }
+    }
+}
+</code></pre>
+<h3 id="2-subscription-management-best-practices">2. Subscription Management Best Practices</h3>
+<pre><code class="language-java">@Component
+public class SubscriptionBestPractices {
+
+    // Use consumer groups for load balancing
+    public void configureConsumerGroups() {
+        SubscriptionRequest request = SubscriptionRequest.builder()
+            .subscriberId(&quot;notification-service-1&quot;)
+            .topic(&quot;contact.events&quot;)
+            .consumerGroup(&quot;notification-processors&quot;) // Multiple instances share load
+            .maxConcurrency(5)
+            .batchSize(10)
+            .build();
+    }
+
+    // Implement graceful shutdown for subscribers
+    @PreDestroy
+    public void shutdown() {
+        log.info(&quot;Shutting down subscribers gracefully...&quot;);
+
+        // Stop accepting new messages
+        stopAcceptingMessages();
+
+        // Wait for in-flight messages to complete
+        waitForInflightMessages(Duration.ofSeconds(30));
+
+        // Unsubscribe from topics
+        unsubscribeFromAllTopics();
+
+        log.info(&quot;Subscriber shutdown completed&quot;);
+    }
+
+    // Use dead letter queues for failed message handling
+    @RetryableTopic(
+        attempts = &quot;3&quot;,
+        backoff = @Backoff(delay = 1000, multiplier = 2),
+        dltStrategy = DltStrategy.FAIL_ON_ERROR
+    )
+    @KafkaListener(topics = &quot;contact.events&quot;)
+    public void handleContactEvent(ContactEvent event) {
+        processEvent(event);
+    }
+
+    @DltHandler
+    public void handleDlt(ContactEvent event, @Header(&quot;kafka_dlt-exception-message&quot;) String exception) {
+        log.error(&quot;Message sent to DLT after retries: {}, exception: {}&quot;, 
+                 event.getEventId(), exception);
+        deadLetterService.handleFailedEvent(event, exception);
+    }
+}
+</code></pre>
+<h3 id="3-message-ordering-and-partitioning">3. Message Ordering and Partitioning</h3>
+<pre><code class="language-java">@Component
+public class MessageOrderingStrategy {
+
+    // Use message keys for ordered processing within partitions
+    public void publishOrderedEvent(ContactEvent event) {
+        String messageKey = event.getContactId(); // Events for same contact go to same partition
+
+        kafkaTemplate.send(&quot;contact.events&quot;, messageKey, event);
+    }
+
+    // Implement custom partitioner for specific ordering requirements
+    public class ContactPartitioner implements Partitioner {
+
+        @Override
+        public int partition(String topic, Object key, byte[] keyBytes, 
+                           Object value, byte[] valueBytes, Cluster cluster) {
+
+            if (key instanceof String) {
+                String contactId = (String) key;
+                // Use consistent hashing based on contact ID
+                return Math.abs(contactId.hashCode()) % cluster.partitionCountForTopic(topic);
+            }
+
+            // Fallback to round-robin
+            return ThreadLocalRandom.current().nextInt(cluster.partitionCountForTopic(topic));
+        }
+    }
+
+    // Handle out-of-order messages with sequence numbers
+    @Component
+    public class OrderedMessageProcessor {
+        private final Map&lt;String, Long&gt; lastProcessedSequence = new ConcurrentHashMap&lt;&gt;();
+
+        public void processMessage(ContactEvent event) {
+            String contactId = event.getContactId();
+            long eventSequence = event.getSequenceNumber();
+
+            Long lastSequence = lastProcessedSequence.get(contactId);
+
+            if (lastSequence == null || eventSequence == lastSequence + 1) {
+                // Process in-order message
+                doProcessMessage(event);
+                lastProcessedSequence.put(contactId, eventSequence);
+            } else if (eventSequence &gt; lastSequence + 1) {
+                // Out-of-order message - buffer for later processing
+                bufferOutOfOrderMessage(event);
+            } else {
+                // Duplicate or old message - ignore
+                log.warn(&quot;Ignoring duplicate/old message for contact {}: sequence {}, last processed: {}&quot;, 
+                         contactId, eventSequence, lastSequence);
+            }
+        }
+    }
+}
+</code></pre>
+<h2 id="common-pitfalls">Common Pitfalls</h2>
+<h3 id="1-message-duplication">1. <strong>Message Duplication</strong></h3>
+<p><strong>Problem</strong>: Subscribers receiving the same message multiple times<br />
+<strong>Solution</strong>: Implement idempotent message processing and duplicate detection</p>
+<h3 id="2-topic-proliferation">2. <strong>Topic Proliferation</strong></h3>
+<p><strong>Problem</strong>: Creating too many fine-grained topics leading to operational complexity<br />
+<strong>Solution</strong>: Use hierarchical topic naming and content-based filtering</p>
+<h3 id="3-unbounded-message-growth">3. <strong>Unbounded Message Growth</strong></h3>
+<p><strong>Problem</strong>: Topics growing indefinitely without retention policies<br />
+<strong>Solution</strong>: Configure appropriate retention policies and monitoring</p>
+<h3 id="4-subscriber-lag">4. <strong>Subscriber Lag</strong></h3>
+<p><strong>Problem</strong>: Slow subscribers causing message backlog<br />
+<strong>Solution</strong>: Implement consumer lag monitoring and auto-scaling</p>
+<h3 id="5-poison-messages">5. <strong>Poison Messages</strong></h3>
+<p><strong>Problem</strong>: Malformed messages causing subscriber failures<br />
+<strong>Solution</strong>: Use schema validation and dead letter queues</p>
+<h2 id="integration-in-distributed-systems">Integration in Distributed Systems</h2>
+<h3 id="event-driven-microservices">Event-Driven Microservices</h3>
+<pre><code class="language-java">@Service
+public class DistributedEventOrchestration {
+
+    @EventListener
+    public void handleOrderCreated(OrderCreatedEvent event) {
+        // Fan-out to multiple services
+        inventoryEventPublisher.publishInventoryReservation(event);
+        paymentEventPublisher.publishPaymentRequest(event);
+        shippingEventPublisher.publishShippingRequest(event);
+    }
+}
+</code></pre>
+<h3 id="multi-tenant-event-streaming">Multi-Tenant Event Streaming</h3>
+<pre><code class="language-java">@Service
+public class MultiTenantEventPublisher {
+
+    public void publishTenantEvent(String tenantId, TenantEvent event) {
+        String topicName = &quot;tenant.&quot; + tenantId + &quot;.events&quot;;
+        eventPublisher.publish(topicName, event);
+    }
+}
+</code></pre>
+<h2 id="conclusion">Conclusion</h2>
+<p>The Publish-Subscribe pattern is fundamental to building scalable, loosely coupled distributed systems. It provides:</p>
+<ul>
+<li><strong>Decoupled Communication</strong>: Publishers and subscribers operate independently</li>
+<li><strong>Scalable Distribution</strong>: One-to-many message delivery with dynamic subscription management</li>
+<li><strong>Event-Driven Architecture</strong>: Foundation for reactive, event-driven system design</li>
+<li><strong>Integration Flexibility</strong>: Support for heterogeneous systems and protocols</li>
+</ul>
+<p>When properly implemented with appropriate topic design, subscription management, and monitoring, the Publish-Subscribe pattern enables robust, scalable integration architectures that can evolve and adapt to changing business requirements.</p>
+<h2 id="references">References</h2>
+<ul>
+<li><a href="https://www.enterpriseintegrationpatterns.com/patterns/messaging/PublishSubscribeChannel.html">Enterprise Integration Patterns - Publish-Subscribe Channel</a></li>
+<li><a href="https://kafka.apache.org/documentation/">Apache Kafka Documentation</a></li>
+<li><a href="https://www.rabbitmq.com/tutorials/tutorial-three-java.html">RabbitMQ Publish/Subscribe Tutorial</a></li>
+<li><a href="https://microservices.io/patterns/data/event-driven-architecture.html">Event-Driven Architecture Patterns</a></li>
+</ul>
+
+      <a href="../index.html" class="back-to-top">← Back to All Patterns</a>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <p>©2026 <a href="https://dataintegrationmastery.com/">Data Integration Mastery™</a> — All Rights Reserved</p>
+  </footer>
+</body>
+</html>

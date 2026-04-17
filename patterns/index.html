@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Primary Meta Tags -->
+  <title>Integration Architecture Patterns — Free Reference Guide | Data Integration Mastery™</title>
+  <meta name="description" content="Comprehensive free reference guide to 39 integration architecture patterns: resilience, messaging, data transformation, routing, security, orchestration, and observability. Built for integration architects and developers.">
+  <meta name="keywords" content="integration architecture patterns, EAI patterns, integration design patterns, circuit breaker pattern, saga pattern, message queue, publish subscribe, API security patterns, data integration patterns, enterprise integration patterns">
+  <link rel="canonical" href="https://dataintegrationmastery.com/patterns/">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://dataintegrationmastery.com/patterns/">
+  <meta property="og:title" content="Integration Architecture Patterns — Free Reference Guide | Data Integration Mastery™">
+  <meta property="og:description" content="39 integration architecture patterns explained: resilience, messaging, data transformation, routing, security, orchestration, and monitoring. A free resource for architects and developers.">
+  <meta property="og:image" content="https://dataintegrationmastery.com/assets/images/logo.png">
+  <meta property="og:site_name" content="Data Integration Mastery">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Integration Architecture Patterns — Free Reference Guide">
+  <meta name="twitter:description" content="39 integration patterns explained: resilience, messaging, transformation, routing, security, orchestration, and observability.">
+  <meta name="twitter:image" content="https://dataintegrationmastery.com/assets/images/logo.png">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="css/docs.css">
+
+  <!-- Structured Data: TechArticle Collection -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": "Integration Architecture Patterns",
+    "description": "A comprehensive free reference guide covering 39 integration architecture patterns across 7 categories: resilience, messaging, data transformation, routing, security, orchestration, and monitoring & observability.",
+    "url": "https://dataintegrationmastery.com/patterns/",
+    "isPartOf": {
+      "@type": "WebSite",
+      "name": "Data Integration Mastery",
+      "url": "https://dataintegrationmastery.com"
+    },
+    "author": {
+      "@type": "Person",
+      "name": "Ari Vilkman",
+      "jobTitle": "Integration Architect",
+      "url": "https://www.linkedin.com/in/arivilkman/"
+    },
+    "provider": {
+      "@type": "Organization",
+      "name": "Data Integration Mastery",
+      "url": "https://dataintegrationmastery.com"
+    },
+    "about": [
+      {"@type": "Thing", "name": "Enterprise Application Integration"},
+      {"@type": "Thing", "name": "Integration Architecture"},
+      {"@type": "Thing", "name": "Design Patterns"},
+      {"@type": "Thing", "name": "Distributed Systems"}
+    ],
+    "educationalLevel": "Intermediate",
+    "audience": {
+      "@type": "Audience",
+      "audienceType": "Integration architects, solution designers, developers"
+    },
+    "inLanguage": "en",
+    "isAccessibleForFree": true
+  }
+  </script>
+
+  <!-- Structured Data: FAQPage (AEO) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What are integration architecture patterns?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Integration architecture patterns are proven, reusable design solutions for connecting systems, data, and processes in enterprise environments. They include resilience patterns (Circuit Breaker, Retry), messaging patterns (Pub-Sub, Message Queue), data transformation patterns (Aggregator, Splitter), routing patterns (Content-Based Router, Load Balancer), security patterns (Authentication, API Security), orchestration patterns (Saga, Choreography), and observability patterns (Distributed Tracing, Health Checks)."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How many integration patterns are covered in this guide?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "This reference guide covers 39 integration architecture patterns across 7 categories: Resilience (6 patterns), Messaging (6 patterns), Data Transformation (6 patterns), Routing (5 patterns), Security (6 patterns), Orchestration (5 patterns), and Monitoring & Observability (6 patterns). Each pattern includes theory, implementation guidance, best practices, and real-world examples."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Who should use this integration patterns reference?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "This reference is designed for IT professionals working with system integration: integration architects, solution designers, backend developers, and DevOps engineers. It is especially useful for professionals preparing for architecture roles or leading integration projects in enterprise environments."
+        }
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="https://dataintegrationmastery.com/" class="header-brand">
+        <img src="../assets/images/dim-icon.png" alt="DIM" width="36" height="36">
+        <span class="header-title">Data Integration Mastery™</span>
+      </a>
+      <nav class="header-nav" aria-label="Main navigation">
+        <a href="https://dataintegrationmastery.com/">Home</a>
+        <a href="https://dataintegrationmastery.com/#free-course">Free Course</a>
+        <a href="https://dataintegrationmastery.com/#mastering-integration-development">Courses</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="docs-layout">
+    <!-- Sidebar Navigation -->
+    <aside class="docs-sidebar" aria-label="Pattern categories">
+      <div class="sidebar-title">Pattern Categories</div>
+
+      <div class="sidebar-section">
+        <a href="#resilience" class="sidebar-section-title">🛡️ Resilience</a>
+        <ul class="sidebar-links">
+          <li><a href="resilience-patterns/circuit-breaker.html">Circuit Breaker</a></li>
+          <li><a href="resilience-patterns/retry-mechanism.html">Retry Mechanism</a></li>
+          <li><a href="resilience-patterns/timeout.html">Timeout</a></li>
+          <li><a href="resilience-patterns/dead-letter-queue.html">Dead Letter Queue</a></li>
+          <li><a href="resilience-patterns/bulkhead.html">Bulkhead</a></li>
+          <li><a href="resilience-patterns/fallback-graceful-degradation.html">Fallback / Graceful Degradation</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-section">
+        <a href="#messaging" class="sidebar-section-title">📨 Messaging</a>
+        <ul class="sidebar-links">
+          <li><a href="messaging-patterns/request-reply.html">Request-Reply</a></li>
+          <li><a href="messaging-patterns/publish-subscribe.html">Publish-Subscribe</a></li>
+          <li><a href="messaging-patterns/message-queue.html">Message Queue</a></li>
+          <li><a href="messaging-patterns/event-streaming.html">Event Streaming</a></li>
+          <li><a href="messaging-patterns/correlation-id.html">Correlation ID</a></li>
+          <li><a href="messaging-patterns/message-routing.html">Message Routing</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-section">
+        <a href="#transformation" class="sidebar-section-title">🔄 Data Transformation</a>
+        <ul class="sidebar-links">
+          <li><a href="data-transformation-patterns/message-translator.html">Message Translator</a></li>
+          <li><a href="data-transformation-patterns/content-filter.html">Content Filter</a></li>
+          <li><a href="data-transformation-patterns/message-router.html">Message Router</a></li>
+          <li><a href="data-transformation-patterns/aggregator.html">Aggregator</a></li>
+          <li><a href="data-transformation-patterns/splitter.html">Splitter</a></li>
+          <li><a href="data-transformation-patterns/data-mapper.html">Data Mapper</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-section">
+        <a href="#routing" class="sidebar-section-title">🔀 Routing</a>
+        <ul class="sidebar-links">
+          <li><a href="routing-patterns/content-based-router.html">Content-Based Router</a></li>
+          <li><a href="routing-patterns/recipient-list.html">Recipient List</a></li>
+          <li><a href="routing-patterns/load-balancer.html">Load Balancer</a></li>
+          <li><a href="routing-patterns/message-filter.html">Message Filter</a></li>
+          <li><a href="routing-patterns/dynamic-router.html">Dynamic Router</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-section">
+        <a href="#security" class="sidebar-section-title">🔐 Security</a>
+        <ul class="sidebar-links">
+          <li><a href="security-patterns/authentication.html">Authentication</a></li>
+          <li><a href="security-patterns/authorization.html">Authorization</a></li>
+          <li><a href="security-patterns/encryption.html">Encryption</a></li>
+          <li><a href="security-patterns/token-management.html">Token Management</a></li>
+          <li><a href="security-patterns/api-security.html">API Security</a></li>
+          <li><a href="security-patterns/secret-management.html">Secret Management</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-section">
+        <a href="#orchestration" class="sidebar-section-title">🎭 Orchestration</a>
+        <ul class="sidebar-links">
+          <li><a href="orchestration-patterns/saga-pattern.html">Saga Pattern</a></li>
+          <li><a href="orchestration-patterns/process-manager.html">Process Manager</a></li>
+          <li><a href="orchestration-patterns/workflow-engine.html">Workflow Engine</a></li>
+          <li><a href="orchestration-patterns/choreography.html">Choreography</a></li>
+          <li><a href="orchestration-patterns/compensation-transactions.html">Compensation Transactions</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-section">
+        <a href="#observability" class="sidebar-section-title">📊 Monitoring &amp; Observability</a>
+        <ul class="sidebar-links">
+          <li><a href="monitoring-observability-patterns/distributed-tracing.html">Distributed Tracing</a></li>
+          <li><a href="monitoring-observability-patterns/metrics-collection.html">Metrics Collection</a></li>
+          <li><a href="monitoring-observability-patterns/health-checks.html">Health Checks</a></li>
+          <li><a href="monitoring-observability-patterns/logging-strategies.html">Logging Strategies</a></li>
+          <li><a href="monitoring-observability-patterns/performance-monitoring.html">Performance Monitoring</a></li>
+          <li><a href="monitoring-observability-patterns/error-tracking.html">Error Tracking</a></li>
+        </ul>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main id="main-content" class="docs-content">
+      <div class="breadcrumb">
+        <a href="https://dataintegrationmastery.com/">Home</a>
+        <span class="sep">›</span>
+        <strong>Integration Architecture Patterns</strong>
+      </div>
+
+      <div class="docs-hero">
+        <h1>Integration Architecture Patterns</h1>
+        <p class="subtitle">A free, comprehensive reference guide to the design patterns that power modern system integration — from resilience and messaging to security and orchestration.</p>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-item">
+          <span class="stat-number">39</span>
+          <span class="stat-label">Patterns</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">7</span>
+          <span class="stat-label">Categories</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">Free</span>
+          <span class="stat-label">Open Access</span>
+        </div>
+      </div>
+
+      <div class="value-box">
+        <h2>Why This Reference?</h2>
+        <p>Integration architecture is one of the most in-demand skills in enterprise IT — yet there are very few practical, well-organized references that connect <strong>theory to real-world implementation</strong>.</p>
+        <p>This guide gives you:</p>
+        <ul>
+          <li><strong>Proven patterns</strong> used daily in enterprise integration projects — EAI, microservices, APIs, and event-driven architectures</li>
+          <li><strong>Theoretical foundations</strong> so you understand <em>why</em> each pattern exists and when to apply it</li>
+          <li><strong>Implementation guidance</strong> with configuration examples and platform-specific notes</li>
+          <li><strong>Best practices and pitfalls</strong> drawn from real integration projects</li>
+          <li><strong>Architecture context</strong> — how patterns relate to each other and combine in production systems</li>
+        </ul>
+        <p>Whether you're designing a new integration, reviewing architecture decisions, or preparing for an architect role — this is your go-to reference.</p>
+      </div>
+
+      <p>Published by <a href="https://dataintegrationmastery.com/">Data Integration Mastery™</a> — an education platform for experienced IT professionals moving into integration architecture. Created by <strong>Ari Vilkman</strong>, integration architect and consultant with 25+ years of experience.</p>
+
+      <hr style="margin: 2.5rem 0; border: none; border-top: 1px solid #e2e2e8;">
+
+      <!-- ==================== RESILIENCE ==================== -->
+      <div class="category-header" id="resilience">
+        <span class="category-icon">🛡️</span>
+        <h2 style="margin:0; border:none; padding:0;">Resilience Patterns</h2>
+      </div>
+      <p>Patterns that ensure system reliability and fault tolerance in distributed environments.</p>
+      <div class="pattern-grid">
+        <a href="resilience-patterns/circuit-breaker.html" class="pattern-card">
+          <h3>Circuit Breaker</h3>
+          <p>Automatic protection against cascading failures by monitoring service health and short-circuiting requests to failing dependencies.</p>
+        </a>
+        <a href="resilience-patterns/retry-mechanism.html" class="pattern-card">
+          <h3>Retry Mechanism</h3>
+          <p>Automatic recovery from transient failures with configurable delays, backoff strategies, and retry policies.</p>
+        </a>
+        <a href="resilience-patterns/timeout.html" class="pattern-card">
+          <h3>Timeout</h3>
+          <p>Bounded execution time for operations, preventing indefinite hangs and protecting system resources.</p>
+        </a>
+        <a href="resilience-patterns/dead-letter-queue.html" class="pattern-card">
+          <h3>Dead Letter Queue</h3>
+          <p>Systematic handling of failed messages — preserving them for analysis and reprocessing instead of losing data.</p>
+        </a>
+        <a href="resilience-patterns/bulkhead.html" class="pattern-card">
+          <h3>Bulkhead</h3>
+          <p>Resource isolation that compartmentalizes failures, preventing problems in one area from affecting the entire system.</p>
+        </a>
+        <a href="resilience-patterns/fallback-graceful-degradation.html" class="pattern-card">
+          <h3>Fallback / Graceful Degradation</h3>
+          <p>Alternative responses when primary services fail — maintaining core functionality during partial outages.</p>
+        </a>
+      </div>
+
+      <!-- ==================== MESSAGING ==================== -->
+      <div class="category-header" id="messaging">
+        <span class="category-icon">📨</span>
+        <h2 style="margin:0; border:none; padding:0;">Messaging Patterns</h2>
+      </div>
+      <p>Patterns for communication between distributed systems and services.</p>
+      <div class="pattern-grid">
+        <a href="messaging-patterns/request-reply.html" class="pattern-card">
+          <h3>Request-Reply</h3>
+          <p>Synchronous-style communication in distributed systems through structured message exchange.</p>
+        </a>
+        <a href="messaging-patterns/publish-subscribe.html" class="pattern-card">
+          <h3>Publish-Subscribe</h3>
+          <p>One-to-many communication through asynchronous message distribution to topic-based subscribers.</p>
+        </a>
+        <a href="messaging-patterns/message-queue.html" class="pattern-card">
+          <h3>Message Queue</h3>
+          <p>Reliable point-to-point message delivery with temporal decoupling and load leveling.</p>
+        </a>
+        <a href="messaging-patterns/event-streaming.html" class="pattern-card">
+          <h3>Event Streaming</h3>
+          <p>Continuous real-time data processing through persistent, append-only event logs.</p>
+        </a>
+        <a href="messaging-patterns/correlation-id.html" class="pattern-card">
+          <h3>Correlation ID</h3>
+          <p>Distributed tracing and request correlation across service boundaries using unique identifiers.</p>
+        </a>
+        <a href="messaging-patterns/message-routing.html" class="pattern-card">
+          <h3>Message Routing</h3>
+          <p>Intelligent message distribution based on content, headers, or configurable routing rules.</p>
+        </a>
+      </div>
+
+      <!-- ==================== DATA TRANSFORMATION ==================== -->
+      <div class="category-header" id="transformation">
+        <span class="category-icon">🔄</span>
+        <h2 style="margin:0; border:none; padding:0;">Data Transformation Patterns</h2>
+      </div>
+      <p>Patterns for data conversion, filtering, and processing between systems.</p>
+      <div class="pattern-grid">
+        <a href="data-transformation-patterns/message-translator.html" class="pattern-card">
+          <h3>Message Translator</h3>
+          <p>Converting data between different formats and protocols while preserving semantic meaning.</p>
+        </a>
+        <a href="data-transformation-patterns/content-filter.html" class="pattern-card">
+          <h3>Content Filter</h3>
+          <p>Selective data transmission by removing unwanted or sensitive elements from messages.</p>
+        </a>
+        <a href="data-transformation-patterns/message-router.html" class="pattern-card">
+          <h3>Message Router</h3>
+          <p>Dynamic destination selection based on message content, headers, or routing logic.</p>
+        </a>
+        <a href="data-transformation-patterns/aggregator.html" class="pattern-card">
+          <h3>Aggregator</h3>
+          <p>Collecting and combining related messages into single, cohesive results.</p>
+        </a>
+        <a href="data-transformation-patterns/splitter.html" class="pattern-card">
+          <h3>Splitter</h3>
+          <p>Dividing composite messages into multiple individual messages for separate processing.</p>
+        </a>
+        <a href="data-transformation-patterns/data-mapper.html" class="pattern-card">
+          <h3>Data Mapper</h3>
+          <p>Sophisticated mapping and conversion between different data formats and structures.</p>
+        </a>
+      </div>
+
+      <!-- ==================== ROUTING ==================== -->
+      <div class="category-header" id="routing">
+        <span class="category-icon">🔀</span>
+        <h2 style="margin:0; border:none; padding:0;">Routing Patterns</h2>
+      </div>
+      <p>Patterns for directing messages and requests to the right destination.</p>
+      <div class="pattern-grid">
+        <a href="routing-patterns/content-based-router.html" class="pattern-card">
+          <h3>Content-Based Router</h3>
+          <p>Intelligent message routing based on content analysis and conditional logic.</p>
+        </a>
+        <a href="routing-patterns/recipient-list.html" class="pattern-card">
+          <h3>Recipient List</h3>
+          <p>Broadcasting messages to multiple destinations based on dynamic recipient determination.</p>
+        </a>
+        <a href="routing-patterns/load-balancer.html" class="pattern-card">
+          <h3>Load Balancer</h3>
+          <p>Intelligent workload distribution across multiple endpoints for optimal performance.</p>
+        </a>
+        <a href="routing-patterns/message-filter.html" class="pattern-card">
+          <h3>Message Filter</h3>
+          <p>Selective message processing through intelligent filtering based on content and business rules.</p>
+        </a>
+        <a href="routing-patterns/dynamic-router.html" class="pattern-card">
+          <h3>Dynamic Router</h3>
+          <p>Runtime routing decisions using configurable rules, system state, and adaptive algorithms.</p>
+        </a>
+      </div>
+
+      <!-- ==================== SECURITY ==================== -->
+      <div class="category-header" id="security">
+        <span class="category-icon">🔐</span>
+        <h2 style="margin:0; border:none; padding:0;">Security Patterns</h2>
+      </div>
+      <p>Patterns for securing integrations, APIs, and data flows.</p>
+      <div class="pattern-grid">
+        <a href="security-patterns/authentication.html" class="pattern-card">
+          <h3>Authentication</h3>
+          <p>Identity verification through multi-factor authentication, JWT tokens, certificates, and secure credential management.</p>
+        </a>
+        <a href="security-patterns/authorization.html" class="pattern-card">
+          <h3>Authorization</h3>
+          <p>Access control through RBAC, ABAC, resource-based permissions, and dynamic policy enforcement.</p>
+        </a>
+        <a href="security-patterns/encryption.html" class="pattern-card">
+          <h3>Encryption</h3>
+          <p>Data protection through symmetric/asymmetric encryption, key management, and cryptographic security.</p>
+        </a>
+        <a href="security-patterns/token-management.html" class="pattern-card">
+          <h3>Token Management</h3>
+          <p>Secure token lifecycle management including generation, validation, renewal, and revocation.</p>
+        </a>
+        <a href="security-patterns/api-security.html" class="pattern-card">
+          <h3>API Security</h3>
+          <p>Comprehensive API protection through multi-layered security, threat prevention, and security gateways.</p>
+        </a>
+        <a href="security-patterns/secret-management.html" class="pattern-card">
+          <h3>Secret Management</h3>
+          <p>Centralized secret storage, lifecycle management, and secure runtime injection of sensitive data.</p>
+        </a>
+      </div>
+
+      <!-- ==================== ORCHESTRATION ==================== -->
+      <div class="category-header" id="orchestration">
+        <span class="category-icon">🎭</span>
+        <h2 style="margin:0; border:none; padding:0;">Orchestration Patterns</h2>
+      </div>
+      <p>Patterns for coordinating complex workflows and distributed transactions.</p>
+      <div class="pattern-grid">
+        <a href="orchestration-patterns/saga-pattern.html" class="pattern-card">
+          <h3>Saga Pattern</h3>
+          <p>Distributed transaction management through sequences of local transactions with compensating actions.</p>
+        </a>
+        <a href="orchestration-patterns/process-manager.html" class="pattern-card">
+          <h3>Process Manager</h3>
+          <p>Stateful orchestration of complex business workflows with centralized state management.</p>
+        </a>
+        <a href="orchestration-patterns/workflow-engine.html" class="pattern-card">
+          <h3>Workflow Engine</h3>
+          <p>Declarative business process execution through dedicated workflow engines.</p>
+        </a>
+        <a href="orchestration-patterns/choreography.html" class="pattern-card">
+          <h3>Choreography</h3>
+          <p>Decentralized coordination through event-driven service collaboration.</p>
+        </a>
+        <a href="orchestration-patterns/compensation-transactions.html" class="pattern-card">
+          <h3>Compensation Transactions</h3>
+          <p>Systematic error recovery through semantically inverse operations.</p>
+        </a>
+      </div>
+
+      <!-- ==================== MONITORING ==================== -->
+      <div class="category-header" id="observability">
+        <span class="category-icon">📊</span>
+        <h2 style="margin:0; border:none; padding:0;">Monitoring &amp; Observability Patterns</h2>
+      </div>
+      <p>Patterns for system monitoring, debugging, and operational visibility.</p>
+      <div class="pattern-grid">
+        <a href="monitoring-observability-patterns/distributed-tracing.html" class="pattern-card">
+          <h3>Distributed Tracing</h3>
+          <p>End-to-end request tracking across distributed services with comprehensive trace correlation.</p>
+        </a>
+        <a href="monitoring-observability-patterns/metrics-collection.html" class="pattern-card">
+          <h3>Metrics Collection</h3>
+          <p>Systematic collection and analysis of system performance and business metrics.</p>
+        </a>
+        <a href="monitoring-observability-patterns/health-checks.html" class="pattern-card">
+          <h3>Health Checks</h3>
+          <p>Proactive system health verification through automated diagnostic procedures.</p>
+        </a>
+        <a href="monitoring-observability-patterns/logging-strategies.html" class="pattern-card">
+          <h3>Logging Strategies</h3>
+          <p>Structured, comprehensive logging for effective troubleshooting and audit trails.</p>
+        </a>
+        <a href="monitoring-observability-patterns/performance-monitoring.html" class="pattern-card">
+          <h3>Performance Monitoring</h3>
+          <p>Multi-dimensional performance measurement and optimization across applications and infrastructure.</p>
+        </a>
+        <a href="monitoring-observability-patterns/error-tracking.html" class="pattern-card">
+          <h3>Error Tracking</h3>
+          <p>Systematic error capture, analysis, and resolution management for improved system reliability.</p>
+        </a>
+      </div>
+
+      <hr style="margin: 2.5rem 0; border: none; border-top: 1px solid #e2e2e8;">
+
+      <h2>References</h2>
+      <ul>
+        <li><strong>Enterprise Integration Patterns</strong> by Gregor Hohpe and Bobby Woolf</li>
+        <li><strong>Microservices Patterns</strong> by Chris Richardson</li>
+        <li><strong>Building Microservices</strong> by Sam Newman</li>
+      </ul>
+
+      <hr style="margin: 2.5rem 0; border: none; border-top: 1px solid #e2e2e8;">
+
+      <h2>Learn Integration Architecture</h2>
+      <p>These patterns are a foundation — but understanding how to <em>apply</em> them in real projects requires deeper learning. Data Integration Mastery™ offers structured courses that build on these patterns:</p>
+      <ul>
+        <li><strong><a href="https://www.udemy.com/course/introduction-to-data-integration/?referralCode=BBA50D056FBA62780EB6">Introduction to Data Integration</a></strong> — Free course covering integration fundamentals</li>
+        <li><strong><a href="https://www.udemy.com/course/mastering-integration-development/?referralCode=C70D949BE0C796967050">Mastering Integration Development</a></strong> — Advanced course on designing and leading integration projects</li>
+      </ul>
+      <p><a href="https://dataintegrationmastery.com/">← Back to Data Integration Mastery™ Home</a></p>
+
+    </main>
+  </div>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <p>©2026 <a href="https://dataintegrationmastery.com/">Data Integration Mastery™</a> — All Rights Reserved</p>
+  </footer>
+</body>
+</html>

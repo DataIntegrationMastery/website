@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Request-Reply Pattern — Integration Architecture Patterns | Data Integration Mastery™</title>
+  <meta name="description" content="The Request-Reply pattern is a fundamental messaging pattern that enables synchronous-style communication in distributed systems through asynchronous message...">
+  <meta name="keywords" content="request-reply pattern, integration pattern, messaging patterns, integration architecture, EAI patterns, data integration">
+  <link rel="canonical" href="https://dataintegrationmastery.com/patterns/messaging-patterns/request-reply.html">
+
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://dataintegrationmastery.com/patterns/messaging-patterns/request-reply.html">
+  <meta property="og:title" content="Request-Reply Pattern — Integration Architecture Patterns">
+  <meta property="og:description" content="The Request-Reply pattern is a fundamental messaging pattern that enables synchronous-style communication in distributed systems through asynchronous message...">
+  <meta property="og:image" content="https://dataintegrationmastery.com/assets/images/logo.png">
+  <meta property="og:site_name" content="Data Integration Mastery">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Request-Reply Pattern — Integration Architecture Patterns">
+  <meta name="twitter:description" content="The Request-Reply pattern is a fundamental messaging pattern that enables synchronous-style communication in distributed systems through asynchronous message...">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/docs.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Request-Reply Pattern",
+    "description": "The Request-Reply pattern is a fundamental messaging pattern that enables synchronous-style communication in distributed systems through asynchronous message...",
+    "url": "https://dataintegrationmastery.com/patterns/messaging-patterns/request-reply.html",
+    "author": {
+      "@type": "Person",
+      "name": "Ari Vilkman",
+      "jobTitle": "Integration Architect"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Data Integration Mastery",
+      "url": "https://dataintegrationmastery.com"
+    },
+    "isPartOf": {
+      "@type": "CollectionPage",
+      "name": "Integration Architecture Patterns",
+      "url": "https://dataintegrationmastery.com/patterns/"
+    },
+    "about": {
+      "@type": "Thing",
+      "name": "Request-Reply Pattern"
+    },
+    "inLanguage": "en",
+    "isAccessibleForFree": true
+  }
+  </script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="https://dataintegrationmastery.com/" class="header-brand">
+        <img src="../../assets/images/dim-icon.png" alt="DIM" width="36" height="36">
+        <span class="header-title">Data Integration Mastery™</span>
+      </a>
+      <nav class="header-nav" aria-label="Main navigation">
+        <a href="https://dataintegrationmastery.com/">Home</a>
+        <a href="../index.html">All Patterns</a>
+        <a href="https://dataintegrationmastery.com/#free-course">Free Course</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="docs-layout">
+    <aside class="docs-sidebar" aria-label="Pattern categories">
+      <div class="sidebar-title">Pattern Categories</div>
+<div class="sidebar-section">
+  <a href="../index.html#resilience" class="sidebar-section-title">🛡️ Resilience Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../resilience-patterns/circuit-breaker.html">Circuit Breaker</a></li>
+    <li><a href="../resilience-patterns/retry-mechanism.html">Retry Mechanism</a></li>
+    <li><a href="../resilience-patterns/timeout.html">Timeout</a></li>
+    <li><a href="../resilience-patterns/dead-letter-queue.html">Dead Letter Queue</a></li>
+    <li><a href="../resilience-patterns/bulkhead.html">Bulkhead</a></li>
+    <li><a href="../resilience-patterns/fallback-graceful-degradation.html">Fallback / Graceful Degradation</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#messaging" class="sidebar-section-title">📨 Messaging Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="request-reply.html" class="active">Request-Reply</a></li>
+    <li><a href="publish-subscribe.html">Publish-Subscribe</a></li>
+    <li><a href="message-queue.html">Message Queue</a></li>
+    <li><a href="event-streaming.html">Event Streaming</a></li>
+    <li><a href="correlation-id.html">Correlation ID</a></li>
+    <li><a href="message-routing.html">Message Routing</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#data-transformation" class="sidebar-section-title">🔄 Data Transformation Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../data-transformation-patterns/message-translator.html">Message Translator</a></li>
+    <li><a href="../data-transformation-patterns/content-filter.html">Content Filter</a></li>
+    <li><a href="../data-transformation-patterns/message-router.html">Message Router</a></li>
+    <li><a href="../data-transformation-patterns/aggregator.html">Aggregator</a></li>
+    <li><a href="../data-transformation-patterns/splitter.html">Splitter</a></li>
+    <li><a href="../data-transformation-patterns/data-mapper.html">Data Mapper</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#routing" class="sidebar-section-title">🔀 Routing Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../routing-patterns/content-based-router.html">Content-Based Router</a></li>
+    <li><a href="../routing-patterns/recipient-list.html">Recipient List</a></li>
+    <li><a href="../routing-patterns/load-balancer.html">Load Balancer</a></li>
+    <li><a href="../routing-patterns/message-filter.html">Message Filter</a></li>
+    <li><a href="../routing-patterns/dynamic-router.html">Dynamic Router</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#security" class="sidebar-section-title">🔐 Security Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../security-patterns/authentication.html">Authentication</a></li>
+    <li><a href="../security-patterns/authorization.html">Authorization</a></li>
+    <li><a href="../security-patterns/encryption.html">Encryption</a></li>
+    <li><a href="../security-patterns/token-management.html">Token Management</a></li>
+    <li><a href="../security-patterns/api-security.html">API Security</a></li>
+    <li><a href="../security-patterns/secret-management.html">Secret Management</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#orchestration" class="sidebar-section-title">🎭 Orchestration Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../orchestration-patterns/saga-pattern.html">Saga Pattern</a></li>
+    <li><a href="../orchestration-patterns/process-manager.html">Process Manager</a></li>
+    <li><a href="../orchestration-patterns/workflow-engine.html">Workflow Engine</a></li>
+    <li><a href="../orchestration-patterns/choreography.html">Choreography</a></li>
+    <li><a href="../orchestration-patterns/compensation-transactions.html">Compensation Transactions</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#observability" class="sidebar-section-title">📊 Monitoring & Observability Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../monitoring-observability-patterns/distributed-tracing.html">Distributed Tracing</a></li>
+    <li><a href="../monitoring-observability-patterns/metrics-collection.html">Metrics Collection</a></li>
+    <li><a href="../monitoring-observability-patterns/health-checks.html">Health Checks</a></li>
+    <li><a href="../monitoring-observability-patterns/logging-strategies.html">Logging Strategies</a></li>
+    <li><a href="../monitoring-observability-patterns/performance-monitoring.html">Performance Monitoring</a></li>
+    <li><a href="../monitoring-observability-patterns/error-tracking.html">Error Tracking</a></li>
+  </ul>
+</div>
+
+    </aside>
+
+    <main id="main-content" class="docs-content">
+      <div class="breadcrumb">
+        <a href="https://dataintegrationmastery.com/">Home</a>
+        <span class="sep">›</span>
+        <a href="../index.html">Patterns</a>
+        <span class="sep">›</span>
+        <a href="../index.html#messaging">Messaging Patterns</a>
+        <span class="sep">›</span>
+        <strong>Request-Reply Pattern</strong>
+      </div>
+
+      <h1>Request-Reply Pattern</h1>
+
+      <h2 id="overview">Overview</h2>
+<p>The Request-Reply pattern is a fundamental messaging pattern that enables synchronous-style communication in distributed systems through asynchronous message exchange. It provides a structured approach for implementing point-to-point communication where a client sends a request message and expects to receive a corresponding reply message, effectively bridging the gap between synchronous and asynchronous communication paradigms.</p>
+<h3 id="theoretical-foundation">Theoretical Foundation</h3>
+<p>The Request-Reply pattern is rooted in <strong>distributed systems communication theory</strong> and <strong>message-oriented middleware principles</strong>. It addresses the fundamental challenge of implementing request-response semantics in loosely coupled, distributed architectures. The pattern embodies the principle of <strong>"temporal decoupling with logical coupling"</strong> - maintaining the familiar request-response interaction model while enabling independent component lifecycles and deployment flexibility.</p>
+<h3 id="core-principles">Core Principles</h3>
+<h4 id="1-message-based-request-response-semantics">1. <strong>Message-Based Request-Response Semantics</strong></h4>
+<p>The pattern transforms traditional synchronous method calls into asynchronous message exchanges while preserving the request-response interaction model that developers expect.</p>
+<h4 id="2-correlation-management">2. <strong>Correlation Management</strong></h4>
+<p>Each request message is associated with a unique correlation identifier that links the eventual response back to the original request, enabling proper request-reply matching in concurrent environments.</p>
+<h4 id="3-temporal-decoupling">3. <strong>Temporal Decoupling</strong></h4>
+<p>Unlike direct API calls, request-reply messaging allows the requestor and responder to operate independently in time, with messages persisted in queues until processing is possible.</p>
+<h4 id="4-location-transparency">4. <strong>Location Transparency</strong></h4>
+<p>The pattern abstracts the physical location and deployment details of the responding service, enabling location independence and dynamic service discovery.</p>
+<h3 id="why-request-reply-is-essential-in-integration-architecture">Why Request-Reply is Essential in Integration Architecture</h3>
+<h4 id="1-legacy-system-integration">1. <strong>Legacy System Integration</strong></h4>
+<p>Many enterprise systems are designed around synchronous communication patterns:
+- <strong>Database-centric applications</strong> expecting immediate responses to queries
+- <strong>Mainframe systems</strong> operating on transaction-response cycles
+- <strong>ERP systems</strong> requiring confirmation of business operations
+- <strong>Synchronous API consumers</strong> needing familiar interaction patterns</p>
+<h4 id="2-service-boundary-management">2. <strong>Service Boundary Management</strong></h4>
+<p>Request-reply enables clean service boundaries while maintaining familiar semantics:
+- <strong>Service encapsulation</strong> with well-defined request-response contracts
+- <strong>Interface standardization</strong> across different technology stacks
+- <strong>Protocol abstraction</strong> hiding underlying messaging complexity from business logic
+- <strong>Service versioning</strong> through message schema evolution</p>
+<h4 id="3-transaction-context-preservation">3. <strong>Transaction Context Preservation</strong></h4>
+<p>The pattern maintains transactional context across service boundaries:
+- <strong>Business process continuity</strong> where operations depend on immediate results
+- <strong>Data consistency requirements</strong> needing confirmation before proceeding
+- <strong>Error handling propagation</strong> from service providers back to consumers
+- <strong>Audit trail maintenance</strong> linking requests with their corresponding responses</p>
+<h4 id="4-performance-optimization">4. <strong>Performance Optimization</strong></h4>
+<p>Request-reply enables various performance optimization strategies:
+- <strong>Connection pooling</strong> and resource sharing across multiple requests
+- <strong>Batch processing</strong> optimization while maintaining individual response semantics
+- <strong>Caching strategies</strong> at the messaging layer for frequently requested data
+- <strong>Load balancing</strong> across multiple service instances transparently</p>
+<h3 id="benefits-in-integration-contexts">Benefits in Integration Contexts</h3>
+<h4 id="1-familiar-programming-model">1. <strong>Familiar Programming Model</strong></h4>
+<ul>
+<li><strong>Reduced cognitive load</strong> for developers accustomed to synchronous patterns</li>
+<li><strong>Easier migration</strong> from monolithic to distributed architectures</li>
+<li><strong>Simplified error handling</strong> with direct exception propagation semantics</li>
+<li><strong>Intuitive debugging</strong> with clear request-response correlation</li>
+</ul>
+<h4 id="2-enhanced-reliability">2. <strong>Enhanced Reliability</strong></h4>
+<ul>
+<li><strong>Message persistence</strong> ensuring requests survive temporary service outages</li>
+<li><strong>Retry capabilities</strong> built into the messaging infrastructure</li>
+<li><strong>Dead letter handling</strong> for requests that cannot be processed</li>
+<li><strong>Transaction coordination</strong> across distributed service boundaries</li>
+</ul>
+<h4 id="3-scalability-and-flexibility">3. <strong>Scalability and Flexibility</strong></h4>
+<ul>
+<li><strong>Dynamic service discovery</strong> enabling runtime service location changes</li>
+<li><strong>Load distribution</strong> across multiple service instances automatically</li>
+<li><strong>Service lifecycle independence</strong> allowing independent deployment and scaling</li>
+<li><strong>Protocol flexibility</strong> supporting different underlying transport mechanisms</li>
+</ul>
+<h4 id="4-monitoring-and-governance">4. <strong>Monitoring and Governance</strong></h4>
+<ul>
+<li><strong>Request tracking</strong> through correlation identifiers across system boundaries</li>
+<li><strong>Performance monitoring</strong> of request-response latencies and volumes</li>
+<li><strong>Service level agreement (SLA) enforcement</strong> through timeout management</li>
+<li><strong>Audit capabilities</strong> with complete request-response logging</li>
+</ul>
+<h3 id="integration-architecture-applications">Integration Architecture Applications</h3>
+<h4 id="1-microservices-communication">1. <strong>Microservices Communication</strong></h4>
+<p>Request-reply serves as the backbone for inter-service communication:
+- <strong>Service-to-service API calls</strong> with messaging-based transport
+- <strong>Command-query separation</strong> with dedicated request-reply channels
+- <strong>Service mesh integration</strong> providing transparent request-reply semantics
+- <strong>Cross-cutting concern handling</strong> like authentication and authorization</p>
+<h4 id="2-enterprise-service-bus-esb-integration">2. <strong>Enterprise Service Bus (ESB) Integration</strong></h4>
+<p>ESB architectures leverage request-reply for service mediation:
+- <strong>Protocol bridging</strong> between different communication standards
+- <strong>Message transformation</strong> and enrichment during request-reply flows
+- <strong>Service orchestration</strong> coordinating multiple request-reply interactions
+- <strong>Enterprise application integration</strong> connecting disparate systems</p>
+<h4 id="3-event-driven-architecture-enhancement">3. <strong>Event-Driven Architecture Enhancement</strong></h4>
+<p>Request-reply complements purely asynchronous event patterns:
+- <strong>Synchronous queries</strong> in predominantly asynchronous systems
+- <strong>State inquiry</strong> services providing current system state on demand
+- <strong>Command acknowledgment</strong> confirming successful event processing
+- <strong>Reference data lookup</strong> during asynchronous event processing</p>
+<h4 id="4-api-gateway-implementation">4. <strong>API Gateway Implementation</strong></h4>
+<p>API gateways use request-reply for backend service integration:
+- <strong>Backend service aggregation</strong> collecting data from multiple services
+- <strong>Protocol translation</strong> between HTTP and messaging systems
+- <strong>Request routing</strong> to appropriate backend services based on content
+- <strong>Response composition</strong> assembling unified responses from multiple services</p>
+<h2 id="how-request-reply-pattern-works">How Request-Reply Pattern Works</h2>
+<p>The Request-Reply pattern operates through a coordinated message exchange involving request queues, reply queues, and correlation mechanisms:</p>
+<h3 id="basic-request-reply-flow">Basic Request-Reply Flow</h3>
+<pre><code>Client Application                    Service Provider
+       │                                     │
+       ├──1. Send Request Message──────────→ │
+       │   (with CorrelationId &amp;             │
+       │    ReplyTo queue address)           │
+       │                                     │
+       ├──2. Wait for Reply──────┐           │
+       │                         │           ├──3. Process Request
+       │                         │           │
+       │                         │           ├──4. Send Reply Message──┐
+       │                         │           │   (with CorrelationId)  │
+       │                         │           │                         │
+       │   ┌─────────────────────┘           │                         │
+       ├──5. Receive Reply←───────────────────────────────────────────┘
+       │   (match CorrelationId)
+       │
+       ├──6. Process Response
+</code></pre>
+<h3 id="message-flow-components">Message Flow Components</h3>
+<h4 id="1-request-message-structure">1. <strong>Request Message Structure</strong></h4>
+<pre><code>┌─────────────────────────────────────┐
+│ Request Message                     │
+├─────────────────────────────────────┤
+│ Headers:                            │
+│  - CorrelationId: uuid-1234         │
+│  - ReplyTo: reply.queue.name        │
+│  - MessageType: REQUEST             │
+│  - Timestamp: 2025-12-30T10:00:00Z  │
+├─────────────────────────────────────┤
+│ Payload:                            │
+│  - Request data (JSON/XML/Binary)   │
+│  - Operation parameters             │
+│  - Security context                 │
+└─────────────────────────────────────┘
+</code></pre>
+<h4 id="2-reply-message-structure">2. <strong>Reply Message Structure</strong></h4>
+<pre><code>┌─────────────────────────────────────┐
+│ Reply Message                       │
+├─────────────────────────────────────┤
+│ Headers:                            │
+│  - CorrelationId: uuid-1234         │
+│  - MessageType: REPLY               │
+│  - Status: SUCCESS|ERROR            │
+│  - Timestamp: 2025-12-30T10:00:05Z  │
+├─────────────────────────────────────┤
+│ Payload:                            │
+│  - Response data                    │
+│  - Error information (if failed)    │
+│  - Processing metadata              │
+└─────────────────────────────────────┘
+</code></pre>
+<h3 id="request-reply-interaction-types">Request-Reply Interaction Types</h3>
+<h4 id="1-synchronous-request-reply">1. <strong>Synchronous Request-Reply</strong></h4>
+<pre><code>Client ──Request──→ [Queue] ──→ Service
+   ↑                              ↓
+   └──Reply←──[Reply Queue] ←──Reply
+</code></pre>
+<h4 id="2-asynchronous-request-reply">2. <strong>Asynchronous Request-Reply</strong></h4>
+<pre><code>Client ──Request──→ [Queue] ──→ Service
+   │                              ↓
+   │         Later...              ↓
+   └──Poll/Callback←──[Reply Queue] ←──Reply
+</code></pre>
+<h4 id="3-temporary-reply-queue">3. <strong>Temporary Reply Queue</strong></h4>
+<pre><code>Client ──Request──→ [Queue] ──→ Service
+   ↑      (ReplyTo: temp.queue.123)  ↓
+   └──Reply←──[temp.queue.123] ←──Reply
+</code></pre>
+<h2 id="key-components">Key Components</h2>
+<h3 id="1-request-reply-manager">1. Request-Reply Manager</h3>
+<p>Coordinates request-reply interactions and manages correlation:</p>
+<pre><code class="language-java">public class RequestReplyManager {
+    private final MessageTemplate messageTemplate;
+    private final CorrelationManager correlationManager;
+    private final ReplyTimeout replyTimeout;
+    private final Map&lt;String, PendingRequest&gt; pendingRequests = new ConcurrentHashMap&lt;&gt;();
+
+    public &lt;T&gt; CompletableFuture&lt;T&gt; sendRequest(String destination,
+                                              Object request,
+                                              Class&lt;T&gt; responseType,
+                                              Duration timeout) {
+
+        String correlationId = generateCorrelationId();
+        String replyTo = getReplyToQueue();
+
+        RequestMessage requestMessage = RequestMessage.builder()
+            .correlationId(correlationId)
+            .replyTo(replyTo)
+            .payload(request)
+            .timestamp(Instant.now())
+            .build();
+
+        CompletableFuture&lt;T&gt; responseFuture = new CompletableFuture&lt;&gt;();
+
+        PendingRequest pendingRequest = PendingRequest.builder()
+            .correlationId(correlationId)
+            .requestTime(Instant.now())
+            .timeout(timeout)
+            .responseFuture(responseFuture)
+            .responseType(responseType)
+            .build();
+
+        pendingRequests.put(correlationId, pendingRequest);
+
+        // Schedule timeout
+        replyTimeout.scheduleTimeout(correlationId, timeout, () -&gt; {
+            PendingRequest pending = pendingRequests.remove(correlationId);
+            if (pending != null) {
+                pending.getResponseFuture().completeExceptionally(
+                    new RequestReplyTimeoutException(&quot;Request timed out: &quot; + correlationId)
+                );
+            }
+        });
+
+        // Send request
+        messageTemplate.send(destination, requestMessage);
+
+        return responseFuture;
+    }
+
+    @MessageHandler(&quot;reply.queue&quot;)
+    public void handleReply(ReplyMessage reply) {
+        String correlationId = reply.getCorrelationId();
+        PendingRequest pendingRequest = pendingRequests.remove(correlationId);
+
+        if (pendingRequest == null) {
+            log.warn(&quot;Received reply for unknown correlation ID: {}&quot;, correlationId);
+            return;
+        }
+
+        replyTimeout.cancelTimeout(correlationId);
+
+        try {
+            if (reply.isSuccess()) {
+                Object response = deserializeResponse(
+                    reply.getPayload(), 
+                    pendingRequest.getResponseType()
+                );
+                pendingRequest.getResponseFuture().complete(response);
+            } else {
+                Exception exception = createExceptionFromReply(reply);
+                pendingRequest.getResponseFuture().completeExceptionally(exception);
+            }
+        } catch (Exception e) {
+            pendingRequest.getResponseFuture().completeExceptionally(e);
+        }
+    }
+}
+</code></pre>
+<h3 id="2-correlation-manager">2. Correlation Manager</h3>
+<p>Manages correlation IDs and request tracking:</p>
+<pre><code class="language-java">public class CorrelationManager {
+    private final String instanceId;
+    private final AtomicLong sequenceNumber = new AtomicLong(0);
+
+    public String generateCorrelationId() {
+        return String.format(&quot;%s-%d-%d&quot;, 
+            instanceId, 
+            System.currentTimeMillis(), 
+            sequenceNumber.incrementAndGet()
+        );
+    }
+
+    public boolean isValidCorrelationId(String correlationId) {
+        return correlationId != null &amp;&amp; 
+               correlationId.startsWith(instanceId + &quot;-&quot;) &amp;&amp;
+               correlationId.split(&quot;-&quot;).length == 3;
+    }
+
+    public CorrelationMetadata parseCorrelationId(String correlationId) {
+        String[] parts = correlationId.split(&quot;-&quot;);
+        if (parts.length != 3) {
+            throw new IllegalArgumentException(&quot;Invalid correlation ID format&quot;);
+        }
+
+        return CorrelationMetadata.builder()
+            .instanceId(parts[0])
+            .timestamp(Long.parseLong(parts[1]))
+            .sequenceNumber(Long.parseLong(parts[2]))
+            .build();
+    }
+}
+</code></pre>
+<h3 id="3-request-reply-service-handler">3. Request-Reply Service Handler</h3>
+<p>Processes incoming requests and generates replies:</p>
+<pre><code class="language-java">@Component
+public class RequestReplyServiceHandler {
+    private final MessageTemplate messageTemplate;
+    private final RequestProcessor requestProcessor;
+
+    @MessageHandler(&quot;service.request.queue&quot;)
+    public void handleRequest(RequestMessage request) {
+        String correlationId = request.getCorrelationId();
+        String replyTo = request.getReplyTo();
+
+        ReplyMessage reply;
+
+        try {
+            // Process the request
+            Object result = requestProcessor.process(request.getPayload());
+
+            reply = ReplyMessage.builder()
+                .correlationId(correlationId)
+                .status(ReplyStatus.SUCCESS)
+                .payload(result)
+                .timestamp(Instant.now())
+                .build();
+
+        } catch (Exception e) {
+            log.error(&quot;Error processing request {}: {}&quot;, correlationId, e.getMessage(), e);
+
+            reply = ReplyMessage.builder()
+                .correlationId(correlationId)
+                .status(ReplyStatus.ERROR)
+                .errorCode(determineErrorCode(e))
+                .errorMessage(e.getMessage())
+                .timestamp(Instant.now())
+                .build();
+        }
+
+        // Send reply
+        if (replyTo != null) {
+            messageTemplate.send(replyTo, reply);
+        } else {
+            log.warn(&quot;No reply-to address specified for request: {}&quot;, correlationId);
+        }
+    }
+
+    private String determineErrorCode(Exception e) {
+        if (e instanceof ValidationException) {
+            return &quot;VALIDATION_ERROR&quot;;
+        } else if (e instanceof BusinessException) {
+            return &quot;BUSINESS_ERROR&quot;;
+        } else if (e instanceof TimeoutException) {
+            return &quot;TIMEOUT_ERROR&quot;;
+        } else {
+            return &quot;INTERNAL_ERROR&quot;;
+        }
+    }
+}
+</code></pre>
+<h3 id="4-reply-timeout-manager">4. Reply Timeout Manager</h3>
+<p>Manages request timeouts and cleanup:</p>
+<pre><code class="language-java">@Component
+public class ReplyTimeoutManager {
+    private final ScheduledExecutorService timeoutExecutor;
+    private final Map&lt;String, ScheduledFuture&lt;?&gt;&gt; timeoutTasks = new ConcurrentHashMap&lt;&gt;();
+
+    public void scheduleTimeout(String correlationId, Duration timeout, Runnable timeoutAction) {
+        ScheduledFuture&lt;?&gt; timeoutTask = timeoutExecutor.schedule(
+            timeoutAction,
+            timeout.toMillis(),
+            TimeUnit.MILLISECONDS
+        );
+
+        timeoutTasks.put(correlationId, timeoutTask);
+    }
+
+    public boolean cancelTimeout(String correlationId) {
+        ScheduledFuture&lt;?&gt; timeoutTask = timeoutTasks.remove(correlationId);
+        if (timeoutTask != null) {
+            return timeoutTask.cancel(false);
+        }
+        return false;
+    }
+
+    @Scheduled(fixedRate = 60000) // Clean up every minute
+    public void cleanupCompletedTasks() {
+        timeoutTasks.entrySet().removeIf(entry -&gt; 
+            entry.getValue().isDone() || entry.getValue().isCancelled()
+        );
+    }
+}
+</code></pre>
+<h2 id="configuration-parameters">Configuration Parameters</h2>
+<h3 id="essential-settings">Essential Settings</h3>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Typical Values</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Request Timeout</strong></td>
+<td>Maximum time to wait for reply</td>
+<td>30s-300s</td>
+</tr>
+<tr>
+<td><strong>Reply Queue TTL</strong></td>
+<td>Time-to-live for reply messages</td>
+<td>1h-24h</td>
+</tr>
+<tr>
+<td><strong>Max Concurrent Requests</strong></td>
+<td>Maximum pending requests per client</td>
+<td>100-10000</td>
+</tr>
+<tr>
+<td><strong>Correlation ID Format</strong></td>
+<td>Format for generating correlation IDs</td>
+<td>UUID/Timestamp-based</td>
+</tr>
+<tr>
+<td><strong>Reply Queue Type</strong></td>
+<td>Temporary vs permanent reply queues</td>
+<td>temp/permanent</td>
+</tr>
+</tbody>
+</table>
+<h3 id="example-configuration">Example Configuration</h3>
+<pre><code class="language-properties"># Request-Reply Configuration
+request-reply.default-timeout=60s
+request-reply.max-concurrent-requests=1000
+request-reply.correlation-format=uuid
+request-reply.reply-queue-ttl=1h
+
+# Queue Configuration
+request-reply.request-queue=service.requests
+request-reply.reply-queue=service.replies
+request-reply.dead-letter-queue=service.requests.dlq
+
+# Performance Tuning
+request-reply.connection-pool-size=20
+request-reply.consumer-concurrency=10
+request-reply.retry-attempts=3
+request-reply.retry-delay=1s
+</code></pre>
+<h2 id="implementation-examples">Implementation Examples</h2>
+<h3 id="1-spring-amqp-request-reply-implementation">1. Spring AMQP Request-Reply Implementation</h3>
+<pre><code class="language-java">@Configuration
+public class RequestReplyConfiguration {
+
+    @Bean
+    public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
+        RabbitTemplate template = new RabbitTemplate(connectionFactory);
+        template.setReplyTimeout(60000);
+        template.setReplyAddress(&quot;amq.rabbitmq.reply-to&quot;);
+        template.setCorrelationKey(&quot;correlation-id&quot;);
+        return template;
+    }
+
+    @Bean
+    public Queue requestQueue() {
+        return QueueBuilder.durable(&quot;contact.service.requests&quot;)
+            .deadLetterExchange(&quot;dlx&quot;)
+            .deadLetterRoutingKey(&quot;contact.service.requests.dlq&quot;)
+            .build();
+    }
+}
+
+@Service
+public class ContactRequestReplyService {
+    private final RabbitTemplate rabbitTemplate;
+
+    public ContactResponse getContact(ContactRequest request) {
+        return (ContactResponse) rabbitTemplate.convertSendAndReceive(
+            &quot;contact.service.requests&quot;, 
+            request
+        );
+    }
+
+    public CompletableFuture&lt;ContactResponse&gt; getContactAsync(ContactRequest request) {
+        return CompletableFuture.supplyAsync(() -&gt; 
+            (ContactResponse) rabbitTemplate.convertSendAndReceive(
+                &quot;contact.service.requests&quot;, 
+                request
+            )
+        );
+    }
+}
+
+@RabbitListener(queues = &quot;contact.service.requests&quot;)
+@Component
+public class ContactRequestHandler {
+    private final ContactService contactService;
+
+    @RabbitHandler
+    public ContactResponse handleContactRequest(ContactRequest request,
+                                              @Header(&quot;spring_request_return_correlation&quot;) String correlationId) {
+        try {
+            return contactService.processContactRequest(request);
+        } catch (Exception e) {
+            throw new AmqpRejectAndDontRequeueException(&quot;Failed to process contact request&quot;, e);
+        }
+    }
+}
+</code></pre>
+<h3 id="2-apache-kafka-request-reply-implementation">2. Apache Kafka Request-Reply Implementation</h3>
+<pre><code class="language-java">@Configuration
+public class KafkaRequestReplyConfiguration {
+
+    @Bean
+    public ReplyingKafkaTemplate&lt;String, ContactRequest, ContactResponse&gt; replyingKafkaTemplate(
+            ProducerFactory&lt;String, ContactRequest&gt; producerFactory,
+            KafkaMessageListenerContainer&lt;String, ContactResponse&gt; replyContainer) {
+
+        return new ReplyingKafkaTemplate&lt;&gt;(producerFactory, replyContainer);
+    }
+
+    @Bean
+    public KafkaMessageListenerContainer&lt;String, ContactResponse&gt; replyContainer(
+            ConsumerFactory&lt;String, ContactResponse&gt; consumerFactory) {
+
+        ContainerProperties properties = new ContainerProperties(&quot;contact.service.replies&quot;);
+        return new KafkaMessageListenerContainer&lt;&gt;(consumerFactory, properties);
+    }
+}
+
+@Service
+public class KafkaContactRequestReplyService {
+    private final ReplyingKafkaTemplate&lt;String, ContactRequest, ContactResponse&gt; replyingTemplate;
+
+    public ContactResponse getContact(ContactRequest request) throws ExecutionException, InterruptedException {
+        ProducerRecord&lt;String, ContactRequest&gt; producerRecord = 
+            new ProducerRecord&lt;&gt;(&quot;contact.service.requests&quot;, request);
+
+        RequestReplyFuture&lt;String, ContactRequest, ContactResponse&gt; future = 
+            replyingTemplate.sendAndReceive(producerRecord);
+
+        ConsumerRecord&lt;String, ContactResponse&gt; responseRecord = future.get(30, TimeUnit.SECONDS);
+        return responseRecord.value();
+    }
+}
+
+@KafkaListener(topics = &quot;contact.service.requests&quot;)
+@SendTo(&quot;contact.service.replies&quot;)
+@Component
+public class KafkaContactRequestHandler {
+    private final ContactService contactService;
+
+    public ContactResponse handleContactRequest(@Payload ContactRequest request,
+                                              @Header(KafkaHeaders.REPLY_TOPIC) String replyTopic,
+                                              @Header(KafkaHeaders.CORRELATION_ID) String correlationId) {
+
+        return contactService.processContactRequest(request);
+    }
+}
+</code></pre>
+<h3 id="3-custom-http-to-message-bridge">3. Custom HTTP-to-Message Bridge</h3>
+<pre><code class="language-java">@RestController
+public class HttpToMessageBridgeController {
+    private final RequestReplyManager requestReplyManager;
+
+    @PostMapping(&quot;/contacts&quot;)
+    public CompletableFuture&lt;ResponseEntity&lt;ContactResponse&gt;&gt; createContact(
+            @RequestBody ContactRequest request) {
+
+        return requestReplyManager.sendRequest(
+            &quot;contact.service.create&quot;, 
+            request, 
+            ContactResponse.class,
+            Duration.ofSeconds(30)
+        ).thenApply(response -&gt; ResponseEntity.ok(response))
+         .exceptionally(throwable -&gt; {
+             if (throwable.getCause() instanceof RequestReplyTimeoutException) {
+                 return ResponseEntity.status(HttpStatus.REQUEST_TIMEOUT).build();
+             } else {
+                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+             }
+         });
+    }
+
+    @GetMapping(&quot;/contacts/{id}&quot;)
+    public DeferredResult&lt;ResponseEntity&lt;ContactResponse&gt;&gt; getContact(@PathVariable String id) {
+        DeferredResult&lt;ResponseEntity&lt;ContactResponse&gt;&gt; deferredResult = 
+            new DeferredResult&lt;&gt;(30000L);
+
+        ContactRequest request = new ContactRequest(id);
+
+        requestReplyManager.sendRequest(
+            &quot;contact.service.get&quot;, 
+            request, 
+            ContactResponse.class,
+            Duration.ofSeconds(30)
+        ).whenComplete((response, throwable) -&gt; {
+            if (throwable != null) {
+                deferredResult.setErrorResult(
+                    ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build()
+                );
+            } else {
+                deferredResult.setResult(ResponseEntity.ok(response));
+            }
+        });
+
+        return deferredResult;
+    }
+}
+</code></pre>
+<h3 id="4-request-reply-with-circuit-breaker-integration">4. Request-Reply with Circuit Breaker Integration</h3>
+<pre><code class="language-java">@Component
+public class ResilientRequestReplyService {
+    private final RequestReplyManager requestReplyManager;
+    private final CircuitBreaker circuitBreaker;
+
+    @CircuitBreaker(name = &quot;contact-service&quot;)
+    @TimeLimiter(name = &quot;contact-service&quot;)
+    @Retry(name = &quot;contact-service&quot;)
+    public CompletableFuture&lt;ContactResponse&gt; getContactWithResilience(ContactRequest request) {
+
+        return requestReplyManager.sendRequest(
+            &quot;contact.service.requests&quot;,
+            request,
+            ContactResponse.class,
+            Duration.ofSeconds(30)
+        );
+    }
+
+    public ContactResponse getContactWithFallback(ContactRequest request) {
+        try {
+            return getContactWithResilience(request).get(30, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            log.warn(&quot;Request-reply failed, using fallback: {}&quot;, e.getMessage());
+            return createFallbackResponse(request);
+        }
+    }
+
+    private ContactResponse createFallbackResponse(ContactRequest request) {
+        return ContactResponse.builder()
+            .id(request.getId())
+            .status(&quot;UNAVAILABLE&quot;)
+            .message(&quot;Service temporarily unavailable&quot;)
+            .fallbackUsed(true)
+            .build();
+    }
+}
+</code></pre>
+<h2 id="best-practices">Best Practices</h2>
+<h3 id="1-correlation-id-management">1. Correlation ID Management</h3>
+<pre><code class="language-java">public class CorrelationIdBestPractices {
+
+    // Use structured correlation IDs for better traceability
+    public String generateStructuredCorrelationId(String serviceId, String operationType) {
+        return String.format(&quot;%s-%s-%s-%d&quot;, 
+            serviceId,
+            operationType,
+            UUID.randomUUID().toString().substring(0, 8),
+            System.currentTimeMillis()
+        );
+    }
+
+    // Propagate correlation IDs across service boundaries
+    @MessageHandler
+    public void handleRequest(RequestMessage request, 
+                            @Header(&quot;X-Correlation-ID&quot;) String correlationId) {
+
+        // Set in thread context for logging
+        MDC.put(&quot;correlationId&quot;, correlationId);
+
+        try {
+            processRequest(request);
+        } finally {
+            MDC.remove(&quot;correlationId&quot;);
+        }
+    }
+
+    // Validate correlation ID format for security
+    public boolean isValidCorrelationId(String correlationId) {
+        return correlationId != null &amp;&amp;
+               correlationId.matches(&quot;^[a-zA-Z0-9\\-_]{8,64}$&quot;) &amp;&amp;
+               !correlationId.contains(&quot;..&quot;) &amp;&amp;
+               !correlationId.startsWith(&quot;-&quot;) &amp;&amp;
+               !correlationId.endsWith(&quot;-&quot;);
+    }
+}
+</code></pre>
+<h3 id="2-request-reply-monitoring">2. Request-Reply Monitoring</h3>
+<pre><code class="language-java">@Component
+public class RequestReplyMonitoring {
+    private final MeterRegistry meterRegistry;
+    private final Timer requestDuration;
+    private final Counter requestCount;
+    private final Counter timeoutCount;
+
+    public void recordRequest(String destination, Duration duration, boolean successful) {
+        requestCount.tag(&quot;destination&quot;, destination)
+                   .tag(&quot;status&quot;, successful ? &quot;success&quot; : &quot;failure&quot;)
+                   .increment();
+
+        requestDuration.tag(&quot;destination&quot;, destination)
+                      .record(duration);
+    }
+
+    public void recordTimeout(String destination) {
+        timeoutCount.tag(&quot;destination&quot;, destination).increment();
+    }
+
+    @EventListener
+    public void handleRequestReplyEvent(RequestReplyEvent event) {
+        recordRequest(
+            event.getDestination(),
+            event.getDuration(),
+            event.isSuccessful()
+        );
+
+        if (event.isTimedOut()) {
+            recordTimeout(event.getDestination());
+        }
+    }
+}
+</code></pre>
+<h3 id="3-reply-queue-management">3. Reply Queue Management</h3>
+<pre><code class="language-java">@Component
+public class ReplyQueueManager {
+    private final Map&lt;String, String&gt; temporaryQueues = new ConcurrentHashMap&lt;&gt;();
+
+    public String createTemporaryReplyQueue(String requestId) {
+        String queueName = &quot;reply.temp.&quot; + requestId;
+
+        // Create temporary queue with TTL
+        QueueSpecification spec = QueueSpecification.builder()
+            .name(queueName)
+            .temporary(true)
+            .ttl(Duration.ofHours(1))
+            .autoDelete(true)
+            .build();
+
+        messageQueueManager.createQueue(spec);
+        temporaryQueues.put(requestId, queueName);
+
+        return queueName;
+    }
+
+    public void cleanupReplyQueue(String requestId) {
+        String queueName = temporaryQueues.remove(requestId);
+        if (queueName != null) {
+            try {
+                messageQueueManager.deleteQueue(queueName);
+            } catch (Exception e) {
+                log.warn(&quot;Failed to cleanup reply queue {}: {}&quot;, queueName, e.getMessage());
+            }
+        }
+    }
+
+    @Scheduled(fixedRate = 300000) // Every 5 minutes
+    public void cleanupExpiredQueues() {
+        temporaryQueues.entrySet().removeIf(entry -&gt; {
+            try {
+                return !messageQueueManager.queueExists(entry.getValue());
+            } catch (Exception e) {
+                return true; // Remove if we can't check existence
+            }
+        });
+    }
+}
+</code></pre>
+<h2 id="common-pitfalls">Common Pitfalls</h2>
+<h3 id="1-correlation-id-collisions">1. <strong>Correlation ID Collisions</strong></h3>
+<p><strong>Problem</strong>: Using simple sequential or timestamp-based IDs that can collide across instances<br />
+<strong>Solution</strong>: Use UUIDs or include instance identifiers in correlation ID generation</p>
+<h3 id="2-reply-queue-memory-leaks">2. <strong>Reply Queue Memory Leaks</strong></h3>
+<p><strong>Problem</strong>: Temporary reply queues not cleaned up after request completion<br />
+<strong>Solution</strong>: Implement automatic cleanup with TTL and monitoring for queue growth</p>
+<h3 id="3-timeout-handling">3. <strong>Timeout Handling</strong></h3>
+<p><strong>Problem</strong>: Not properly handling timeout scenarios leading to resource leaks<br />
+<strong>Solution</strong>: Always implement timeout cleanup and ensure futures are completed properly</p>
+<h3 id="4-message-ordering-issues">4. <strong>Message Ordering Issues</strong></h3>
+<p><strong>Problem</strong>: Assuming message ordering in request-reply scenarios<br />
+<strong>Solution</strong>: Design for out-of-order message handling and use explicit sequencing when needed</p>
+<h3 id="5-exception-propagation">5. <strong>Exception Propagation</strong></h3>
+<p><strong>Problem</strong>: Not properly converting and transmitting exception information in replies<br />
+<strong>Solution</strong>: Standardize error response formats and exception serialization</p>
+<h2 id="integration-in-distributed-systems">Integration in Distributed Systems</h2>
+<p>In distributed integration scenarios, Request-Reply Pattern provides:</p>
+<h3 id="microservices-integration">Microservices Integration</h3>
+<pre><code class="language-java">@Service
+public class DistributedContactService {
+
+    @RequestReply(destination = &quot;user.service&quot;, timeout = &quot;30s&quot;)
+    public UserData getUserData(String userId) {
+        return UserRequest.builder().userId(userId).build();
+    }
+
+    @RequestReply(destination = &quot;profile.service&quot;, timeout = &quot;15s&quot;)
+    public ProfileData getProfileData(String profileId) {
+        return ProfileRequest.builder().profileId(profileId).build();
+    }
+}
+</code></pre>
+<h3 id="legacy-system-integration">Legacy System Integration</h3>
+<pre><code class="language-java">@Component
+public class LegacySystemBridge {
+
+    @RequestReply(destination = &quot;mainframe.bridge&quot;, timeout = &quot;120s&quot;)
+    public LegacyResponse queryMainframe(LegacyQuery query) {
+        return transformToLegacyFormat(query);
+    }
+}
+</code></pre>
+<h3 id="event-driven-query-services">Event-Driven Query Services</h3>
+<pre><code class="language-java">@Service
+public class QueryService {
+
+    @RequestReply(destination = &quot;data.query.service&quot;)
+    public QueryResponse executeQuery(QueryRequest query) {
+        return query;
+    }
+}
+</code></pre>
+<h2 id="conclusion">Conclusion</h2>
+<p>The Request-Reply pattern is essential for building distributed systems that require synchronous-style interactions while maintaining the benefits of message-oriented architectures. It provides:</p>
+<ul>
+<li><strong>Familiar Semantics</strong>: Maintains request-response interaction patterns developers expect</li>
+<li><strong>Temporal Decoupling</strong>: Enables independent service lifecycles and deployment flexibility</li>
+<li><strong>Enhanced Reliability</strong>: Leverages messaging infrastructure for improved fault tolerance</li>
+<li><strong>Location Transparency</strong>: Abstracts service location and enables dynamic discovery</li>
+</ul>
+<p>When properly implemented with appropriate correlation management, timeout handling, and monitoring, the Request-Reply pattern serves as a crucial bridge between synchronous and asynchronous communication paradigms in distributed architectures.</p>
+<h2 id="references">References</h2>
+<ul>
+<li><a href="https://www.enterpriseintegrationpatterns.com/patterns/messaging/RequestReply.html">Enterprise Integration Patterns - Request-Reply</a></li>
+<li><a href="https://docs.spring.io/spring-amqp/reference/html/#request-reply">Spring AMQP Request/Reply</a></li>
+<li><a href="https://kafka.apache.org/documentation/#requestreply">Apache Kafka Request/Reply</a></li>
+<li><a href="https://www.cloudcomputingpatterns.org/request_response_messaging/">Message Queuing Patterns and Anti-Patterns</a></li>
+</ul>
+
+      <a href="../index.html" class="back-to-top">← Back to All Patterns</a>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <p>©2026 <a href="https://dataintegrationmastery.com/">Data Integration Mastery™</a> — All Rights Reserved</p>
+  </footer>
+</body>
+</html>

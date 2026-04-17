@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Content Filter Pattern — Integration Architecture Patterns | Data Integration Mastery™</title>
+  <meta name="description" content="The Content Filter pattern is a fundamental data transformation pattern in enterprise integration architectures that provides selective data transmission by ...">
+  <meta name="keywords" content="content filter pattern, integration pattern, data transformation patterns, integration architecture, EAI patterns, data integration">
+  <link rel="canonical" href="https://dataintegrationmastery.com/patterns/data-transformation-patterns/content-filter.html">
+
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://dataintegrationmastery.com/patterns/data-transformation-patterns/content-filter.html">
+  <meta property="og:title" content="Content Filter Pattern — Integration Architecture Patterns">
+  <meta property="og:description" content="The Content Filter pattern is a fundamental data transformation pattern in enterprise integration architectures that provides selective data transmission by ...">
+  <meta property="og:image" content="https://dataintegrationmastery.com/assets/images/logo.png">
+  <meta property="og:site_name" content="Data Integration Mastery">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Content Filter Pattern — Integration Architecture Patterns">
+  <meta name="twitter:description" content="The Content Filter pattern is a fundamental data transformation pattern in enterprise integration architectures that provides selective data transmission by ...">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/docs.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Content Filter Pattern",
+    "description": "The Content Filter pattern is a fundamental data transformation pattern in enterprise integration architectures that provides selective data transmission by ...",
+    "url": "https://dataintegrationmastery.com/patterns/data-transformation-patterns/content-filter.html",
+    "author": {
+      "@type": "Person",
+      "name": "Ari Vilkman",
+      "jobTitle": "Integration Architect"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Data Integration Mastery",
+      "url": "https://dataintegrationmastery.com"
+    },
+    "isPartOf": {
+      "@type": "CollectionPage",
+      "name": "Integration Architecture Patterns",
+      "url": "https://dataintegrationmastery.com/patterns/"
+    },
+    "about": {
+      "@type": "Thing",
+      "name": "Content Filter Pattern"
+    },
+    "inLanguage": "en",
+    "isAccessibleForFree": true
+  }
+  </script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="https://dataintegrationmastery.com/" class="header-brand">
+        <img src="../../assets/images/dim-icon.png" alt="DIM" width="36" height="36">
+        <span class="header-title">Data Integration Mastery™</span>
+      </a>
+      <nav class="header-nav" aria-label="Main navigation">
+        <a href="https://dataintegrationmastery.com/">Home</a>
+        <a href="../index.html">All Patterns</a>
+        <a href="https://dataintegrationmastery.com/#free-course">Free Course</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="docs-layout">
+    <aside class="docs-sidebar" aria-label="Pattern categories">
+      <div class="sidebar-title">Pattern Categories</div>
+<div class="sidebar-section">
+  <a href="../index.html#resilience" class="sidebar-section-title">🛡️ Resilience Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../resilience-patterns/circuit-breaker.html">Circuit Breaker</a></li>
+    <li><a href="../resilience-patterns/retry-mechanism.html">Retry Mechanism</a></li>
+    <li><a href="../resilience-patterns/timeout.html">Timeout</a></li>
+    <li><a href="../resilience-patterns/dead-letter-queue.html">Dead Letter Queue</a></li>
+    <li><a href="../resilience-patterns/bulkhead.html">Bulkhead</a></li>
+    <li><a href="../resilience-patterns/fallback-graceful-degradation.html">Fallback / Graceful Degradation</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#messaging" class="sidebar-section-title">📨 Messaging Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../messaging-patterns/request-reply.html">Request-Reply</a></li>
+    <li><a href="../messaging-patterns/publish-subscribe.html">Publish-Subscribe</a></li>
+    <li><a href="../messaging-patterns/message-queue.html">Message Queue</a></li>
+    <li><a href="../messaging-patterns/event-streaming.html">Event Streaming</a></li>
+    <li><a href="../messaging-patterns/correlation-id.html">Correlation ID</a></li>
+    <li><a href="../messaging-patterns/message-routing.html">Message Routing</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#data-transformation" class="sidebar-section-title">🔄 Data Transformation Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="message-translator.html">Message Translator</a></li>
+    <li><a href="content-filter.html" class="active">Content Filter</a></li>
+    <li><a href="message-router.html">Message Router</a></li>
+    <li><a href="aggregator.html">Aggregator</a></li>
+    <li><a href="splitter.html">Splitter</a></li>
+    <li><a href="data-mapper.html">Data Mapper</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#routing" class="sidebar-section-title">🔀 Routing Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../routing-patterns/content-based-router.html">Content-Based Router</a></li>
+    <li><a href="../routing-patterns/recipient-list.html">Recipient List</a></li>
+    <li><a href="../routing-patterns/load-balancer.html">Load Balancer</a></li>
+    <li><a href="../routing-patterns/message-filter.html">Message Filter</a></li>
+    <li><a href="../routing-patterns/dynamic-router.html">Dynamic Router</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#security" class="sidebar-section-title">🔐 Security Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../security-patterns/authentication.html">Authentication</a></li>
+    <li><a href="../security-patterns/authorization.html">Authorization</a></li>
+    <li><a href="../security-patterns/encryption.html">Encryption</a></li>
+    <li><a href="../security-patterns/token-management.html">Token Management</a></li>
+    <li><a href="../security-patterns/api-security.html">API Security</a></li>
+    <li><a href="../security-patterns/secret-management.html">Secret Management</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#orchestration" class="sidebar-section-title">🎭 Orchestration Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../orchestration-patterns/saga-pattern.html">Saga Pattern</a></li>
+    <li><a href="../orchestration-patterns/process-manager.html">Process Manager</a></li>
+    <li><a href="../orchestration-patterns/workflow-engine.html">Workflow Engine</a></li>
+    <li><a href="../orchestration-patterns/choreography.html">Choreography</a></li>
+    <li><a href="../orchestration-patterns/compensation-transactions.html">Compensation Transactions</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#observability" class="sidebar-section-title">📊 Monitoring & Observability Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../monitoring-observability-patterns/distributed-tracing.html">Distributed Tracing</a></li>
+    <li><a href="../monitoring-observability-patterns/metrics-collection.html">Metrics Collection</a></li>
+    <li><a href="../monitoring-observability-patterns/health-checks.html">Health Checks</a></li>
+    <li><a href="../monitoring-observability-patterns/logging-strategies.html">Logging Strategies</a></li>
+    <li><a href="../monitoring-observability-patterns/performance-monitoring.html">Performance Monitoring</a></li>
+    <li><a href="../monitoring-observability-patterns/error-tracking.html">Error Tracking</a></li>
+  </ul>
+</div>
+
+    </aside>
+
+    <main id="main-content" class="docs-content">
+      <div class="breadcrumb">
+        <a href="https://dataintegrationmastery.com/">Home</a>
+        <span class="sep">›</span>
+        <a href="../index.html">Patterns</a>
+        <span class="sep">›</span>
+        <a href="../index.html#data-transformation">Data Transformation Patterns</a>
+        <span class="sep">›</span>
+        <strong>Content Filter Pattern</strong>
+      </div>
+
+      <h1>Content Filter Pattern</h1>
+
+      <h2 id="overview">Overview</h2>
+<p>The Content Filter pattern is a fundamental data transformation pattern in enterprise integration architectures that provides selective data transmission by removing unwanted or sensitive elements from messages while preserving the core information structure. Like a physical filter that allows certain particles to pass through while blocking others, the Content Filter pattern ensures that only relevant, authorized, and appropriately formatted data reaches its intended destination.</p>
+<h3 id="theoretical-foundation">Theoretical Foundation</h3>
+<p>The Content Filter pattern is grounded in <strong>information theory</strong> and <strong>data processing principles</strong>, specifically addressing the challenges of <strong>information reduction</strong> and <strong>selective data transmission</strong> in distributed systems. The pattern embodies the principle of <strong>"least privilege"</strong> for data access - ensuring that systems and users receive only the information necessary for their specific function or security clearance level.</p>
+<h3 id="core-principles">Core Principles</h3>
+<h4 id="1-selective-data-transmission">1. <strong>Selective Data Transmission</strong></h4>
+<p>The Content Filter acts as an <strong>intelligent gatekeeper</strong>, analyzing message content and selectively removing elements based on predefined criteria. This enables precise control over what information flows between systems, supporting both functional requirements and security policies.</p>
+<h4 id="2-information-security-and-privacy">2. <strong>Information Security and Privacy</strong></h4>
+<p>By filtering out sensitive data elements before transmission, the pattern provides:
+- <strong>Data minimization</strong> - reducing exposure of personally identifiable information (PII)
+- <strong>Field-level security</strong> - granular control over sensitive data elements
+- <strong>Compliance support</strong> - adherence to GDPR, HIPAA, and other privacy regulations
+- <strong>Cross-domain protection</strong> - secure data sharing between different security zones</p>
+<h4 id="3-bandwidth-and-performance-optimization">3. <strong>Bandwidth and Performance Optimization</strong></h4>
+<p>Content filtering reduces message payload sizes, resulting in:
+- <strong>Reduced network bandwidth</strong> consumption for inter-service communication
+- <strong>Lower serialization/deserialization</strong> overhead for large message structures
+- <strong>Improved cache efficiency</strong> with smaller, more focused data sets
+- <strong>Faster processing</strong> in downstream systems receiving only relevant data</p>
+<h4 id="4-interface-adaptation">4. <strong>Interface Adaptation</strong></h4>
+<p>The pattern enables <strong>semantic decoupling</strong> between systems with different data requirements:
+- <strong>Legacy system integration</strong> - filtering modern data formats to match legacy expectations
+- <strong>API versioning support</strong> - exposing different data views for different API versions
+- <strong>Client-specific responses</strong> - customizing data based on client capabilities or permissions</p>
+<h3 id="why-content-filters-are-essential-in-integration-architecture">Why Content Filters are Essential in Integration Architecture</h3>
+<h4 id="1-data-sovereignty-and-compliance">1. <strong>Data Sovereignty and Compliance</strong></h4>
+<p>In modern integration architectures, data flows across multiple jurisdictions and regulatory boundaries:
+- <strong>GDPR compliance</strong> requires data minimization and purpose limitation
+- <strong>Industry regulations</strong> (PCI DSS, HIPAA, SOX) mandate strict data access controls
+- <strong>Cross-border data transfers</strong> must comply with local data protection laws
+- <strong>Audit requirements</strong> demand detailed logging of data access and transmission</p>
+<h4 id="2-microservices-architecture-optimization">2. <strong>Microservices Architecture Optimization</strong></h4>
+<p>In microservices environments, Content Filters address:
+- <strong>Service autonomy</strong> - each service receives only the data it needs to operate
+- <strong>Interface evolution</strong> - backward compatibility when service contracts change
+- <strong>Performance isolation</strong> - preventing large payloads from affecting service performance
+- <strong>Security boundaries</strong> - enforcing data access policies at service boundaries</p>
+<h4 id="3-api-economy-and-third-party-integration">3. <strong>API Economy and Third-Party Integration</strong></h4>
+<p>When integrating with external systems and partners:
+- <strong>API rate limiting</strong> - reducing payload sizes to stay within usage quotas
+- <strong>Partner data agreements</strong> - honoring contractual limitations on data sharing
+- <strong>Competitive information protection</strong> - filtering out proprietary business data
+- <strong>Integration cost optimization</strong> - reducing data transfer costs in cloud environments</p>
+<h4 id="4-real-time-and-event-driven-architecture">4. <strong>Real-Time and Event-Driven Architecture</strong></h4>
+<p>In streaming and event-driven systems:
+- <strong>Event payload optimization</strong> - reducing message sizes for better throughput
+- <strong>Consumer-specific filtering</strong> - different consumers receive different data subsets
+- <strong>Stream processing efficiency</strong> - smaller messages improve processing performance
+- <strong>Storage cost reduction</strong> - filtered events require less storage in event stores</p>
+<h3 id="benefits-in-integration-contexts">Benefits in Integration Contexts</h3>
+<h4 id="1-security-enhancement">1. <strong>Security Enhancement</strong></h4>
+<ul>
+<li><strong>Principle of least privilege</strong> - systems receive only necessary data</li>
+<li><strong>Data leak prevention</strong> - sensitive information filtered before transmission</li>
+<li><strong>Attack surface reduction</strong> - less exposed data means smaller security risk</li>
+<li><strong>Compliance automation</strong> - automated enforcement of data protection policies</li>
+</ul>
+<h4 id="2-performance-optimization">2. <strong>Performance Optimization</strong></h4>
+<ul>
+<li><strong>Network efficiency</strong> - reduced bandwidth consumption and faster transmission</li>
+<li><strong>Memory optimization</strong> - smaller objects reduce heap pressure</li>
+<li><strong>Processing speed</strong> - downstream systems process less data more quickly</li>
+<li><strong>Caching effectiveness</strong> - smaller, focused data sets improve cache hit ratios</li>
+</ul>
+<h4 id="3-system-decoupling">3. <strong>System Decoupling</strong></h4>
+<ul>
+<li><strong>Schema independence</strong> - services don't need to handle irrelevant data fields</li>
+<li><strong>Evolution flexibility</strong> - easier to modify interfaces without breaking consumers</li>
+<li><strong>Technology diversity</strong> - different systems can use different data representations</li>
+<li><strong>Testing simplification</strong> - test data can focus on relevant fields only</li>
+</ul>
+<h4 id="4-business-value">4. <strong>Business Value</strong></h4>
+<ul>
+<li><strong>Faster time-to-market</strong> - simplified integration reduces development time</li>
+<li><strong>Reduced operational costs</strong> - lower bandwidth and storage requirements</li>
+<li><strong>Improved user experience</strong> - faster response times and reduced data usage</li>
+<li><strong>Regulatory compliance</strong> - automated adherence to data protection requirements</li>
+</ul>
+<h3 id="integration-architecture-applications">Integration Architecture Applications</h3>
+<h4 id="1-api-gateway-pattern">1. <strong>API Gateway Pattern</strong></h4>
+<p>Content Filters in API gateways provide:
+- <strong>Client-specific responses</strong> - mobile clients receive optimized data structures
+- <strong>Version compatibility</strong> - different API versions expose different data sets
+- <strong>Rate limiting optimization</strong> - smaller responses allow more requests within limits
+- <strong>Security enforcement</strong> - sensitive fields filtered before reaching external clients</p>
+<h4 id="2-event-sourcing-and-cqrs">2. <strong>Event Sourcing and CQRS</strong></h4>
+<p>In event-driven architectures, Content Filters enable:
+- <strong>Command filtering</strong> - removing unnecessary fields from commands before processing
+- <strong>Event projection</strong> - creating specialized read models with filtered data
+- <strong>Stream processing</strong> - filtering events before sending to different consumers
+- <strong>Audit trail optimization</strong> - storing only relevant fields in audit logs</p>
+<h4 id="3-data-pipeline-and-etl-processes">3. <strong>Data Pipeline and ETL Processes</strong></h4>
+<p>Content Filters support data processing workflows:
+- <strong>Source system filtering</strong> - extracting only relevant data from source systems
+- <strong>Transformation preprocessing</strong> - removing fields before expensive transformation operations
+- <strong>Target system optimization</strong> - preparing data in the exact format required by targets
+- <strong>Data quality improvement</strong> - filtering out invalid or incomplete data elements</p>
+<h4 id="4-integration-hub-and-esb-patterns">4. <strong>Integration Hub and ESB Patterns</strong></h4>
+<p>In enterprise service bus architectures:
+- <strong>Message routing optimization</strong> - different routes receive different data subsets
+- <strong>Transformation efficiency</strong> - filtering before transformation reduces processing load
+- <strong>Protocol adaptation</strong> - removing fields not supported by target protocols
+- <strong>Legacy system protection</strong> - filtering modern data structures to match legacy schemas</p>
+<h2 id="implementation-patterns">Implementation Patterns</h2>
+<h3 id="1-field-level-filtering">1. <strong>Field-Level Filtering</strong></h3>
+<pre><code class="language-java">// Remove sensitive fields based on security context
+public ContactDto filterSensitiveFields(ContactDto contact, SecurityContext context) {
+    if (!context.hasRole(&quot;ADMIN&quot;)) {
+        contact.setSsn(null);
+        contact.setBankAccount(null);
+    }
+    if (!context.hasPermission(&quot;VIEW_FINANCIAL&quot;)) {
+        contact.setSalary(null);
+        contact.setCreditRating(null);
+    }
+    return contact;
+}
+</code></pre>
+<h3 id="2-dynamic-field-selection">2. <strong>Dynamic Field Selection</strong></h3>
+<pre><code class="language-java">// Filter based on client-specified field list
+public Map&lt;String, Object&gt; applyFieldSelection(ContactDto contact, Set&lt;String&gt; requestedFields) {
+    Map&lt;String, Object&gt; result = new HashMap&lt;&gt;();
+
+    if (requestedFields.contains(&quot;id&quot;)) result.put(&quot;id&quot;, contact.getId());
+    if (requestedFields.contains(&quot;name&quot;)) result.put(&quot;name&quot;, contact.getName());
+    if (requestedFields.contains(&quot;email&quot;) &amp;&amp; isEmailAllowed(contact)) {
+        result.put(&quot;email&quot;, contact.getEmail());
+    }
+
+    return result;
+}
+</code></pre>
+<h3 id="3-conditional-content-filtering">3. <strong>Conditional Content Filtering</strong></h3>
+<pre><code class="language-java">// Apply different filters based on context
+public ResponseDto filterByContext(DataDto data, FilterContext context) {
+    return switch (context.getClientType()) {
+        case MOBILE -&gt; applyMobileFilter(data);
+        case WEB -&gt; applyWebFilter(data);
+        case API -&gt; applyApiFilter(data);
+        case INTERNAL -&gt; data; // No filtering for internal systems
+    };
+}
+</code></pre>
+<h3 id="4-compliance-based-filtering">4. <strong>Compliance-Based Filtering</strong></h3>
+<pre><code class="language-java">// Filter based on regulatory requirements
+public PersonalDataDto applyGdprFilter(PersonalDataDto data, String jurisdiction) {
+    PersonalDataDto filtered = data.copy();
+
+    if (&quot;EU&quot;.equals(jurisdiction)) {
+        // Apply GDPR data minimization
+        filtered.setLocationHistory(null);
+        filtered.setBehavioralData(null);
+    }
+
+    if (data.getConsent() == null || !data.getConsent().isMarketingAllowed()) {
+        filtered.setMarketingPreferences(null);
+    }
+
+    return filtered;
+}
+</code></pre>
+<h2 id="apache-camel-implementation">Apache Camel Implementation</h2>
+<h3 id="1-simple-content-filter-route">1. <strong>Simple Content Filter Route</strong></h3>
+<pre><code class="language-java">@Component
+public class ContentFilterRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from(&quot;direct:filterContact&quot;)
+            .routeId(&quot;content-filter-contact&quot;)
+            .log(&quot;Filtering contact data: ${body}&quot;)
+            .process(exchange -&gt; {
+                ContactDto contact = exchange.getIn().getBody(ContactDto.class);
+                Set&lt;String&gt; allowedFields = exchange.getIn().getHeader(&quot;allowedFields&quot;, Set.class);
+
+                ContactDto filtered = filterContactFields(contact, allowedFields);
+                exchange.getIn().setBody(filtered);
+            })
+            .to(&quot;direct:processFilteredContact&quot;);
+    }
+
+    private ContactDto filterContactFields(ContactDto contact, Set&lt;String&gt; allowedFields) {
+        ContactDto filtered = new ContactDto();
+
+        if (allowedFields.contains(&quot;id&quot;)) filtered.setId(contact.getId());
+        if (allowedFields.contains(&quot;firstName&quot;)) filtered.setFirstName(contact.getFirstName());
+        if (allowedFields.contains(&quot;lastName&quot;)) filtered.setLastName(contact.getLastName());
+        if (allowedFields.contains(&quot;email&quot;)) filtered.setEmail(contact.getEmail());
+        // Only include phone if both phone is requested AND user has permission
+        if (allowedFields.contains(&quot;phone&quot;) &amp;&amp; hasPhonePermission()) {
+            filtered.setPhone(contact.getPhone());
+        }
+
+        return filtered;
+    }
+}
+</code></pre>
+<h3 id="2-security-based-content-filter">2. <strong>Security-Based Content Filter</strong></h3>
+<pre><code class="language-java">@Component
+public class SecurityContentFilter extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from(&quot;direct:applySecurityFilter&quot;)
+            .routeId(&quot;security-content-filter&quot;)
+            .choice()
+                .when(header(&quot;userRole&quot;).isEqualTo(&quot;ADMIN&quot;))
+                    .log(&quot;Admin user - no filtering applied&quot;)
+                    .to(&quot;direct:noFiltering&quot;)
+                .when(header(&quot;userRole&quot;).isEqualTo(&quot;MANAGER&quot;))
+                    .log(&quot;Manager user - applying manager filter&quot;)
+                    .process(new ManagerContentFilter())
+                .when(header(&quot;userRole&quot;).isEqualTo(&quot;USER&quot;))
+                    .log(&quot;Regular user - applying standard filter&quot;)
+                    .process(new StandardContentFilter())
+                .otherwise()
+                    .log(&quot;Unknown role - applying maximum filter&quot;)
+                    .process(new RestrictiveContentFilter())
+            .end();
+    }
+}
+
+@Component
+public class StandardContentFilter implements Processor {
+
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        MemberDataDto data = exchange.getIn().getBody(MemberDataDto.class);
+
+        // Remove sensitive financial information
+        data.setSalary(null);
+        data.setCreditScore(null);
+        data.setBankAccount(null);
+
+        // Mask partial SSN (show only last 4 digits)
+        if (data.getSsn() != null) {
+            String maskedSsn = &quot;****-***&quot; + data.getSsn().substring(7);
+            data.setSsn(maskedSsn);
+        }
+
+        exchange.getIn().setBody(data);
+    }
+}
+</code></pre>
+<h3 id="3-dynamic-field-selection-filter">3. <strong>Dynamic Field Selection Filter</strong></h3>
+<pre><code class="language-java">@Component
+public class DynamicFieldFilter extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from(&quot;rest:GET:/contact/{id}&quot;)
+            .routeId(&quot;dynamic-field-filter&quot;)
+            .log(&quot;Received field selection request: fields=${header.fields}&quot;)
+            .to(&quot;direct:fetchContact&quot;)
+            .process(exchange -&gt; {
+                String fieldsParam = exchange.getIn().getHeader(&quot;fields&quot;, String.class);
+                Set&lt;String&gt; requestedFields = parseFieldsParameter(fieldsParam);
+                exchange.setProperty(&quot;requestedFields&quot;, requestedFields);
+            })
+            .to(&quot;direct:applyFieldFilter&quot;);
+
+        from(&quot;direct:applyFieldFilter&quot;)
+            .process(exchange -&gt; {
+                ContactDto contact = exchange.getIn().getBody(ContactDto.class);
+                Set&lt;String&gt; requestedFields = exchange.getProperty(&quot;requestedFields&quot;, Set.class);
+
+                Map&lt;String, Object&gt; filteredData = new HashMap&lt;&gt;();
+
+                // Apply field selection
+                if (requestedFields.contains(&quot;id&quot;)) {
+                    filteredData.put(&quot;id&quot;, contact.getId());
+                }
+                if (requestedFields.contains(&quot;firstName&quot;)) {
+                    filteredData.put(&quot;firstName&quot;, contact.getFirstName());
+                }
+                if (requestedFields.contains(&quot;lastName&quot;)) {
+                    filteredData.put(&quot;lastName&quot;, contact.getLastName());
+                }
+                if (requestedFields.contains(&quot;email&quot;)) {
+                    filteredData.put(&quot;email&quot;, contact.getEmail());
+                }
+                if (requestedFields.contains(&quot;phone&quot;)) {
+                    filteredData.put(&quot;phone&quot;, contact.getPhone());
+                }
+                if (requestedFields.contains(&quot;address&quot;)) {
+                    filteredData.put(&quot;address&quot;, contact.getAddress());
+                }
+
+                exchange.getIn().setBody(filteredData);
+            })
+            .marshal().json()
+            .setHeader(Exchange.CONTENT_TYPE, constant(&quot;application/json&quot;));
+    }
+
+    private Set&lt;String&gt; parseFieldsParameter(String fieldsParam) {
+        if (fieldsParam == null || fieldsParam.trim().isEmpty()) {
+            // Default fields when none specified
+            return Set.of(&quot;id&quot;, &quot;firstName&quot;, &quot;lastName&quot;, &quot;email&quot;);
+        }
+
+        return Arrays.stream(fieldsParam.split(&quot;,&quot;))
+                .map(String::trim)
+                .filter(field -&gt; !field.isEmpty())
+                .collect(Collectors.toSet());
+    }
+}
+</code></pre>
+<h3 id="4-compliance-and-audit-filter">4. <strong>Compliance and Audit Filter</strong></h3>
+<pre><code class="language-java">@Component
+public class ComplianceContentFilter extends RouteBuilder {
+
+    @Autowired
+    private AuditService auditService;
+
+    @Override
+    public void configure() throws Exception {
+        from(&quot;direct:applyComplianceFilter&quot;)
+            .routeId(&quot;compliance-content-filter&quot;)
+            .log(&quot;Applying compliance filter for jurisdiction: ${header.jurisdiction}&quot;)
+            .process(exchange -&gt; {
+                PersonalDataDto data = exchange.getIn().getBody(PersonalDataDto.class);
+                String jurisdiction = exchange.getIn().getHeader(&quot;jurisdiction&quot;, String.class);
+                String purpose = exchange.getIn().getHeader(&quot;dataPurpose&quot;, String.class);
+
+                PersonalDataDto filtered = applyComplianceRules(data, jurisdiction, purpose);
+
+                // Audit the filtering action
+                auditService.logDataAccess(
+                    data.getSubjectId(),
+                    getFilteredFields(data, filtered),
+                    purpose,
+                    jurisdiction
+                );
+
+                exchange.getIn().setBody(filtered);
+            })
+            .to(&quot;direct:processCompliantData&quot;);
+    }
+
+    private PersonalDataDto applyComplianceRules(PersonalDataDto data, String jurisdiction, String purpose) {
+        PersonalDataDto filtered = data.copy();
+
+        // GDPR compliance rules
+        if (&quot;EU&quot;.equals(jurisdiction)) {
+            // Data minimization principle
+            if (!&quot;MARKETING&quot;.equals(purpose)) {
+                filtered.setMarketingData(null);
+            }
+            if (!&quot;ANALYTICS&quot;.equals(purpose)) {
+                filtered.setBehavioralData(null);
+                filtered.setLocationHistory(null);
+            }
+
+            // Right to be forgotten
+            if (data.isDeletionRequested()) {
+                return createMinimalDataRecord(data.getId());
+            }
+        }
+
+        // PCI DSS compliance
+        if (data.getPaymentInfo() != null) {
+            PaymentInfoDto maskedPayment = maskPaymentInfo(data.getPaymentInfo());
+            filtered.setPaymentInfo(maskedPayment);
+        }
+
+        return filtered;
+    }
+}
+</code></pre>
+<h3 id="5-performance-optimized-filter">5. <strong>Performance-Optimized Filter</strong></h3>
+<pre><code class="language-java">@Component
+public class PerformanceContentFilter extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from(&quot;direct:optimizeForClient&quot;)
+            .routeId(&quot;performance-content-filter&quot;)
+            .choice()
+                .when(header(&quot;clientType&quot;).isEqualTo(&quot;MOBILE&quot;))
+                    .log(&quot;Applying mobile optimization filter&quot;)
+                    .to(&quot;direct:mobileFilter&quot;)
+                .when(header(&quot;clientType&quot;).isEqualTo(&quot;WEB&quot;))
+                    .log(&quot;Applying web optimization filter&quot;)
+                    .to(&quot;direct:webFilter&quot;)
+                .when(header(&quot;bandwidth&quot;).isEqualTo(&quot;LOW&quot;))
+                    .log(&quot;Applying low-bandwidth filter&quot;)
+                    .to(&quot;direct:lowBandwidthFilter&quot;)
+                .otherwise()
+                    .log(&quot;No optimization filter needed&quot;)
+            .end();
+
+        from(&quot;direct:mobileFilter&quot;)
+            .process(exchange -&gt; {
+                ContactListDto contacts = exchange.getIn().getBody(ContactListDto.class);
+
+                // For mobile, return minimal contact info
+                List&lt;MobileContactDto&gt; mobileContacts = contacts.getContacts().stream()
+                    .map(this::convertToMobileFormat)
+                    .collect(Collectors.toList());
+
+                exchange.getIn().setBody(new MobileContactListDto(mobileContacts));
+            });
+
+        from(&quot;direct:lowBandwidthFilter&quot;)
+            .process(exchange -&gt; {
+                Object data = exchange.getIn().getBody();
+
+                // Remove binary data and large text fields
+                if (data instanceof ContactDto contact) {
+                    contact.setProfileImage(null);
+                    contact.setNotes(truncateNotes(contact.getNotes()));
+                    contact.setDocuments(null);
+                }
+
+                exchange.getIn().setBody(data);
+            });
+    }
+
+    private MobileContactDto convertToMobileFormat(ContactDto contact) {
+        return MobileContactDto.builder()
+            .id(contact.getId())
+            .displayName(contact.getFirstName() + &quot; &quot; + contact.getLastName())
+            .primaryEmail(contact.getEmail())
+            .primaryPhone(contact.getPhone())
+            .build();
+    }
+}
+</code></pre>
+<h2 id="best-practices">Best Practices</h2>
+<h3 id="1-filter-configuration-management">1. <strong>Filter Configuration Management</strong></h3>
+<ul>
+<li>Use external configuration for filter rules to enable runtime changes</li>
+<li>Implement role-based and permission-based filtering policies</li>
+<li>Maintain audit logs of what data was filtered and why</li>
+<li>Provide clear error messages when required data is filtered out</li>
+</ul>
+<h3 id="2-performance-considerations">2. <strong>Performance Considerations</strong></h3>
+<ul>
+<li>Apply filters as early as possible in the processing pipeline</li>
+<li>Use streaming filters for large data sets to avoid memory issues</li>
+<li>Cache filter results when the same data is processed multiple times</li>
+<li>Consider filter complexity vs. performance trade-offs</li>
+</ul>
+<h3 id="3-security-best-practices">3. <strong>Security Best Practices</strong></h3>
+<ul>
+<li>Implement whitelist-based filtering (allow known good) rather than blacklist (block known bad)</li>
+<li>Validate filter parameters to prevent injection attacks</li>
+<li>Use secure defaults - filter out sensitive data unless explicitly allowed</li>
+<li>Regular security reviews of filter implementations</li>
+</ul>
+<h3 id="4-compliance-and-governance">4. <strong>Compliance and Governance</strong></h3>
+<ul>
+<li>Document data classification and filtering policies</li>
+<li>Implement data lineage tracking through filter operations</li>
+<li>Regular compliance audits of filter effectiveness</li>
+<li>Automated testing of compliance filter rules</li>
+</ul>
+<h3 id="5-monitoring-and-observability">5. <strong>Monitoring and Observability</strong></h3>
+<ul>
+<li>Track filter performance metrics and impact on system performance</li>
+<li>Monitor filter effectiveness - are the right fields being filtered?</li>
+<li>Alert on unusual filtering patterns or failures</li>
+<li>Provide visibility into filter operations for debugging</li>
+</ul>
+<p>The Content Filter pattern is essential for building secure, compliant, and performant integration architectures that handle sensitive data appropriately while optimizing system performance and user experience.</p>
+
+      <a href="../index.html" class="back-to-top">← Back to All Patterns</a>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <p>©2026 <a href="https://dataintegrationmastery.com/">Data Integration Mastery™</a> — All Rights Reserved</p>
+  </footer>
+</body>
+</html>

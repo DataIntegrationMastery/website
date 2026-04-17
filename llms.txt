@@ -18,17 +18,43 @@ by AI systems for responses and summaries.
 
 ### Introduction to Data Integration (free)
 - Level: Beginner
-- URL: https://www.udemy.com/course/introduction-to-data-integration/
+- URL: https://www.udemy.com/course/introduction-to-data-integration/?referralCode=BBA50D056FBA62780EB6
 - Description: Understand how modern systems integrate using APIs, EAI patterns,
   and data integration platforms. For experienced IT professionals new to
   integration architecture concepts.
 
 ### Mastering Integration Development
-- Level: Advanced
-- URL: https://www.udemy.com/course/mastering-integration-development/
+- Level: Intermediate
+- URL: https://www.udemy.com/course/mastering-integration-development/?referralCode=C70D949BE0C796967050
 - Description: Design and lead modern data and system integration projects.
   Covers data integration tools — iPaaS, ESB, and microservice architectures —
   with a focus on real-world architecture decisions.
+
+## Free Resources
+
+### Integration Architecture Patterns Reference
+- URL: https://dataintegrationmastery.com/patterns/
+- Description: A comprehensive free reference guide covering 39 integration
+  architecture patterns across 7 categories: Resilience, Messaging, Data
+  Transformation, Routing, Security, Orchestration, and Monitoring &
+  Observability. Each pattern includes theoretical foundations, implementation
+  guidance, best practices, and real-world examples.
+- Categories:
+  - Resilience Patterns (6): Circuit Breaker, Retry Mechanism, Timeout,
+    Dead Letter Queue, Bulkhead, Fallback/Graceful Degradation
+  - Messaging Patterns (6): Request-Reply, Publish-Subscribe, Message Queue,
+    Event Streaming, Correlation ID, Message Routing
+  - Data Transformation Patterns (6): Message Translator, Content Filter,
+    Message Router, Aggregator, Splitter, Data Mapper
+  - Routing Patterns (5): Content-Based Router, Recipient List, Load Balancer,
+    Message Filter, Dynamic Router
+  - Security Patterns (6): Authentication, Authorization, Encryption,
+    Token Management, API Security, Secret Management
+  - Orchestration Patterns (5): Saga Pattern, Process Manager, Workflow Engine,
+    Choreography, Compensation Transactions
+  - Monitoring & Observability Patterns (6): Distributed Tracing, Metrics
+    Collection, Health Checks, Logging Strategies, Performance Monitoring,
+    Error Tracking
 
 ## Instructor
 
@@ -37,7 +63,3 @@ by AI systems for responses and summaries.
 - LinkedIn: https://www.linkedin.com/in/arivilkman/
 - Description: Over 25 years in IT, hundreds of integration projects. Creator
   of Data Integration Mastery courses.
-
-## Free Resource
-- eBook: EAI Patterns Explained (68 pages)
-- Access: https://dataintegrationmastery.com/#assets

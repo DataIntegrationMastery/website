@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Circuit Breaker Pattern — Integration Architecture Patterns | Data Integration Mastery™</title>
+  <meta name="description" content="The Circuit Breaker pattern is a critical stability pattern in distributed systems architecture, designed to provide automatic protection against cascading f...">
+  <meta name="keywords" content="circuit breaker pattern, integration pattern, resilience patterns, integration architecture, EAI patterns, data integration">
+  <link rel="canonical" href="https://dataintegrationmastery.com/patterns/resilience-patterns/circuit-breaker.html">
+
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://dataintegrationmastery.com/patterns/resilience-patterns/circuit-breaker.html">
+  <meta property="og:title" content="Circuit Breaker Pattern — Integration Architecture Patterns">
+  <meta property="og:description" content="The Circuit Breaker pattern is a critical stability pattern in distributed systems architecture, designed to provide automatic protection against cascading f...">
+  <meta property="og:image" content="https://dataintegrationmastery.com/assets/images/logo.png">
+  <meta property="og:site_name" content="Data Integration Mastery">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Circuit Breaker Pattern — Integration Architecture Patterns">
+  <meta name="twitter:description" content="The Circuit Breaker pattern is a critical stability pattern in distributed systems architecture, designed to provide automatic protection against cascading f...">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/docs.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Circuit Breaker Pattern",
+    "description": "The Circuit Breaker pattern is a critical stability pattern in distributed systems architecture, designed to provide automatic protection against cascading f...",
+    "url": "https://dataintegrationmastery.com/patterns/resilience-patterns/circuit-breaker.html",
+    "author": {
+      "@type": "Person",
+      "name": "Ari Vilkman",
+      "jobTitle": "Integration Architect"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Data Integration Mastery",
+      "url": "https://dataintegrationmastery.com"
+    },
+    "isPartOf": {
+      "@type": "CollectionPage",
+      "name": "Integration Architecture Patterns",
+      "url": "https://dataintegrationmastery.com/patterns/"
+    },
+    "about": {
+      "@type": "Thing",
+      "name": "Circuit Breaker Pattern"
+    },
+    "inLanguage": "en",
+    "isAccessibleForFree": true
+  }
+  </script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="https://dataintegrationmastery.com/" class="header-brand">
+        <img src="../../assets/images/dim-icon.png" alt="DIM" width="36" height="36">
+        <span class="header-title">Data Integration Mastery™</span>
+      </a>
+      <nav class="header-nav" aria-label="Main navigation">
+        <a href="https://dataintegrationmastery.com/">Home</a>
+        <a href="../index.html">All Patterns</a>
+        <a href="https://dataintegrationmastery.com/#free-course">Free Course</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="docs-layout">
+    <aside class="docs-sidebar" aria-label="Pattern categories">
+      <div class="sidebar-title">Pattern Categories</div>
+<div class="sidebar-section">
+  <a href="../index.html#resilience" class="sidebar-section-title">🛡️ Resilience Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="circuit-breaker.html" class="active">Circuit Breaker</a></li>
+    <li><a href="retry-mechanism.html">Retry Mechanism</a></li>
+    <li><a href="timeout.html">Timeout</a></li>
+    <li><a href="dead-letter-queue.html">Dead Letter Queue</a></li>
+    <li><a href="bulkhead.html">Bulkhead</a></li>
+    <li><a href="fallback-graceful-degradation.html">Fallback / Graceful Degradation</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#messaging" class="sidebar-section-title">📨 Messaging Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../messaging-patterns/request-reply.html">Request-Reply</a></li>
+    <li><a href="../messaging-patterns/publish-subscribe.html">Publish-Subscribe</a></li>
+    <li><a href="../messaging-patterns/message-queue.html">Message Queue</a></li>
+    <li><a href="../messaging-patterns/event-streaming.html">Event Streaming</a></li>
+    <li><a href="../messaging-patterns/correlation-id.html">Correlation ID</a></li>
+    <li><a href="../messaging-patterns/message-routing.html">Message Routing</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#data-transformation" class="sidebar-section-title">🔄 Data Transformation Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../data-transformation-patterns/message-translator.html">Message Translator</a></li>
+    <li><a href="../data-transformation-patterns/content-filter.html">Content Filter</a></li>
+    <li><a href="../data-transformation-patterns/message-router.html">Message Router</a></li>
+    <li><a href="../data-transformation-patterns/aggregator.html">Aggregator</a></li>
+    <li><a href="../data-transformation-patterns/splitter.html">Splitter</a></li>
+    <li><a href="../data-transformation-patterns/data-mapper.html">Data Mapper</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#routing" class="sidebar-section-title">🔀 Routing Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../routing-patterns/content-based-router.html">Content-Based Router</a></li>
+    <li><a href="../routing-patterns/recipient-list.html">Recipient List</a></li>
+    <li><a href="../routing-patterns/load-balancer.html">Load Balancer</a></li>
+    <li><a href="../routing-patterns/message-filter.html">Message Filter</a></li>
+    <li><a href="../routing-patterns/dynamic-router.html">Dynamic Router</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#security" class="sidebar-section-title">🔐 Security Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../security-patterns/authentication.html">Authentication</a></li>
+    <li><a href="../security-patterns/authorization.html">Authorization</a></li>
+    <li><a href="../security-patterns/encryption.html">Encryption</a></li>
+    <li><a href="../security-patterns/token-management.html">Token Management</a></li>
+    <li><a href="../security-patterns/api-security.html">API Security</a></li>
+    <li><a href="../security-patterns/secret-management.html">Secret Management</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#orchestration" class="sidebar-section-title">🎭 Orchestration Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../orchestration-patterns/saga-pattern.html">Saga Pattern</a></li>
+    <li><a href="../orchestration-patterns/process-manager.html">Process Manager</a></li>
+    <li><a href="../orchestration-patterns/workflow-engine.html">Workflow Engine</a></li>
+    <li><a href="../orchestration-patterns/choreography.html">Choreography</a></li>
+    <li><a href="../orchestration-patterns/compensation-transactions.html">Compensation Transactions</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#observability" class="sidebar-section-title">📊 Monitoring & Observability Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../monitoring-observability-patterns/distributed-tracing.html">Distributed Tracing</a></li>
+    <li><a href="../monitoring-observability-patterns/metrics-collection.html">Metrics Collection</a></li>
+    <li><a href="../monitoring-observability-patterns/health-checks.html">Health Checks</a></li>
+    <li><a href="../monitoring-observability-patterns/logging-strategies.html">Logging Strategies</a></li>
+    <li><a href="../monitoring-observability-patterns/performance-monitoring.html">Performance Monitoring</a></li>
+    <li><a href="../monitoring-observability-patterns/error-tracking.html">Error Tracking</a></li>
+  </ul>
+</div>
+
+    </aside>
+
+    <main id="main-content" class="docs-content">
+      <div class="breadcrumb">
+        <a href="https://dataintegrationmastery.com/">Home</a>
+        <span class="sep">›</span>
+        <a href="../index.html">Patterns</a>
+        <span class="sep">›</span>
+        <a href="../index.html#resilience">Resilience Patterns</a>
+        <span class="sep">›</span>
+        <strong>Circuit Breaker Pattern</strong>
+      </div>
+
+      <h1>Circuit Breaker Pattern</h1>
+
+      <h2 id="overview">Overview</h2>
+<p>The Circuit Breaker pattern is a critical stability pattern in distributed systems architecture, designed to provide automatic protection against cascading failures and resource exhaustion. Named after electrical circuit breakers that protect electrical circuits from damage caused by overcurrent, the software Circuit Breaker pattern serves as an intelligent intermediary that monitors the health and availability of external service dependencies.</p>
+<h3 id="theoretical-foundation">Theoretical Foundation</h3>
+<p>The Circuit Breaker pattern is rooted in <strong>fault tolerance theory</strong> and <strong>systems reliability engineering</strong>. It addresses the fundamental challenge of <strong>partial failure handling</strong> in distributed systems, where individual components can fail independently without bringing down the entire system. The pattern embodies the principle of <strong>"failing fast"</strong> - immediately returning an error when a dependency is known to be unavailable, rather than waiting for inevitable timeouts.</p>
+<h3 id="core-principles">Core Principles</h3>
+<h4 id="1-isolation-of-failure">1. <strong>Isolation of Failure</strong></h4>
+<p>The Circuit Breaker acts as a <strong>bulkhead</strong>, isolating failures in one service from affecting other parts of the system. This prevents the <strong>"domino effect"</strong> where one failing component triggers a cascade of failures throughout the distributed architecture.</p>
+<h4 id="2-resource-protection">2. <strong>Resource Protection</strong></h4>
+<p>By preventing futile calls to failing services, the pattern protects valuable system resources:
+- <strong>Thread pools</strong> from being exhausted by blocked calls
+- <strong>Connection pools</strong> from being depleted by hanging connections
+- <strong>Memory</strong> from accumulating timeout exceptions
+- <strong>Network bandwidth</strong> from repeated failed requests</p>
+<h4 id="3-temporal-failure-handling">3. <strong>Temporal Failure Handling</strong></h4>
+<p>The pattern recognizes that many failures in distributed systems are <strong>temporal</strong> - services may recover on their own given sufficient time. The Circuit Breaker provides a mechanism for <strong>automatic recovery detection</strong> without requiring manual intervention.</p>
+<h4 id="4-graceful-degradation">4. <strong>Graceful Degradation</strong></h4>
+<p>Rather than complete system failure, the Circuit Breaker enables <strong>graceful degradation</strong> where the system continues to operate with reduced functionality when dependencies are unavailable.</p>
+<h3 id="why-circuit-breakers-are-essential-in-integration-architecture">Why Circuit Breakers are Essential in Integration Architecture</h3>
+<h4 id="1-network-unreliability">1. <strong>Network Unreliability</strong></h4>
+<p>In integration scenarios, services communicate across unreliable networks where:
+- <strong>Latency</strong> can vary unpredictably
+- <strong>Packet loss</strong> may occur intermittently<br />
+- <strong>Network partitions</strong> can temporarily isolate services
+- <strong>DNS resolution</strong> failures can prevent service discovery</p>
+<h4 id="2-third-party-service-dependencies">2. <strong>Third-Party Service Dependencies</strong></h4>
+<p>Modern integration architectures often depend on external services that are:
+- <strong>Outside organizational control</strong> - SaaS providers, payment gateways, authentication services
+- <strong>Subject to rate limiting</strong> - API quotas and throttling mechanisms
+- <strong>Experiencing variable load</strong> - Performance degradation during peak usage
+- <strong>Under maintenance</strong> - Scheduled and unscheduled downtime</p>
+<h4 id="3-distributed-system-complexity">3. <strong>Distributed System Complexity</strong></h4>
+<p>In distributed architectures, the <strong>"distributed monolith"</strong> anti-pattern can emerge where:
+- <strong>Deep service chains</strong> create multiple failure points
+- <strong>Synchronous communication</strong> amplifies latency and failure impact
+- <strong>Service interdependencies</strong> create complex failure scenarios
+- <strong>Load balancing</strong> may not account for service health</p>
+<h4 id="4-integration-pattern-challenges">4. <strong>Integration Pattern Challenges</strong></h4>
+<p>Common integration patterns face specific challenges that Circuit Breakers address:</p>
+<ul>
+<li><strong>Request-Reply</strong>: Long timeouts block calling threads</li>
+<li><strong>Scatter-Gather</strong>: One slow/failing service delays entire aggregation</li>
+<li><strong>Orchestration</strong>: Workflow engines need protection from service failures</li>
+<li><strong>Event-Driven</strong>: Event processing pipelines can back up when downstream services fail</li>
+</ul>
+<h3 id="benefits-in-integration-contexts">Benefits in Integration Contexts</h3>
+<h4 id="1-immediate-failure-detection">1. <strong>Immediate Failure Detection</strong></h4>
+<ul>
+<li><strong>Real-time monitoring</strong> of service health through success/failure tracking</li>
+<li><strong>Threshold-based detection</strong> allows fine-tuning sensitivity to different failure types</li>
+<li><strong>Automatic state transitions</strong> eliminate manual intervention for common failure scenarios</li>
+</ul>
+<h4 id="2-resource-optimization">2. <strong>Resource Optimization</strong></h4>
+<ul>
+<li><strong>Reduced thread contention</strong> by eliminating blocked threads waiting for timeouts</li>
+<li><strong>Lower memory pressure</strong> from fewer timeout exceptions and connection objects</li>
+<li><strong>Improved throughput</strong> for healthy service paths by removing failed service overhead</li>
+</ul>
+<h4 id="3-system-resilience">3. <strong>System Resilience</strong></h4>
+<ul>
+<li><strong>Fault isolation</strong> prevents single service failures from system-wide impact</li>
+<li><strong>Automatic recovery</strong> restores service integration when dependencies recover</li>
+<li><strong>Predictable failure modes</strong> replace unpredictable cascading failures with controlled degradation</li>
+</ul>
+<h4 id="4-operational-excellence">4. <strong>Operational Excellence</strong></h4>
+<ul>
+<li><strong>Clear failure visibility</strong> through circuit breaker state monitoring</li>
+<li><strong>Reduced alert fatigue</strong> by handling expected temporary failures automatically</li>
+<li><strong>Improved debugging</strong> with circuit breaker metrics providing failure patterns</li>
+</ul>
+<h4 id="5-business-continuity">5. <strong>Business Continuity</strong></h4>
+<ul>
+<li><strong>Partial functionality preservation</strong> allows critical business processes to continue</li>
+<li><strong>User experience protection</strong> through fallback responses rather than timeouts</li>
+<li><strong>SLA compliance</strong> by meeting response time requirements even during dependency failures</li>
+</ul>
+<h3 id="integration-architecture-applications">Integration Architecture Applications</h3>
+<h4 id="1-api-gateway-pattern">1. <strong>API Gateway Pattern</strong></h4>
+<p>Circuit Breakers in API gateways protect against:
+- <strong>Backend service failures</strong> affecting multiple API consumers
+- <strong>Rate limit violations</strong> from overwhelmed downstream services
+- <strong>Authentication service outages</strong> blocking all API access</p>
+<h4 id="2-service-mesh-integration">2. <strong>Service Mesh Integration</strong></h4>
+<p>In service mesh architectures, Circuit Breakers provide:
+- <strong>Sidecar-level protection</strong> for all service-to-service communication
+- <strong>Policy-driven configuration</strong> for different service tiers and criticality levels
+- <strong>Distributed circuit breaker state</strong> shared across service instances</p>
+<h4 id="3-event-driven-architectures">3. <strong>Event-Driven Architectures</strong></h4>
+<p>For asynchronous integration patterns:
+- <strong>Event processor protection</strong> when downstream event handlers fail
+- <strong>Dead letter queue integration</strong> for permanently failed event processing
+- <strong>Backpressure management</strong> when event consumers cannot keep up</p>
+<h4 id="4-legacy-system-integration">4. <strong>Legacy System Integration</strong></h4>
+<p>When integrating with legacy systems:
+- <strong>Protection against legacy system instability</strong> and unpredictable performance
+- <strong>Gradual migration support</strong> by providing fallbacks during system transitions
+- <strong>Resource consumption control</strong> for resource-constrained legacy environments</p>
+<h3 id="relationship-to-other-resilience-patterns">Relationship to Other Resilience Patterns</h3>
+<p>The Circuit Breaker pattern works synergistically with other resilience patterns:</p>
+<ul>
+<li><strong>Retry + Circuit Breaker</strong>: Retry handles transient failures; Circuit Breaker handles persistent failures</li>
+<li><strong>Timeout + Circuit Breaker</strong>: Timeout limits individual request duration; Circuit Breaker limits cumulative failure impact</li>
+<li><strong>Bulkhead + Circuit Breaker</strong>: Bulkhead isolates resource pools; Circuit Breaker isolates failure domains</li>
+<li><strong>Fallback + Circuit Breaker</strong>: Circuit Breaker triggers fallback execution when primary path is unavailable</li>
+</ul>
+<p>This layered approach creates <strong>defense in depth</strong> for distributed system reliability.</p>
+<h2 id="how-circuit-breaker-works">How Circuit Breaker Works</h2>
+<p>The Circuit Breaker pattern operates like an electrical circuit breaker in three distinct states:</p>
+<h3 id="states">States</h3>
+<h4 id="1-closed-state-normal-operation">1. CLOSED State (Normal Operation)</h4>
+<ul>
+<li>All requests are allowed to pass through</li>
+<li>Success and failure counts are monitored</li>
+<li>When failure threshold is reached → transitions to OPEN</li>
+</ul>
+<h4 id="2-open-state-failing-fast">2. OPEN State (Failing Fast)</h4>
+<ul>
+<li>All requests are immediately rejected without calling the service</li>
+<li>No network calls or timeouts occur</li>
+<li>After a recovery timeout period → transitions to HALF-OPEN</li>
+</ul>
+<h4 id="3-half-open-state-testing-recovery">3. HALF-OPEN State (Testing Recovery)</h4>
+<ul>
+<li>Limited number of test requests are allowed through</li>
+<li>If test requests succeed → transitions back to CLOSED</li>
+<li>If test requests fail → transitions back to OPEN</li>
+</ul>
+<h3 id="state-transition-diagram">State Transition Diagram</h3>
+<pre><code>    success &lt; threshold
+    ┌─────────────────┐
+    │     CLOSED      │
+    │ (Normal Ops)    │
+    └─────────────────┘
+           │ │
+  failures │ │ reset success
+  &gt; thresh │ │
+           ▼ │
+    ┌─────────────────┐
+    │      OPEN       │◄──── test request fails
+    │  (Fail Fast)    │
+    └─────────────────┘
+           │
+           │ timeout elapsed
+           ▼
+    ┌─────────────────┐
+    │   HALF-OPEN     │
+    │ (Testing)       │
+    └─────────────────┘
+           │
+           └──── test request succeeds
+</code></pre>
+<h2 id="key-components">Key Components</h2>
+<h3 id="1-failure-counter">1. Failure Counter</h3>
+<p>Tracks consecutive failures and success rates:</p>
+<pre><code class="language-java">public class FailureCounter {
+    private int consecutiveFailures = 0;
+    private int totalRequests = 0;
+    private int failures = 0;
+
+    public void recordSuccess() {
+        consecutiveFailures = 0;
+        totalRequests++;
+    }
+
+    public void recordFailure() {
+        consecutiveFailures++;
+        failures++;
+        totalRequests++;
+    }
+
+    public double getFailureRate() {
+        return totalRequests &gt; 0 ? (double) failures / totalRequests : 0.0;
+    }
+}
+</code></pre>
+<h3 id="2-state-manager">2. State Manager</h3>
+<p>Controls circuit state transitions:</p>
+<pre><code class="language-java">public enum CircuitState {
+    CLOSED,   // Normal operation
+    OPEN,     // Failing fast
+    HALF_OPEN // Testing recovery
+}
+
+public class CircuitBreakerStateManager {
+    private CircuitState currentState = CircuitState.CLOSED;
+    private long lastFailureTime;
+    private int testRequestCount = 0;
+
+    public boolean shouldAllowRequest(CircuitBreakerConfig config) {
+        switch (currentState) {
+            case CLOSED:
+                return true;
+            case OPEN:
+                if (hasRecoveryTimeoutElapsed(config)) {
+                    transitionToHalfOpen();
+                    return true;
+                }
+                return false;
+            case HALF_OPEN:
+                return testRequestCount &lt; config.getMaxTestRequests();
+        }
+        return false;
+    }
+}
+</code></pre>
+<h3 id="3-recovery-timer">3. Recovery Timer</h3>
+<p>Manages timeout periods and recovery testing:</p>
+<pre><code class="language-java">public class RecoveryTimer {
+    private final long recoveryTimeoutMs;
+    private long lastFailureTimestamp;
+
+    public boolean isRecoveryTimeoutElapsed() {
+        return (System.currentTimeMillis() - lastFailureTimestamp) &gt;= recoveryTimeoutMs;
+    }
+
+    public void recordFailure() {
+        this.lastFailureTimestamp = System.currentTimeMillis();
+    }
+}
+</code></pre>
+<h2 id="configuration-parameters">Configuration Parameters</h2>
+<h3 id="essential-settings">Essential Settings</h3>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Typical Values</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Failure Threshold</strong></td>
+<td>Number of consecutive failures to trigger OPEN state</td>
+<td>3-10</td>
+</tr>
+<tr>
+<td><strong>Recovery Timeout</strong></td>
+<td>Time to wait before testing recovery (HALF-OPEN)</td>
+<td>30s-300s</td>
+</tr>
+<tr>
+<td><strong>Request Volume Threshold</strong></td>
+<td>Minimum requests before calculating failure rate</td>
+<td>10-50</td>
+</tr>
+<tr>
+<td><strong>Success Threshold</strong></td>
+<td>Successful requests needed to close circuit</td>
+<td>1-5</td>
+</tr>
+</tbody>
+</table>
+<h3 id="example-configuration">Example Configuration</h3>
+<pre><code class="language-properties"># Circuit breaker for Service A
+circuit-breaker.service-a.failure-threshold=5
+circuit-breaker.service-a.recovery-timeout=60s
+circuit-breaker.service-a.request-volume-threshold=20
+circuit-breaker.service-a.success-threshold=3
+
+# Circuit breaker for Service B
+circuit-breaker.service-b.failure-threshold=3
+circuit-breaker.service-b.recovery-timeout=30s
+circuit-breaker.service-b.request-volume-threshold=10
+circuit-breaker.service-b.success-threshold=2
+</code></pre>
+<h2 id="implementation-examples">Implementation Examples</h2>
+<h3 id="1-basic-circuit-breaker-implementation">1. Basic Circuit Breaker Implementation</h3>
+<pre><code class="language-java">@Component
+public class BasicCircuitBreaker {
+    private final CircuitBreakerConfig config;
+    private final FailureCounter failureCounter;
+    private final CircuitBreakerStateManager stateManager;
+    private final RecoveryTimer recoveryTimer;
+
+    public &lt;T&gt; T execute(Supplier&lt;T&gt; operation, Supplier&lt;T&gt; fallback) {
+        if (!stateManager.shouldAllowRequest(config)) {
+            // Circuit is OPEN - fail fast
+            return fallback.get();
+        }
+
+        try {
+            T result = operation.get();
+            onSuccess();
+            return result;
+        } catch (Exception e) {
+            onFailure(e);
+            return fallback.get();
+        }
+    }
+
+    private void onSuccess() {
+        failureCounter.recordSuccess();
+        if (stateManager.getCurrentState() == CircuitState.HALF_OPEN) {
+            // Enough successes to close circuit
+            if (failureCounter.getConsecutiveSuccesses() &gt;= config.getSuccessThreshold()) {
+                stateManager.transitionToClosed();
+            }
+        }
+    }
+
+    private void onFailure(Exception e) {
+        failureCounter.recordFailure();
+        recoveryTimer.recordFailure();
+
+        if (failureCounter.getConsecutiveFailures() &gt;= config.getFailureThreshold()) {
+            stateManager.transitionToOpen();
+        }
+    }
+}
+</code></pre>
+<h3 id="2-integration-with-http-client">2. Integration with HTTP Client</h3>
+<pre><code class="language-java">@Service
+public class ExternalServiceClient {
+    private final RestTemplate restTemplate;
+    private final BasicCircuitBreaker circuitBreaker;
+
+    public ContactResponse updateContact(ContactRequest request) {
+        return circuitBreaker.execute(
+            // Primary operation
+            () -&gt; restTemplate.postForObject(&quot;/contact/update&quot;, request, ContactResponse.class),
+            // Fallback operation
+            () -&gt; createErrorResponse(&quot;External service unavailable - circuit breaker OPEN&quot;)
+        );
+    }
+
+    private ContactResponse createErrorResponse(String message) {
+        return ContactResponse.builder()
+            .status(&quot;ERROR&quot;)
+            .errorCode(&quot;CIRCUIT_BREAKER_OPEN&quot;)
+            .errorMessage(message)
+            .retryable(false)
+            .build();
+    }
+}
+</code></pre>
+<h3 id="3-quarkus-implementation-with-microprofile">3. Quarkus Implementation with MicroProfile</h3>
+<pre><code class="language-java">@ApplicationScoped
+public class QuarkusCircuitBreakerService {
+
+    @CircuitBreaker(
+        failureRatio = 0.5,           // 50% failure rate threshold
+        requestVolumeThreshold = 10,   // Minimum 10 requests
+        delay = 60000,                 // 60 second recovery timeout
+        successThreshold = 3           // 3 successes to close circuit
+    )
+    @Retry(
+        maxRetries = 3,
+        delay = 1000,
+        delayUnit = ChronoUnit.MILLIS
+    )
+    @Timeout(value = 30, unit = ChronoUnit.SECONDS)
+    public String callExternalService(String data) {
+        // External service call
+        return externalServiceClient.processData(data);
+    }
+
+    @Fallback
+    public String fallbackResponse(String data) {
+        return &quot;Service temporarily unavailable. Please try again later.&quot;;
+    }
+}
+</code></pre>
+<h2 id="integration-patterns">Integration Patterns</h2>
+<h3 id="1-circuit-breaker-with-retry">1. Circuit Breaker with Retry</h3>
+<p>Combine Circuit Breaker with Retry for comprehensive resilience:</p>
+<pre><code class="language-java">@Service
+public class ResilientServiceClient {
+
+    public ResponseEntity&lt;String&gt; callWithRetryAndCircuitBreaker(RequestData data) {
+        return circuitBreaker.execute(
+            () -&gt; retryTemplate.execute(context -&gt; 
+                restTemplate.postForEntity(&quot;/api/process&quot;, data, String.class)
+            ),
+            () -&gt; ResponseEntity.status(503)
+                .body(&quot;Service unavailable - please try again later&quot;)
+        );
+    }
+}
+</code></pre>
+<h3 id="2-per-endpoint-circuit-breakers">2. Per-Endpoint Circuit Breakers</h3>
+<p>Separate circuit breakers for different service endpoints:</p>
+<pre><code class="language-java">@Component
+public class MultiEndpointCircuitBreaker {
+    private final Map&lt;String, BasicCircuitBreaker&gt; circuitBreakers = new ConcurrentHashMap&lt;&gt;();
+
+    public &lt;T&gt; T executeForEndpoint(String endpoint, Supplier&lt;T&gt; operation, Supplier&lt;T&gt; fallback) {
+        BasicCircuitBreaker cb = circuitBreakers.computeIfAbsent(
+            endpoint, 
+            key -&gt; new BasicCircuitBreaker(getConfigForEndpoint(key))
+        );
+        return cb.execute(operation, fallback);
+    }
+}
+</code></pre>
+<h3 id="3-monitoring-and-metrics">3. Monitoring and Metrics</h3>
+<pre><code class="language-java">@Component
+public class CircuitBreakerMetrics {
+    private final MeterRegistry meterRegistry;
+
+    public void recordCircuitBreakerState(String serviceName, CircuitState state) {
+        Gauge.builder(&quot;circuit_breaker_state&quot;)
+            .tag(&quot;service&quot;, serviceName)
+            .tag(&quot;state&quot;, state.name())
+            .register(meterRegistry, state.ordinal());
+    }
+
+    public void incrementCircuitBreakerTransition(String serviceName, String fromState, String toState) {
+        Counter.builder(&quot;circuit_breaker_transitions&quot;)
+            .tag(&quot;service&quot;, serviceName)
+            .tag(&quot;from&quot;, fromState)
+            .tag(&quot;to&quot;, toState)
+            .register(meterRegistry)
+            .increment();
+    }
+}
+</code></pre>
+<h2 id="best-practices">Best Practices</h2>
+<h3 id="1-configuration-guidelines">1. Configuration Guidelines</h3>
+<ul>
+<li><strong>Start Conservative</strong>: Begin with lower thresholds and adjust based on monitoring</li>
+<li><strong>Service-Specific Settings</strong>: Different services may need different configurations</li>
+<li><strong>Environment Tuning</strong>: Production vs development environments require different settings</li>
+</ul>
+<h3 id="2-fallback-strategies">2. Fallback Strategies</h3>
+<ul>
+<li><strong>Cached Data</strong>: Return previously cached responses when available</li>
+<li><strong>Default Values</strong>: Provide sensible defaults for non-critical operations</li>
+<li><strong>Graceful Degradation</strong>: Reduce functionality rather than complete failure</li>
+</ul>
+<h3 id="3-monitoring-and-alerting">3. Monitoring and Alerting</h3>
+<ul>
+<li><strong>State Changes</strong>: Alert on circuit breaker state transitions</li>
+<li><strong>Failure Rates</strong>: Monitor failure rates approaching thresholds</li>
+<li><strong>Recovery Times</strong>: Track how long circuits remain open</li>
+</ul>
+<h3 id="4-testing-strategies">4. Testing Strategies</h3>
+<ul>
+<li><strong>Chaos Engineering</strong>: Intentionally fail services to test circuit breaker behavior</li>
+<li><strong>Load Testing</strong>: Verify circuit breaker performance under high load</li>
+<li><strong>Recovery Testing</strong>: Ensure circuits close properly when services recover</li>
+</ul>
+<h2 id="common-pitfalls">Common Pitfalls</h2>
+<h3 id="1-inappropriate-timeouts">1. Inappropriate Timeouts</h3>
+<ul>
+<li><strong>Too Short</strong>: Premature circuit opening during temporary slowness</li>
+<li><strong>Too Long</strong>: Delayed protection during actual outages</li>
+</ul>
+<h3 id="2-shared-circuit-breakers">2. Shared Circuit Breakers</h3>
+<ul>
+<li><strong>Problem</strong>: One failing operation affects unrelated operations</li>
+<li><strong>Solution</strong>: Use separate circuit breakers per service/endpoint</li>
+</ul>
+<h3 id="3-lack-of-monitoring">3. Lack of Monitoring</h3>
+<ul>
+<li><strong>Problem</strong>: Circuit breaker state changes go unnoticed</li>
+<li><strong>Solution</strong>: Implement comprehensive monitoring and alerting</li>
+</ul>
+<h3 id="4-inadequate-fallbacks">4. Inadequate Fallbacks</h3>
+<ul>
+<li><strong>Problem</strong>: Circuit breaker opens but no meaningful fallback exists</li>
+<li><strong>Solution</strong>: Design appropriate fallback strategies for each use case</li>
+</ul>
+<h2 id="integration-in-distributed-systems">Integration in Distributed Systems</h2>
+<p>In distributed integration scenarios, Circuit Breaker protects against:</p>
+<h3 id="external-system-failures">External System Failures</h3>
+<pre><code class="language-java">// Service A Integration
+@CircuitBreaker(name = &quot;service-a&quot;)
+public ContactResponse updateServiceAContact(ContactRequest request) {
+    return serviceAClient.updateContact(request);
+}
+
+// Service B Integration  
+@CircuitBreaker(name = &quot;service-b&quot;)
+public ContactResponse updateServiceBContact(ContactRequest request) {
+    return serviceBClient.updateContact(request);
+}
+</code></pre>
+<h3 id="compensation-transaction-protection">Compensation Transaction Protection</h3>
+<pre><code class="language-java">// Rollback operations also need protection
+@CircuitBreaker(name = &quot;service-a-rollback&quot;)
+public void rollbackServiceAContact(String contactId, ContactData originalData) {
+    serviceAClient.revertContact(contactId, originalData);
+}
+</code></pre>
+<h2 id="conclusion">Conclusion</h2>
+<p>The Circuit Breaker pattern is essential for building resilient distributed systems. It provides:</p>
+<ul>
+<li><strong>Fast Failure Response</strong>: Immediate error response during outages</li>
+<li><strong>Resource Protection</strong>: Prevents thread pool exhaustion and cascading failures  </li>
+<li><strong>Automatic Recovery</strong>: Self-healing behavior when services recover</li>
+<li><strong>System Stability</strong>: Maintains overall system health during partial failures</li>
+</ul>
+<p>When properly implemented and configured, Circuit Breaker significantly improves system reliability and user experience during service disruptions.</p>
+<h2 id="references">References</h2>
+<ul>
+<li><a href="https://martinfowler.com/bliki/CircuitBreaker.html">Circuit Breaker by Martin Fowler</a></li>
+<li><a href="https://microprofile.io/specifications/fault-tolerance/">MicroProfile Fault Tolerance Specification</a></li>
+<li><a href="https://resilience4j.readme.io/docs/circuitbreaker">Resilience4j Documentation</a></li>
+<li><a href="https://github.com/Netflix/Hystrix">Netflix Hystrix (archived)</a></li>
+</ul>
+
+      <a href="../index.html" class="back-to-top">← Back to All Patterns</a>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <p>©2026 <a href="https://dataintegrationmastery.com/">Data Integration Mastery™</a> — All Rights Reserved</p>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Encryption Pattern — Integration Architecture Patterns | Data Integration Mastery™</title>
+  <meta name="description" content="The Encryption pattern is a fundamental security mechanism in enterprise integration architectures that transforms readable data into an encoded format that ...">
+  <meta name="keywords" content="encryption pattern, integration pattern, security patterns, integration architecture, EAI patterns, data integration">
+  <link rel="canonical" href="https://dataintegrationmastery.com/patterns/security-patterns/encryption.html">
+
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://dataintegrationmastery.com/patterns/security-patterns/encryption.html">
+  <meta property="og:title" content="Encryption Pattern — Integration Architecture Patterns">
+  <meta property="og:description" content="The Encryption pattern is a fundamental security mechanism in enterprise integration architectures that transforms readable data into an encoded format that ...">
+  <meta property="og:image" content="https://dataintegrationmastery.com/assets/images/logo.png">
+  <meta property="og:site_name" content="Data Integration Mastery">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Encryption Pattern — Integration Architecture Patterns">
+  <meta name="twitter:description" content="The Encryption pattern is a fundamental security mechanism in enterprise integration architectures that transforms readable data into an encoded format that ...">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/docs.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Encryption Pattern",
+    "description": "The Encryption pattern is a fundamental security mechanism in enterprise integration architectures that transforms readable data into an encoded format that ...",
+    "url": "https://dataintegrationmastery.com/patterns/security-patterns/encryption.html",
+    "author": {
+      "@type": "Person",
+      "name": "Ari Vilkman",
+      "jobTitle": "Integration Architect"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Data Integration Mastery",
+      "url": "https://dataintegrationmastery.com"
+    },
+    "isPartOf": {
+      "@type": "CollectionPage",
+      "name": "Integration Architecture Patterns",
+      "url": "https://dataintegrationmastery.com/patterns/"
+    },
+    "about": {
+      "@type": "Thing",
+      "name": "Encryption Pattern"
+    },
+    "inLanguage": "en",
+    "isAccessibleForFree": true
+  }
+  </script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="https://dataintegrationmastery.com/" class="header-brand">
+        <img src="../../assets/images/dim-icon.png" alt="DIM" width="36" height="36">
+        <span class="header-title">Data Integration Mastery™</span>
+      </a>
+      <nav class="header-nav" aria-label="Main navigation">
+        <a href="https://dataintegrationmastery.com/">Home</a>
+        <a href="../index.html">All Patterns</a>
+        <a href="https://dataintegrationmastery.com/#free-course">Free Course</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="docs-layout">
+    <aside class="docs-sidebar" aria-label="Pattern categories">
+      <div class="sidebar-title">Pattern Categories</div>
+<div class="sidebar-section">
+  <a href="../index.html#resilience" class="sidebar-section-title">🛡️ Resilience Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../resilience-patterns/circuit-breaker.html">Circuit Breaker</a></li>
+    <li><a href="../resilience-patterns/retry-mechanism.html">Retry Mechanism</a></li>
+    <li><a href="../resilience-patterns/timeout.html">Timeout</a></li>
+    <li><a href="../resilience-patterns/dead-letter-queue.html">Dead Letter Queue</a></li>
+    <li><a href="../resilience-patterns/bulkhead.html">Bulkhead</a></li>
+    <li><a href="../resilience-patterns/fallback-graceful-degradation.html">Fallback / Graceful Degradation</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#messaging" class="sidebar-section-title">📨 Messaging Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../messaging-patterns/request-reply.html">Request-Reply</a></li>
+    <li><a href="../messaging-patterns/publish-subscribe.html">Publish-Subscribe</a></li>
+    <li><a href="../messaging-patterns/message-queue.html">Message Queue</a></li>
+    <li><a href="../messaging-patterns/event-streaming.html">Event Streaming</a></li>
+    <li><a href="../messaging-patterns/correlation-id.html">Correlation ID</a></li>
+    <li><a href="../messaging-patterns/message-routing.html">Message Routing</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#data-transformation" class="sidebar-section-title">🔄 Data Transformation Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../data-transformation-patterns/message-translator.html">Message Translator</a></li>
+    <li><a href="../data-transformation-patterns/content-filter.html">Content Filter</a></li>
+    <li><a href="../data-transformation-patterns/message-router.html">Message Router</a></li>
+    <li><a href="../data-transformation-patterns/aggregator.html">Aggregator</a></li>
+    <li><a href="../data-transformation-patterns/splitter.html">Splitter</a></li>
+    <li><a href="../data-transformation-patterns/data-mapper.html">Data Mapper</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#routing" class="sidebar-section-title">🔀 Routing Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../routing-patterns/content-based-router.html">Content-Based Router</a></li>
+    <li><a href="../routing-patterns/recipient-list.html">Recipient List</a></li>
+    <li><a href="../routing-patterns/load-balancer.html">Load Balancer</a></li>
+    <li><a href="../routing-patterns/message-filter.html">Message Filter</a></li>
+    <li><a href="../routing-patterns/dynamic-router.html">Dynamic Router</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#security" class="sidebar-section-title">🔐 Security Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="authentication.html">Authentication</a></li>
+    <li><a href="authorization.html">Authorization</a></li>
+    <li><a href="encryption.html" class="active">Encryption</a></li>
+    <li><a href="token-management.html">Token Management</a></li>
+    <li><a href="api-security.html">API Security</a></li>
+    <li><a href="secret-management.html">Secret Management</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#orchestration" class="sidebar-section-title">🎭 Orchestration Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../orchestration-patterns/saga-pattern.html">Saga Pattern</a></li>
+    <li><a href="../orchestration-patterns/process-manager.html">Process Manager</a></li>
+    <li><a href="../orchestration-patterns/workflow-engine.html">Workflow Engine</a></li>
+    <li><a href="../orchestration-patterns/choreography.html">Choreography</a></li>
+    <li><a href="../orchestration-patterns/compensation-transactions.html">Compensation Transactions</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#observability" class="sidebar-section-title">📊 Monitoring & Observability Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../monitoring-observability-patterns/distributed-tracing.html">Distributed Tracing</a></li>
+    <li><a href="../monitoring-observability-patterns/metrics-collection.html">Metrics Collection</a></li>
+    <li><a href="../monitoring-observability-patterns/health-checks.html">Health Checks</a></li>
+    <li><a href="../monitoring-observability-patterns/logging-strategies.html">Logging Strategies</a></li>
+    <li><a href="../monitoring-observability-patterns/performance-monitoring.html">Performance Monitoring</a></li>
+    <li><a href="../monitoring-observability-patterns/error-tracking.html">Error Tracking</a></li>
+  </ul>
+</div>
+
+    </aside>
+
+    <main id="main-content" class="docs-content">
+      <div class="breadcrumb">
+        <a href="https://dataintegrationmastery.com/">Home</a>
+        <span class="sep">›</span>
+        <a href="../index.html">Patterns</a>
+        <span class="sep">›</span>
+        <a href="../index.html#security">Security Patterns</a>
+        <span class="sep">›</span>
+        <strong>Encryption Pattern</strong>
+      </div>
+
+      <h1>Encryption Pattern</h1>
+
+      <h2 id="overview">Overview</h2>
+<p>The Encryption pattern is a fundamental security mechanism in enterprise integration architectures that transforms readable data into an encoded format that can only be decoded by authorized parties possessing the correct decryption keys. Like a sophisticated safe that protects valuable documents by making them unreadable to anyone without the proper combination, encryption ensures that sensitive information remains protected both during transmission across networks and while stored in databases, files, or other storage systems. This pattern encompasses various encryption algorithms, key management strategies, and implementation approaches that form the backbone of data protection in modern integration systems.</p>
+<h3 id="theoretical-foundation">Theoretical Foundation</h3>
+<p>The Encryption pattern is grounded in <strong>cryptographic theory</strong> and <strong>information security principles</strong>, specifically addressing the challenges of <strong>confidentiality</strong>, <strong>integrity</strong>, and <strong>authenticity</strong> in distributed systems. The pattern incorporates concepts from <strong>symmetric cryptography</strong>, <strong>asymmetric cryptography</strong>, <strong>digital signatures</strong>, and <strong>key management systems</strong> to provide comprehensive protection for sensitive data throughout its lifecycle, from creation and processing to transmission and storage.</p>
+<h3 id="core-principles">Core Principles</h3>
+<h4 id="1-cryptographic-algorithms">1. <strong>Cryptographic Algorithms</strong></h4>
+<p>Encryption employs various mathematical algorithms for data protection:
+- <strong>Symmetric encryption</strong> - using the same key for encryption and decryption (AES, ChaCha20)
+- <strong>Asymmetric encryption</strong> - using key pairs with public and private keys (RSA, ECC)
+- <strong>Hybrid encryption</strong> - combining symmetric and asymmetric encryption for optimal performance and security
+- <strong>Stream vs block ciphers</strong> - different approaches for encrypting data in streams or fixed-size blocks</p>
+<h4 id="2-key-management">2. <strong>Key Management</strong></h4>
+<p>Systematic control of cryptographic keys throughout their lifecycle:
+- <strong>Key generation</strong> - creating cryptographically strong keys using secure random number generation
+- <strong>Key distribution</strong> - securely sharing keys between authorized parties
+- <strong>Key rotation</strong> - regularly updating encryption keys to maintain security
+- <strong>Key revocation</strong> - invalidating compromised or obsolete keys</p>
+<h4 id="3-encryption-scope">3. <strong>Encryption Scope</strong></h4>
+<p>Comprehensive protection at different levels and contexts:
+- <strong>Data-at-rest encryption</strong> - protecting stored data in databases, files, and backup systems
+- <strong>Data-in-transit encryption</strong> - securing data during network transmission
+- <strong>Data-in-use encryption</strong> - protecting data while being processed (homomorphic encryption, secure enclaves)
+- <strong>Application-level encryption</strong> - encrypting specific data fields or messages within applications</p>
+<h4 id="4-cryptographic-services">4. <strong>Cryptographic Services</strong></h4>
+<p>Supporting services that enhance encryption effectiveness:
+- <strong>Digital signatures</strong> - ensuring data authenticity and non-repudiation
+- <strong>Message authentication codes (MAC)</strong> - verifying data integrity and authenticity
+- <strong>Hash functions</strong> - creating digital fingerprints for data integrity verification
+- <strong>Certificate management</strong> - handling digital certificates for public key infrastructure</p>
+<h3 id="why-encryption-is-essential-in-integration-architecture">Why Encryption is Essential in Integration Architecture</h3>
+<h4 id="1-data-protection">1. <strong>Data Protection</strong></h4>
+<p>Encryption provides critical protection for sensitive information:
+- <strong>Confidentiality assurance</strong> - ensuring only authorized parties can access sensitive data
+- <strong>Privacy protection</strong> - safeguarding personal and confidential information from unauthorized disclosure
+- <strong>Intellectual property protection</strong> - securing valuable business data and trade secrets
+- <strong>Regulatory compliance</strong> - meeting data protection requirements mandated by law</p>
+<h4 id="2-communication-security">2. <strong>Communication Security</strong></h4>
+<p>For securing data transmission between systems:
+- <strong>Network protection</strong> - defending against eavesdropping and man-in-the-middle attacks
+- <strong>API security</strong> - protecting sensitive data exchanged through API calls
+- <strong>Message integrity</strong> - ensuring messages haven't been tampered with during transmission
+- <strong>Authentication verification</strong> - confirming the identity of communication partners</p>
+<h4 id="3-storage-security">3. <strong>Storage Security</strong></h4>
+<p>Protecting data in various storage systems:
+- <strong>Database encryption</strong> - securing sensitive data stored in relational and NoSQL databases
+- <strong>File system protection</strong> - encrypting files and documents stored on disk
+- <strong>Backup security</strong> - ensuring backup copies remain protected if storage media is compromised
+- <strong>Cloud storage protection</strong> - maintaining data security when using cloud storage services</p>
+<h4 id="4-compliance-and-legal-requirements">4. <strong>Compliance and Legal Requirements</strong></h4>
+<p>Meeting regulatory and industry standards:
+- <strong>GDPR compliance</strong> - protecting personal data as required by European privacy regulations
+- <strong>PCI DSS requirements</strong> - securing payment card data according to industry standards
+- <strong>HIPAA compliance</strong> - protecting healthcare information as mandated by law
+- <strong>SOX requirements</strong> - securing financial data to meet audit and governance standards</p>
+<h3 id="benefits-in-integration-contexts">Benefits in Integration Contexts</h3>
+<h4 id="1-enhanced-security-posture">1. <strong>Enhanced Security Posture</strong></h4>
+<ul>
+<li><strong>Multi-layered protection</strong> - providing defense against various attack vectors</li>
+<li><strong>Risk mitigation</strong> - reducing potential impact of data breaches and security incidents</li>
+<li><strong>Trust establishment</strong> - building confidence with customers and partners through strong security</li>
+<li><strong>Competitive advantage</strong> - demonstrating superior security capabilities</li>
+</ul>
+<h4 id="2-regulatory-compliance">2. <strong>Regulatory Compliance</strong></h4>
+<ul>
+<li><strong>Legal adherence</strong> - meeting mandatory data protection requirements</li>
+<li><strong>Audit readiness</strong> - maintaining documentation and controls for compliance audits</li>
+<li><strong>Risk reduction</strong> - minimizing legal and financial penalties from non-compliance</li>
+<li><strong>Global operations</strong> - enabling business operations across different regulatory jurisdictions</li>
+</ul>
+<h4 id="3-business-value">3. <strong>Business Value</strong></h4>
+<ul>
+<li><strong>Customer confidence</strong> - building trust through demonstrated data protection</li>
+<li><strong>Partner enablement</strong> - facilitating secure collaboration with external organizations</li>
+<li><strong>Market access</strong> - meeting security requirements to access new markets and customers</li>
+<li><strong>Operational continuity</strong> - maintaining business operations despite security threats</li>
+</ul>
+<h4 id="4-technical-excellence">4. <strong>Technical Excellence</strong></h4>
+<ul>
+<li><strong>System integrity</strong> - maintaining data quality and system reliability through protection mechanisms</li>
+<li><strong>Performance optimization</strong> - using efficient encryption algorithms that minimize performance impact</li>
+<li><strong>Scalability support</strong> - implementing encryption solutions that scale with business growth</li>
+<li><strong>Interoperability</strong> - ensuring encrypted systems can communicate effectively with partners</li>
+</ul>
+<h3 id="integration-architecture-applications">Integration Architecture Applications</h3>
+<h4 id="1-api-and-web-service-security">1. <strong>API and Web Service Security</strong></h4>
+<p>Encryption in API security provides:
+- <strong>HTTPS/TLS encryption</strong> - securing all API communications with transport-layer security
+- <strong>Message-level encryption</strong> - protecting sensitive payload data regardless of transport security
+- <strong>API key protection</strong> - encrypting and securing API authentication credentials
+- <strong>Response encryption</strong> - protecting sensitive data returned in API responses</p>
+<h4 id="2-database-and-storage-security">2. <strong>Database and Storage Security</strong></h4>
+<p>For protecting stored data:
+- <strong>Transparent data encryption (TDE)</strong> - automatically encrypting database files and backups
+- <strong>Column-level encryption</strong> - protecting specific sensitive data fields within database tables
+- <strong>File system encryption</strong> - securing entire file systems or individual files and directories
+- <strong>Object storage encryption</strong> - protecting data stored in cloud object storage systems</p>
+<h4 id="3-message-queue-and-event-security">3. <strong>Message Queue and Event Security</strong></h4>
+<p>In messaging systems:
+- <strong>Message payload encryption</strong> - protecting sensitive data within message content
+- <strong>Queue encryption</strong> - securing message queues and persistent message storage
+- <strong>Event stream protection</strong> - encrypting sensitive data in event streaming platforms
+- <strong>Dead letter queue security</strong> - protecting failed messages that may contain sensitive data</p>
+<h4 id="4-enterprise-application-integration">4. <strong>Enterprise Application Integration</strong></h4>
+<p>For connecting enterprise systems:
+- <strong>Legacy system protection</strong> - adding encryption layers to existing systems without encryption
+- <strong>Cross-system data exchange</strong> - securing data as it moves between different enterprise applications
+- <strong>Batch processing security</strong> - protecting large data transfers and batch operations
+- <strong>Backup and archival encryption</strong> - securing long-term data storage and disaster recovery systems</p>
+<h2 id="implementation-patterns">Implementation Patterns</h2>
+<h3 id="1-symmetric-encryption-implementation">1. <strong>Symmetric Encryption Implementation</strong></h3>
+<pre><code class="language-java">// AES encryption service for high-performance symmetric encryption
+@Service
+public class AESEncryptionService {
+
+    private static final String ALGORITHM = &quot;AES&quot;;
+    private static final String TRANSFORMATION = &quot;AES/GCM/NoPadding&quot;;
+    private static final int GCM_IV_LENGTH = 12;
+    private static final int GCM_TAG_LENGTH = 16;
+
+    @Autowired
+    private KeyManagementService keyManagementService;
+
+    public EncryptionResult encrypt(byte[] plaintext, String keyId) {
+        try {
+            // Retrieve encryption key
+            SecretKey secretKey = keyManagementService.getSecretKey(keyId);
+
+            // Initialize cipher
+            Cipher cipher = Cipher.getInstance(TRANSFORMATION);
+
+            // Generate random IV
+            byte[] iv = new byte[GCM_IV_LENGTH];
+            new SecureRandom().nextBytes(iv);
+
+            GCMParameterSpec gcmParameterSpec = new GCMParameterSpec(GCM_TAG_LENGTH * 8, iv);
+            cipher.init(Cipher.ENCRYPT_MODE, secretKey, gcmParameterSpec);
+
+            // Encrypt data
+            byte[] ciphertext = cipher.doFinal(plaintext);
+
+            return EncryptionResult.builder()
+                .ciphertext(ciphertext)
+                .iv(iv)
+                .keyId(keyId)
+                .algorithm(TRANSFORMATION)
+                .timestamp(Instant.now())
+                .build();
+
+        } catch (Exception e) {
+            log.error(&quot;Encryption failed for keyId: {}&quot;, keyId, e);
+            throw new EncryptionException(&quot;Failed to encrypt data&quot;, e);
+        }
+    }
+
+    public byte[] decrypt(EncryptionResult encryptionResult) {
+        try {
+            // Retrieve decryption key
+            SecretKey secretKey = keyManagementService.getSecretKey(encryptionResult.getKeyId());
+
+            // Initialize cipher for decryption
+            Cipher cipher = Cipher.getInstance(encryptionResult.getAlgorithm());
+            GCMParameterSpec gcmParameterSpec = new GCMParameterSpec(GCM_TAG_LENGTH * 8, encryptionResult.getIv());
+            cipher.init(Cipher.DECRYPT_MODE, secretKey, gcmParameterSpec);
+
+            // Decrypt data
+            return cipher.doFinal(encryptionResult.getCiphertext());
+
+        } catch (Exception e) {
+            log.error(&quot;Decryption failed for keyId: {}&quot;, encryptionResult.getKeyId(), e);
+            throw new DecryptionException(&quot;Failed to decrypt data&quot;, e);
+        }
+    }
+
+    public String encryptString(String plaintext, String keyId) {
+        EncryptionResult result = encrypt(plaintext.getBytes(StandardCharsets.UTF_8), keyId);
+
+        // Combine IV and ciphertext for storage
+        byte[] combined = new byte[GCM_IV_LENGTH + result.getCiphertext().length];
+        System.arraycopy(result.getIv(), 0, combined, 0, GCM_IV_LENGTH);
+        System.arraycopy(result.getCiphertext(), 0, combined, GCM_IV_LENGTH, result.getCiphertext().length);
+
+        // Encode as Base64 for string representation
+        return Base64.getEncoder().encodeToString(combined);
+    }
+
+    public String decryptString(String encryptedData, String keyId) {
+        byte[] combined = Base64.getDecoder().decode(encryptedData);
+
+        // Extract IV and ciphertext
+        byte[] iv = new byte[GCM_IV_LENGTH];
+        byte[] ciphertext = new byte[combined.length - GCM_IV_LENGTH];
+
+        System.arraycopy(combined, 0, iv, 0, GCM_IV_LENGTH);
+        System.arraycopy(combined, GCM_IV_LENGTH, ciphertext, 0, ciphertext.length);
+
+        // Create encryption result for decryption
+        EncryptionResult result = EncryptionResult.builder()
+            .ciphertext(ciphertext)
+            .iv(iv)
+            .keyId(keyId)
+            .algorithm(TRANSFORMATION)
+            .build();
+
+        return new String(decrypt(result), StandardCharsets.UTF_8);
+    }
+}
+
+@Service
+public class ChaCha20EncryptionService {
+
+    private static final String ALGORITHM = &quot;ChaCha20-Poly1305&quot;;
+    private static final int NONCE_LENGTH = 12;
+
+    public EncryptionResult encrypt(byte[] plaintext, byte[] key, byte[] associatedData) {
+        try {
+            // Generate random nonce
+            byte[] nonce = new byte[NONCE_LENGTH];
+            new SecureRandom().nextBytes(nonce);
+
+            // Create cipher instance
+            Cipher cipher = Cipher.getInstance(ALGORITHM);
+            SecretKeySpec keySpec = new SecretKeySpec(key, &quot;ChaCha20&quot;);
+            ChaCha20ParameterSpec parameterSpec = new ChaCha20ParameterSpec(nonce, 1);
+
+            cipher.init(Cipher.ENCRYPT_MODE, keySpec, parameterSpec);
+
+            // Add associated data for authentication
+            if (associatedData != null) {
+                cipher.updateAAD(associatedData);
+            }
+
+            // Encrypt data
+            byte[] ciphertext = cipher.doFinal(plaintext);
+
+            return EncryptionResult.builder()
+                .ciphertext(ciphertext)
+                .iv(nonce)
+                .algorithm(ALGORITHM)
+                .associatedData(associatedData)
+                .timestamp(Instant.now())
+                .build();
+
+        } catch (Exception e) {
+            throw new EncryptionException(&quot;ChaCha20 encryption failed&quot;, e);
+        }
+    }
+}
+</code></pre>
+<h3 id="2-asymmetric-encryption-implementation">2. <strong>Asymmetric Encryption Implementation</strong></h3>
+<pre><code class="language-java">// RSA encryption service for asymmetric encryption scenarios
+@Service
+public class RSAEncryptionService {
+
+    private static final String ALGORITHM = &quot;RSA&quot;;
+    private static final String TRANSFORMATION = &quot;RSA/OAEP/SHA-256&quot;;
+    private static final int RSA_KEY_SIZE = 2048;
+
+    @Autowired
+    private KeyPairService keyPairService;
+
+    public AsymmetricEncryptionResult encryptWithPublicKey(byte[] plaintext, String keyPairId) {
+        try {
+            // Retrieve public key
+            PublicKey publicKey = keyPairService.getPublicKey(keyPairId);
+
+            // Initialize cipher
+            Cipher cipher = Cipher.getInstance(TRANSFORMATION);
+            cipher.init(Cipher.ENCRYPT_MODE, publicKey);
+
+            // Encrypt data
+            byte[] ciphertext = cipher.doFinal(plaintext);
+
+            return AsymmetricEncryptionResult.builder()
+                .ciphertext(ciphertext)
+                .keyPairId(keyPairId)
+                .algorithm(TRANSFORMATION)
+                .encryptedWithPublicKey(true)
+                .timestamp(Instant.now())
+                .build();
+
+        } catch (Exception e) {
+            log.error(&quot;RSA encryption failed for keyPairId: {}&quot;, keyPairId, e);
+            throw new EncryptionException(&quot;Failed to encrypt with RSA public key&quot;, e);
+        }
+    }
+
+    public byte[] decryptWithPrivateKey(AsymmetricEncryptionResult encryptionResult) {
+        try {
+            // Retrieve private key
+            PrivateKey privateKey = keyPairService.getPrivateKey(encryptionResult.getKeyPairId());
+
+            // Initialize cipher for decryption
+            Cipher cipher = Cipher.getInstance(encryptionResult.getAlgorithm());
+            cipher.init(Cipher.DECRYPT_MODE, privateKey);
+
+            // Decrypt data
+            return cipher.doFinal(encryptionResult.getCiphertext());
+
+        } catch (Exception e) {
+            log.error(&quot;RSA decryption failed for keyPairId: {}&quot;, encryptionResult.getKeyPairId(), e);
+            throw new DecryptionException(&quot;Failed to decrypt with RSA private key&quot;, e);
+        }
+    }
+
+    public HybridEncryptionResult hybridEncrypt(byte[] plaintext, String recipientPublicKeyId) {
+        try {
+            // Generate symmetric key for bulk encryption
+            KeyGenerator keyGen = KeyGenerator.getInstance(&quot;AES&quot;);
+            keyGen.init(256);
+            SecretKey symmetricKey = keyGen.generateKey();
+
+            // Encrypt data with symmetric key
+            EncryptionResult dataEncryption = aesEncryptionService.encrypt(plaintext, symmetricKey);
+
+            // Encrypt symmetric key with recipient's public key
+            AsymmetricEncryptionResult keyEncryption = encryptWithPublicKey(
+                symmetricKey.getEncoded(), 
+                recipientPublicKeyId
+            );
+
+            return HybridEncryptionResult.builder()
+                .encryptedData(dataEncryption)
+                .encryptedKey(keyEncryption)
+                .recipientKeyId(recipientPublicKeyId)
+                .timestamp(Instant.now())
+                .build();
+
+        } catch (Exception e) {
+            throw new EncryptionException(&quot;Hybrid encryption failed&quot;, e);
+        }
+    }
+
+    public byte[] hybridDecrypt(HybridEncryptionResult hybridResult) {
+        try {
+            // Decrypt symmetric key with private key
+            byte[] symmetricKeyBytes = decryptWithPrivateKey(hybridResult.getEncryptedKey());
+            SecretKey symmetricKey = new SecretKeySpec(symmetricKeyBytes, &quot;AES&quot;);
+
+            // Decrypt data with recovered symmetric key
+            return aesEncryptionService.decrypt(hybridResult.getEncryptedData(), symmetricKey);
+
+        } catch (Exception e) {
+            throw new DecryptionException(&quot;Hybrid decryption failed&quot;, e);
+        }
+    }
+}
+
+@Service
+public class ECCEncryptionService {
+
+    private static final String ALGORITHM = &quot;EC&quot;;
+    private static final String SIGNATURE_ALGORITHM = &quot;SHA256withECDSA&quot;;
+
+    public ECDHKeyExchangeResult performKeyExchange(String localKeyPairId, String remotePublicKeyId) {
+        try {
+            // Get local private key and remote public key
+            PrivateKey localPrivateKey = keyPairService.getPrivateKey(localKeyPairId);
+            PublicKey remotePublicKey = keyPairService.getPublicKey(remotePublicKeyId);
+
+            // Perform ECDH key agreement
+            KeyAgreement keyAgreement = KeyAgreement.getInstance(&quot;ECDH&quot;);
+            keyAgreement.init(localPrivateKey);
+            keyAgreement.doPhase(remotePublicKey, true);
+
+            byte[] sharedSecret = keyAgreement.generateSecret();
+
+            // Derive symmetric key from shared secret
+            MessageDigest md = MessageDigest.getInstance(&quot;SHA-256&quot;);
+            byte[] derivedKey = md.digest(sharedSecret);
+
+            SecretKey symmetricKey = new SecretKeySpec(derivedKey, &quot;AES&quot;);
+
+            return ECDHKeyExchangeResult.builder()
+                .symmetricKey(symmetricKey)
+                .localKeyId(localKeyPairId)
+                .remoteKeyId(remotePublicKeyId)
+                .sharedSecret(sharedSecret)
+                .build();
+
+        } catch (Exception e) {
+            throw new CryptographicException(&quot;ECDH key exchange failed&quot;, e);
+        }
+    }
+}
+</code></pre>
+<h3 id="3-database-encryption-implementation">3. <strong>Database Encryption Implementation</strong></h3>
+<pre><code class="language-java">// Database field encryption with transparent encryption/decryption
+@Service
+public class DatabaseFieldEncryptionService {
+
+    @Autowired
+    private FieldEncryptionService fieldEncryptionService;
+
+    @Autowired
+    private EncryptionKeyResolver keyResolver;
+
+    public void encryptEntity(Object entity) {
+        Class&lt;?&gt; entityClass = entity.getClass();
+        Field[] fields = entityClass.getDeclaredFields();
+
+        for (Field field : fields) {
+            if (field.isAnnotationPresent(Encrypted.class)) {
+                encryptField(entity, field);
+            }
+        }
+    }
+
+    public void decryptEntity(Object entity) {
+        Class&lt;?&gt; entityClass = entity.getClass();
+        Field[] fields = entityClass.getDeclaredFields();
+
+        for (Field field : fields) {
+            if (field.isAnnotationPresent(Encrypted.class)) {
+                decryptField(entity, field);
+            }
+        }
+    }
+
+    private void encryptField(Object entity, Field field) {
+        try {
+            field.setAccessible(true);
+            Object value = field.get(entity);
+
+            if (value != null) {
+                Encrypted encryptedAnnotation = field.getAnnotation(Encrypted.class);
+                String keyId = keyResolver.resolveKeyId(entity, field, encryptedAnnotation);
+
+                String encryptedValue = fieldEncryptionService.encryptFieldValue(
+                    value.toString(), 
+                    keyId, 
+                    encryptedAnnotation.algorithm()
+                );
+
+                field.set(entity, encryptedValue);
+            }
+
+        } catch (Exception e) {
+            throw new EncryptionException(&quot;Failed to encrypt field: &quot; + field.getName(), e);
+        }
+    }
+
+    private void decryptField(Object entity, Field field) {
+        try {
+            field.setAccessible(true);
+            Object value = field.get(entity);
+
+            if (value != null &amp;&amp; value instanceof String) {
+                Encrypted encryptedAnnotation = field.getAnnotation(Encrypted.class);
+                String keyId = keyResolver.resolveKeyId(entity, field, encryptedAnnotation);
+
+                String decryptedValue = fieldEncryptionService.decryptFieldValue(
+                    (String) value, 
+                    keyId, 
+                    encryptedAnnotation.algorithm()
+                );
+
+                // Convert back to original type if needed
+                Object typedValue = convertToFieldType(decryptedValue, field.getType());
+                field.set(entity, typedValue);
+            }
+
+        } catch (Exception e) {
+            throw new DecryptionException(&quot;Failed to decrypt field: &quot; + field.getName(), e);
+        }
+    }
+}
+
+// JPA Entity Listener for transparent database encryption
+@Component
+public class EncryptionEntityListener {
+
+    @Autowired
+    private DatabaseFieldEncryptionService encryptionService;
+
+    @PrePersist
+    public void encryptBeforePersist(Object entity) {
+        encryptionService.encryptEntity(entity);
+    }
+
+    @PreUpdate
+    public void encryptBeforeUpdate(Object entity) {
+        encryptionService.encryptEntity(entity);
+    }
+
+    @PostLoad
+    public void decryptAfterLoad(Object entity) {
+        encryptionService.decryptEntity(entity);
+    }
+
+    @PostPersist
+    public void decryptAfterPersist(Object entity) {
+        encryptionService.decryptEntity(entity);
+    }
+
+    @PostUpdate
+    public void decryptAfterUpdate(Object entity) {
+        encryptionService.decryptEntity(entity);
+    }
+}
+
+// Example encrypted entity
+@Entity
+@EntityListeners(EncryptionEntityListener.class)
+public class Customer {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String name;
+
+    @Encrypted(keyId = &quot;customer-pii-key&quot;, algorithm = &quot;AES/GCM/NoPadding&quot;)
+    private String socialSecurityNumber;
+
+    @Encrypted(keyId = &quot;customer-contact-key&quot;, algorithm = &quot;AES/GCM/NoPadding&quot;)
+    private String email;
+
+    @Encrypted(keyId = &quot;customer-contact-key&quot;, algorithm = &quot;AES/GCM/NoPadding&quot;)
+    private String phoneNumber;
+
+    private String address;
+
+    @Encrypted(keyId = &quot;customer-financial-key&quot;, algorithm = &quot;AES/GCM/NoPadding&quot;)
+    private String creditCardNumber;
+
+    // Getters and setters...
+}
+
+// Custom annotation for field encryption
+@Target(ElementType.FIELD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Encrypted {
+    String keyId();
+    String algorithm() default &quot;AES/GCM/NoPadding&quot;;
+    boolean required() default true;
+}
+</code></pre>
+<h3 id="4-message-level-encryption-implementation">4. <strong>Message-Level Encryption Implementation</strong></h3>
+<pre><code class="language-java">// Message encryption service for protecting message payloads
+@Service
+public class MessageEncryptionService {
+
+    @Autowired
+    private SymmetricEncryptionService symmetricEncryptionService;
+
+    @Autowired
+    private AsymmetricEncryptionService asymmetricEncryptionService;
+
+    @Autowired
+    private DigitalSignatureService signatureService;
+
+    public EncryptedMessage encryptMessage(Message message, EncryptionConfig config) {
+        try {
+            // Serialize message to JSON
+            String messageJson = objectMapper.writeValueAsString(message);
+            byte[] messageBytes = messageJson.getBytes(StandardCharsets.UTF_8);
+
+            EncryptionResult encryptionResult;
+
+            switch (config.getEncryptionType()) {
+                case SYMMETRIC:
+                    encryptionResult = symmetricEncryptionService.encrypt(
+                        messageBytes, 
+                        config.getKeyId()
+                    );
+                    break;
+
+                case ASYMMETRIC:
+                    HybridEncryptionResult hybridResult = asymmetricEncryptionService.hybridEncrypt(
+                        messageBytes, 
+                        config.getRecipientKeyId()
+                    );
+                    encryptionResult = hybridResult.toEncryptionResult();
+                    break;
+
+                default:
+                    throw new IllegalArgumentException(&quot;Unsupported encryption type: &quot; + config.getEncryptionType());
+            }
+
+            // Create encrypted message envelope
+            EncryptedMessage encryptedMessage = EncryptedMessage.builder()
+                .messageId(message.getMessageId())
+                .senderId(message.getSenderId())
+                .recipientId(message.getRecipientId())
+                .encryptedPayload(encryptionResult)
+                .encryptionConfig(config)
+                .timestamp(Instant.now())
+                .build();
+
+            // Add digital signature if requested
+            if (config.isSigningRequired()) {
+                String signature = signatureService.sign(encryptedMessage, config.getSigningKeyId());
+                encryptedMessage.setDigitalSignature(signature);
+            }
+
+            return encryptedMessage;
+
+        } catch (Exception e) {
+            throw new MessageEncryptionException(&quot;Failed to encrypt message&quot;, e);
+        }
+    }
+
+    public Message decryptMessage(EncryptedMessage encryptedMessage) {
+        try {
+            // Verify digital signature if present
+            if (encryptedMessage.getDigitalSignature() != null) {
+                boolean signatureValid = signatureService.verify(
+                    encryptedMessage, 
+                    encryptedMessage.getDigitalSignature(),
+                    encryptedMessage.getEncryptionConfig().getSigningKeyId()
+                );
+
+                if (!signatureValid) {
+                    throw new MessageDecryptionException(&quot;Digital signature verification failed&quot;);
+                }
+            }
+
+            // Decrypt message payload
+            byte[] decryptedBytes;
+            EncryptionConfig config = encryptedMessage.getEncryptionConfig();
+            EncryptionResult encryptionResult = encryptedMessage.getEncryptedPayload();
+
+            switch (config.getEncryptionType()) {
+                case SYMMETRIC:
+                    decryptedBytes = symmetricEncryptionService.decrypt(encryptionResult);
+                    break;
+
+                case ASYMMETRIC:
+                    HybridEncryptionResult hybridResult = HybridEncryptionResult.fromEncryptionResult(encryptionResult);
+                    decryptedBytes = asymmetricEncryptionService.hybridDecrypt(hybridResult);
+                    break;
+
+                default:
+                    throw new IllegalArgumentException(&quot;Unsupported encryption type: &quot; + config.getEncryptionType());
+            }
+
+            // Deserialize message
+            String messageJson = new String(decryptedBytes, StandardCharsets.UTF_8);
+            return objectMapper.readValue(messageJson, Message.class);
+
+        } catch (Exception e) {
+            throw new MessageDecryptionException(&quot;Failed to decrypt message&quot;, e);
+        }
+    }
+}
+
+@Service
+public class StreamEncryptionService {
+
+    public EncryptedInputStream encryptStream(InputStream inputStream, String keyId) {
+        try {
+            SecretKey secretKey = keyManagementService.getSecretKey(keyId);
+
+            // Initialize cipher for streaming encryption
+            Cipher cipher = Cipher.getInstance(&quot;AES/CTR/NoPadding&quot;);
+
+            // Generate random IV
+            byte[] iv = new byte[16];
+            new SecureRandom().nextBytes(iv);
+
+            IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
+            cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivParameterSpec);
+
+            return new EncryptedInputStream(inputStream, cipher, iv, keyId);
+
+        } catch (Exception e) {
+            throw new EncryptionException(&quot;Failed to create encrypted stream&quot;, e);
+        }
+    }
+
+    public DecryptedInputStream decryptStream(EncryptedInputStream encryptedStream) {
+        try {
+            SecretKey secretKey = keyManagementService.getSecretKey(encryptedStream.getKeyId());
+
+            Cipher cipher = Cipher.getInstance(&quot;AES/CTR/NoPadding&quot;);
+            IvParameterSpec ivParameterSpec = new IvParameterSpec(encryptedStream.getIv());
+            cipher.init(Cipher.DECRYPT_MODE, secretKey, ivParameterSpec);
+
+            return new DecryptedInputStream(encryptedStream, cipher);
+
+        } catch (Exception e) {
+            throw new DecryptionException(&quot;Failed to create decrypted stream&quot;, e);
+        }
+    }
+}
+
+// Custom InputStream for streaming encryption
+public class EncryptedInputStream extends InputStream {
+    private final InputStream sourceStream;
+    private final Cipher cipher;
+    private final byte[] iv;
+    private final String keyId;
+    private final CipherInputStream cipherStream;
+
+    public EncryptedInputStream(InputStream sourceStream, Cipher cipher, byte[] iv, String keyId) {
+        this.sourceStream = sourceStream;
+        this.cipher = cipher;
+        this.iv = iv;
+        this.keyId = keyId;
+        this.cipherStream = new CipherInputStream(sourceStream, cipher);
+    }
+
+    @Override
+    public int read() throws IOException {
+        return cipherStream.read();
+    }
+
+    @Override
+    public int read(byte[] b, int off, int len) throws IOException {
+        return cipherStream.read(b, off, len);
+    }
+
+    // Getters for encryption metadata
+    public byte[] getIv() { return iv.clone(); }
+    public String getKeyId() { return keyId; }
+}
+</code></pre>
+<h2 id="apache-camel-implementation">Apache Camel Implementation</h2>
+<h3 id="1-message-encryption-route">1. <strong>Message Encryption Route</strong></h3>
+<pre><code class="language-java">@Component
+public class MessageEncryptionRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from(&quot;direct:encryptMessage&quot;)
+            .routeId(&quot;message-encryption-route&quot;)
+            .log(&quot;Encrypting message: ${header.messageId}&quot;)
+            .process(exchange -&gt; {
+                Object messageBody = exchange.getIn().getBody();
+                String recipientId = exchange.getIn().getHeader(&quot;recipientId&quot;, String.class);
+
+                // Determine encryption configuration
+                EncryptionConfig config = determineEncryptionConfig(recipientId);
+
+                // Encrypt message
+                EncryptedMessage encryptedMessage = messageEncryptionService.encryptMessage(
+                    Message.builder()
+                        .messageId(UUID.randomUUID().toString())
+                        .payload(messageBody)
+                        .senderId(getCurrentUserId())
+                        .recipientId(recipientId)
+                        .build(),
+                    config
+                );
+
+                exchange.getIn().setBody(encryptedMessage);
+                exchange.getIn().setHeader(&quot;encrypted&quot;, true);
+                exchange.getIn().setHeader(&quot;encryptionAlgorithm&quot;, config.getAlgorithm());
+            })
+            .log(&quot;Message encrypted successfully&quot;)
+            .to(&quot;direct:sendEncryptedMessage&quot;);
+    }
+
+    private EncryptionConfig determineEncryptionConfig(String recipientId) {
+        // Determine appropriate encryption based on recipient
+        if (isInternalRecipient(recipientId)) {
+            return EncryptionConfig.builder()
+                .encryptionType(EncryptionType.SYMMETRIC)
+                .keyId(&quot;internal-message-key&quot;)
+                .algorithm(&quot;AES/GCM/NoPadding&quot;)
+                .signingRequired(false)
+                .build();
+        } else {
+            return EncryptionConfig.builder()
+                .encryptionType(EncryptionType.ASYMMETRIC)
+                .recipientKeyId(getRecipientPublicKeyId(recipientId))
+                .algorithm(&quot;RSA/OAEP/SHA-256&quot;)
+                .signingRequired(true)
+                .signingKeyId(&quot;our-signing-key&quot;)
+                .build();
+        }
+    }
+}
+</code></pre>
+<h3 id="2-database-encryption-route">2. <strong>Database Encryption Route</strong></h3>
+<pre><code class="language-java">@Component
+public class DatabaseEncryptionRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from(&quot;direct:storeEncryptedData&quot;)
+            .routeId(&quot;database-encryption-route&quot;)
+            .log(&quot;Storing encrypted data for entity: ${header.entityType}&quot;)
+            .process(exchange -&gt; {
+                Object entity = exchange.getIn().getBody();
+
+                // Encrypt sensitive fields before database storage
+                databaseFieldEncryptionService.encryptEntity(entity);
+
+                exchange.getIn().setBody(entity);
+                exchange.getIn().setHeader(&quot;encrypted-for-storage&quot;, true);
+            })
+            .to(&quot;jpa://&quot; + &quot;entityClassName&quot;)
+            .log(&quot;Data stored with encryption&quot;);
+
+        from(&quot;direct:retrieveEncryptedData&quot;)
+            .routeId(&quot;database-decryption-route&quot;)
+            .log(&quot;Retrieving encrypted data for entity: ${header.entityId}&quot;)
+            .to(&quot;jpa://findEntityById&quot;)
+            .process(exchange -&gt; {
+                Object entity = exchange.getIn().getBody();
+
+                // Decrypt sensitive fields after database retrieval
+                if (entity != null) {
+                    databaseFieldEncryptionService.decryptEntity(entity);
+                }
+
+                exchange.getIn().setBody(entity);
+                exchange.getIn().setHeader(&quot;decrypted-from-storage&quot;, true);
+            })
+            .log(&quot;Data retrieved and decrypted&quot;);
+    }
+}
+</code></pre>
+<h3 id="3-file-encryption-route">3. <strong>File Encryption Route</strong></h3>
+<pre><code class="language-java">@Component
+public class FileEncryptionRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from(&quot;file:input/unencrypted?delete=true&quot;)
+            .routeId(&quot;file-encryption-route&quot;)
+            .log(&quot;Encrypting file: ${header.CamelFileName}&quot;)
+            .process(exchange -&gt; {
+                InputStream inputStream = exchange.getIn().getBody(InputStream.class);
+                String filename = exchange.getIn().getHeader(Exchange.FILE_NAME, String.class);
+
+                // Determine encryption key based on file type or content
+                String keyId = determineFileEncryptionKey(filename);
+
+                // Encrypt file stream
+                EncryptedInputStream encryptedStream = streamEncryptionService.encryptStream(inputStream, keyId);
+
+                exchange.getIn().setBody(encryptedStream);
+                exchange.getIn().setHeader(&quot;encryptionKeyId&quot;, keyId);
+                exchange.getIn().setHeader(Exchange.FILE_NAME, filename + &quot;.encrypted&quot;);
+            })
+            .to(&quot;file:output/encrypted&quot;)
+            .log(&quot;File encrypted and saved: ${header.CamelFileName}&quot;);
+
+        from(&quot;file:input/encrypted?delete=true&quot;)
+            .routeId(&quot;file-decryption-route&quot;)
+            .log(&quot;Decrypting file: ${header.CamelFileName}&quot;)
+            .process(exchange -&gt; {
+                String filename = exchange.getIn().getHeader(Exchange.FILE_NAME, String.class);
+
+                if (!filename.endsWith(&quot;.encrypted&quot;)) {
+                    throw new IllegalArgumentException(&quot;File does not appear to be encrypted&quot;);
+                }
+
+                // Extract original filename
+                String originalFilename = filename.substring(0, filename.lastIndexOf(&quot;.encrypted&quot;));
+
+                // Read encryption metadata (in real implementation, this would be stored with the file)
+                String keyId = extractKeyIdFromFile(exchange.getIn().getBody());
+
+                // Decrypt file
+                EncryptedInputStream encryptedStream = createEncryptedInputStream(
+                    exchange.getIn().getBody(InputStream.class), 
+                    keyId
+                );
+                DecryptedInputStream decryptedStream = streamEncryptionService.decryptStream(encryptedStream);
+
+                exchange.getIn().setBody(decryptedStream);
+                exchange.getIn().setHeader(Exchange.FILE_NAME, originalFilename);
+            })
+            .to(&quot;file:output/decrypted&quot;)
+            .log(&quot;File decrypted and saved: ${header.CamelFileName}&quot;);
+    }
+}
+</code></pre>
+<h3 id="4-api-response-encryption-route">4. <strong>API Response Encryption Route</strong></h3>
+<pre><code class="language-java">@Component
+public class APIResponseEncryptionRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from(&quot;jetty:http://0.0.0.0:8080/api/secure/data&quot;)
+            .routeId(&quot;api-response-encryption-route&quot;)
+            .log(&quot;Processing secure API request&quot;)
+            .process(exchange -&gt; {
+                // Check if client supports encryption
+                String acceptEncryption = exchange.getIn().getHeader(&quot;Accept-Encryption&quot;, String.class);
+
+                if (acceptEncryption == null || !acceptEncryption.contains(&quot;AES-GCM&quot;)) {
+                    throw new UnsupportedOperationException(&quot;Client must support encryption&quot;);
+                }
+
+                // Get client certificate or API key for encryption key derivation
+                String clientId = exchange.getIn().getHeader(&quot;X-Client-ID&quot;, String.class);
+                if (clientId == null) {
+                    throw new UnauthorizedException(&quot;Client ID required for encrypted response&quot;);
+                }
+
+                exchange.setProperty(&quot;clientId&quot;, clientId);
+            })
+            .to(&quot;direct:processSecureRequest&quot;)
+            .process(exchange -&gt; {
+                Object responseData = exchange.getIn().getBody();
+                String clientId = exchange.getProperty(&quot;clientId&quot;, String.class);
+
+                // Determine client-specific encryption key
+                String encryptionKeyId = &quot;client-&quot; + clientId + &quot;-response-key&quot;;
+
+                // Encrypt response data
+                String encryptedResponse = aesEncryptionService.encryptString(
+                    objectMapper.writeValueAsString(responseData),
+                    encryptionKeyId
+                );
+
+                // Create encrypted response wrapper
+                EncryptedResponse response = EncryptedResponse.builder()
+                    .encryptedData(encryptedResponse)
+                    .algorithm(&quot;AES-256-GCM&quot;)
+                    .keyId(encryptionKeyId)
+                    .timestamp(Instant.now())
+                    .build();
+
+                exchange.getIn().setBody(response);
+                exchange.getIn().setHeader(Exchange.CONTENT_TYPE, &quot;application/json&quot;);
+                exchange.getIn().setHeader(&quot;Content-Encryption&quot;, &quot;AES-256-GCM&quot;);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .log(&quot;Encrypted API response sent to client&quot;);
+    }
+}
+</code></pre>
+<h2 id="best-practices">Best Practices</h2>
+<h3 id="1-algorithm-selection-and-implementation">1. <strong>Algorithm Selection and Implementation</strong></h3>
+<ul>
+<li>Use modern, well-vetted encryption algorithms (AES-256, ChaCha20-Poly1305) and avoid deprecated algorithms</li>
+<li>Implement authenticated encryption modes (GCM, CCM) that provide both confidentiality and integrity</li>
+<li>Use cryptographically secure random number generators for keys, IVs, and nonces</li>
+<li>Follow current cryptographic standards and recommendations (NIST, RFC specifications)</li>
+<li>Regularly review and update cryptographic implementations based on security research</li>
+</ul>
+<h3 id="2-key-management_1">2. <strong>Key Management</strong></h3>
+<ul>
+<li>Implement comprehensive key lifecycle management including generation, distribution, rotation, and revocation</li>
+<li>Use hardware security modules (HSMs) or key management services for critical key storage</li>
+<li>Implement key derivation functions (KDF) for generating encryption keys from master keys</li>
+<li>Separate encryption keys by purpose, environment, and data classification levels</li>
+<li>Implement secure key backup and recovery procedures</li>
+</ul>
+<h3 id="3-performance-optimization">3. <strong>Performance Optimization</strong></h3>
+<ul>
+<li>Use streaming encryption for large files and data sets to minimize memory usage</li>
+<li>Implement connection pooling and cipher instance reuse where appropriate</li>
+<li>Consider hardware acceleration for encryption operations in high-throughput scenarios</li>
+<li>Cache frequently used keys while maintaining security boundaries</li>
+<li>Monitor encryption performance and optimize bottlenecks</li>
+</ul>
+<h3 id="4-security-implementation">4. <strong>Security Implementation</strong></h3>
+<ul>
+<li>Implement proper IV/nonce generation with sufficient entropy and uniqueness</li>
+<li>Use constant-time comparison functions to prevent timing attacks</li>
+<li>Implement secure memory management for cryptographic operations</li>
+<li>Validate all cryptographic inputs and handle errors securely</li>
+<li>Implement proper secure deletion of sensitive data and cryptographic material</li>
+</ul>
+<h3 id="5-error-handling-and-logging">5. <strong>Error Handling and Logging</strong></h3>
+<ul>
+<li>Implement comprehensive error handling that doesn't leak cryptographic information</li>
+<li>Log encryption operations for audit purposes without exposing sensitive data</li>
+<li>Implement monitoring and alerting for encryption failures and security events</li>
+<li>Provide clear error messages that help with troubleshooting without revealing implementation details</li>
+<li>Implement fallback procedures for encryption service outages</li>
+</ul>
+<h3 id="6-compliance-and-documentation">6. <strong>Compliance and Documentation</strong></h3>
+<ul>
+<li>Maintain documentation of all encryption implementations, algorithms, and key management procedures</li>
+<li>Ensure encryption implementations meet relevant regulatory requirements (FIPS 140-2, Common Criteria)</li>
+<li>Implement regular security assessments and penetration testing of encryption systems</li>
+<li>Maintain encryption key inventories and access logs for compliance audits</li>
+<li>Provide training and guidelines for developers implementing encryption features</li>
+</ul>
+<p>The Encryption pattern is essential for protecting sensitive data in enterprise integration architectures, providing the cryptographic foundation necessary to maintain confidentiality, integrity, and authenticity throughout the data lifecycle in complex distributed systems.</p>
+
+      <a href="../index.html" class="back-to-top">← Back to All Patterns</a>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <p>©2026 <a href="https://dataintegrationmastery.com/">Data Integration Mastery™</a> — All Rights Reserved</p>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aggregator Pattern — Integration Architecture Patterns | Data Integration Mastery™</title>
+  <meta name="description" content="The Aggregator pattern is a fundamental composition pattern in enterprise integration architectures that collects and combines related messages or data eleme...">
+  <meta name="keywords" content="aggregator pattern, integration pattern, data transformation patterns, integration architecture, EAI patterns, data integration">
+  <link rel="canonical" href="https://dataintegrationmastery.com/patterns/data-transformation-patterns/aggregator.html">
+
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://dataintegrationmastery.com/patterns/data-transformation-patterns/aggregator.html">
+  <meta property="og:title" content="Aggregator Pattern — Integration Architecture Patterns">
+  <meta property="og:description" content="The Aggregator pattern is a fundamental composition pattern in enterprise integration architectures that collects and combines related messages or data eleme...">
+  <meta property="og:image" content="https://dataintegrationmastery.com/assets/images/logo.png">
+  <meta property="og:site_name" content="Data Integration Mastery">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Aggregator Pattern — Integration Architecture Patterns">
+  <meta name="twitter:description" content="The Aggregator pattern is a fundamental composition pattern in enterprise integration architectures that collects and combines related messages or data eleme...">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/docs.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Aggregator Pattern",
+    "description": "The Aggregator pattern is a fundamental composition pattern in enterprise integration architectures that collects and combines related messages or data eleme...",
+    "url": "https://dataintegrationmastery.com/patterns/data-transformation-patterns/aggregator.html",
+    "author": {
+      "@type": "Person",
+      "name": "Ari Vilkman",
+      "jobTitle": "Integration Architect"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Data Integration Mastery",
+      "url": "https://dataintegrationmastery.com"
+    },
+    "isPartOf": {
+      "@type": "CollectionPage",
+      "name": "Integration Architecture Patterns",
+      "url": "https://dataintegrationmastery.com/patterns/"
+    },
+    "about": {
+      "@type": "Thing",
+      "name": "Aggregator Pattern"
+    },
+    "inLanguage": "en",
+    "isAccessibleForFree": true
+  }
+  </script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="https://dataintegrationmastery.com/" class="header-brand">
+        <img src="../../assets/images/dim-icon.png" alt="DIM" width="36" height="36">
+        <span class="header-title">Data Integration Mastery™</span>
+      </a>
+      <nav class="header-nav" aria-label="Main navigation">
+        <a href="https://dataintegrationmastery.com/">Home</a>
+        <a href="../index.html">All Patterns</a>
+        <a href="https://dataintegrationmastery.com/#free-course">Free Course</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="docs-layout">
+    <aside class="docs-sidebar" aria-label="Pattern categories">
+      <div class="sidebar-title">Pattern Categories</div>
+<div class="sidebar-section">
+  <a href="../index.html#resilience" class="sidebar-section-title">🛡️ Resilience Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../resilience-patterns/circuit-breaker.html">Circuit Breaker</a></li>
+    <li><a href="../resilience-patterns/retry-mechanism.html">Retry Mechanism</a></li>
+    <li><a href="../resilience-patterns/timeout.html">Timeout</a></li>
+    <li><a href="../resilience-patterns/dead-letter-queue.html">Dead Letter Queue</a></li>
+    <li><a href="../resilience-patterns/bulkhead.html">Bulkhead</a></li>
+    <li><a href="../resilience-patterns/fallback-graceful-degradation.html">Fallback / Graceful Degradation</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#messaging" class="sidebar-section-title">📨 Messaging Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../messaging-patterns/request-reply.html">Request-Reply</a></li>
+    <li><a href="../messaging-patterns/publish-subscribe.html">Publish-Subscribe</a></li>
+    <li><a href="../messaging-patterns/message-queue.html">Message Queue</a></li>
+    <li><a href="../messaging-patterns/event-streaming.html">Event Streaming</a></li>
+    <li><a href="../messaging-patterns/correlation-id.html">Correlation ID</a></li>
+    <li><a href="../messaging-patterns/message-routing.html">Message Routing</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#data-transformation" class="sidebar-section-title">🔄 Data Transformation Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="message-translator.html">Message Translator</a></li>
+    <li><a href="content-filter.html">Content Filter</a></li>
+    <li><a href="message-router.html">Message Router</a></li>
+    <li><a href="aggregator.html" class="active">Aggregator</a></li>
+    <li><a href="splitter.html">Splitter</a></li>
+    <li><a href="data-mapper.html">Data Mapper</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#routing" class="sidebar-section-title">🔀 Routing Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../routing-patterns/content-based-router.html">Content-Based Router</a></li>
+    <li><a href="../routing-patterns/recipient-list.html">Recipient List</a></li>
+    <li><a href="../routing-patterns/load-balancer.html">Load Balancer</a></li>
+    <li><a href="../routing-patterns/message-filter.html">Message Filter</a></li>
+    <li><a href="../routing-patterns/dynamic-router.html">Dynamic Router</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#security" class="sidebar-section-title">🔐 Security Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../security-patterns/authentication.html">Authentication</a></li>
+    <li><a href="../security-patterns/authorization.html">Authorization</a></li>
+    <li><a href="../security-patterns/encryption.html">Encryption</a></li>
+    <li><a href="../security-patterns/token-management.html">Token Management</a></li>
+    <li><a href="../security-patterns/api-security.html">API Security</a></li>
+    <li><a href="../security-patterns/secret-management.html">Secret Management</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#orchestration" class="sidebar-section-title">🎭 Orchestration Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../orchestration-patterns/saga-pattern.html">Saga Pattern</a></li>
+    <li><a href="../orchestration-patterns/process-manager.html">Process Manager</a></li>
+    <li><a href="../orchestration-patterns/workflow-engine.html">Workflow Engine</a></li>
+    <li><a href="../orchestration-patterns/choreography.html">Choreography</a></li>
+    <li><a href="../orchestration-patterns/compensation-transactions.html">Compensation Transactions</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#observability" class="sidebar-section-title">📊 Monitoring & Observability Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../monitoring-observability-patterns/distributed-tracing.html">Distributed Tracing</a></li>
+    <li><a href="../monitoring-observability-patterns/metrics-collection.html">Metrics Collection</a></li>
+    <li><a href="../monitoring-observability-patterns/health-checks.html">Health Checks</a></li>
+    <li><a href="../monitoring-observability-patterns/logging-strategies.html">Logging Strategies</a></li>
+    <li><a href="../monitoring-observability-patterns/performance-monitoring.html">Performance Monitoring</a></li>
+    <li><a href="../monitoring-observability-patterns/error-tracking.html">Error Tracking</a></li>
+  </ul>
+</div>
+
+    </aside>
+
+    <main id="main-content" class="docs-content">
+      <div class="breadcrumb">
+        <a href="https://dataintegrationmastery.com/">Home</a>
+        <span class="sep">›</span>
+        <a href="../index.html">Patterns</a>
+        <span class="sep">›</span>
+        <a href="../index.html#data-transformation">Data Transformation Patterns</a>
+        <span class="sep">›</span>
+        <strong>Aggregator Pattern</strong>
+      </div>
+
+      <h1>Aggregator Pattern</h1>
+
+      <h2 id="overview">Overview</h2>
+<p>The Aggregator pattern is a fundamental composition pattern in enterprise integration architectures that collects and combines related messages or data elements into a single, cohesive message or result. Like a conductor orchestrating multiple musicians into a harmonious symphony, the Aggregator pattern coordinates multiple incoming messages, waits for completion criteria to be met, and then produces a unified response that combines the individual contributions into a meaningful whole.</p>
+<h3 id="theoretical-foundation">Theoretical Foundation</h3>
+<p>The Aggregator pattern is grounded in <strong>information integration theory</strong> and <strong>distributed computation principles</strong>, specifically addressing the challenge of <strong>scatter-gather operations</strong> and <strong>parallel processing coordination</strong> in distributed systems. The pattern embodies the principle of <strong>"temporal data correlation"</strong> - collecting related data that arrives at different times and combining it based on correlation identifiers and completion criteria.</p>
+<h3 id="core-principles">Core Principles</h3>
+<h4 id="1-message-correlation-and-collection">1. <strong>Message Correlation and Collection</strong></h4>
+<p>The Aggregator identifies related messages using correlation identifiers and collects them until completion criteria are met:
+- <strong>Correlation ID matching</strong> - grouping messages that belong to the same logical operation
+- <strong>Temporal correlation</strong> - collecting messages within time windows or sequences
+- <strong>Content-based correlation</strong> - grouping based on shared data elements or business keys
+- <strong>State management</strong> - maintaining correlation state across multiple message arrivals</p>
+<h4 id="2-completion-detection">2. <strong>Completion Detection</strong></h4>
+<p>The pattern implements various strategies to determine when aggregation is complete:
+- <strong>Count-based completion</strong> - waiting for a specific number of messages
+- <strong>Timeout-based completion</strong> - completing aggregation after a time threshold
+- <strong>Content-based completion</strong> - detecting completion through message content analysis
+- <strong>Conditional completion</strong> - complex completion criteria based on business rules</p>
+<h4 id="3-data-combination-and-synthesis">3. <strong>Data Combination and Synthesis</strong></h4>
+<p>Once completion criteria are met, the aggregator combines the collected messages:
+- <strong>Data merging</strong> - combining data elements from multiple messages
+- <strong>Result computation</strong> - performing calculations across collected data
+- <strong>Structure transformation</strong> - reformatting aggregated data into target structure
+- <strong>Conflict resolution</strong> - handling conflicting or duplicate data elements</p>
+<h4 id="4-resource-and-memory-management">4. <strong>Resource and Memory Management</strong></h4>
+<p>The pattern manages resources efficiently during aggregation:
+- <strong>Memory optimization</strong> - managing storage for pending aggregations
+- <strong>Timeout handling</strong> - cleaning up incomplete aggregations
+- <strong>Persistence strategies</strong> - handling aggregation state across system restarts
+- <strong>Scalability considerations</strong> - managing large numbers of concurrent aggregations</p>
+<h3 id="why-aggregators-are-essential-in-integration-architecture">Why Aggregators are Essential in Integration Architecture</h3>
+<h4 id="1-distributed-query-and-response-coordination">1. <strong>Distributed Query and Response Coordination</strong></h4>
+<p>In distributed systems, aggregators enable:
+- <strong>Scatter-gather queries</strong> - sending requests to multiple services and combining responses
+- <strong>Parallel processing coordination</strong> - orchestrating concurrent operations
+- <strong>Multi-source data integration</strong> - combining data from multiple systems or databases
+- <strong>Composite API responses</strong> - building unified responses from multiple service calls</p>
+<h4 id="2-event-driven-architecture-support">2. <strong>Event-Driven Architecture Support</strong></h4>
+<p>In event streaming and messaging systems:
+- <strong>Event correlation</strong> - grouping related events for complex event processing
+- <strong>Workflow coordination</strong> - collecting workflow step completions
+- <strong>Batch processing</strong> - accumulating events for batch operations
+- <strong>State reconstruction</strong> - rebuilding entity state from event sequences</p>
+<h4 id="3-real-time-analytics-and-monitoring">3. <strong>Real-Time Analytics and Monitoring</strong></h4>
+<p>For analytics and monitoring use cases:
+- <strong>Metrics aggregation</strong> - combining measurements from multiple sources
+- <strong>Alert correlation</strong> - grouping related alerts to prevent alert storms
+- <strong>Performance monitoring</strong> - collecting performance data across service boundaries
+- <strong>Business intelligence</strong> - aggregating transaction data for reporting</p>
+<h4 id="4-microservices-orchestration">4. <strong>Microservices Orchestration</strong></h4>
+<p>In microservices architectures:
+- <strong>Saga pattern implementation</strong> - coordinating distributed transactions
+- <strong>Composite service operations</strong> - building higher-level services from microservice calls
+- <strong>Data consistency management</strong> - ensuring consistent views across services
+- <strong>Cross-cutting concern coordination</strong> - aggregating logging, security, or audit data</p>
+<h3 id="benefits-in-integration-contexts">Benefits in Integration Contexts</h3>
+<h4 id="1-system-performance-optimization">1. <strong>System Performance Optimization</strong></h4>
+<ul>
+<li><strong>Parallel processing</strong> - multiple operations can execute concurrently</li>
+<li><strong>Reduced latency</strong> - overlapping processing time instead of sequential execution</li>
+<li><strong>Batch efficiency</strong> - combining multiple operations into efficient batches</li>
+<li><strong>Resource utilization</strong> - better utilization of network and processing resources</li>
+</ul>
+<h4 id="2-data-consistency-and-completeness">2. <strong>Data Consistency and Completeness</strong></h4>
+<ul>
+<li><strong>Complete data views</strong> - ensuring all relevant data is collected before processing</li>
+<li><strong>Cross-system consistency</strong> - maintaining consistency across multiple data sources</li>
+<li><strong>Duplicate detection</strong> - identifying and handling duplicate messages</li>
+<li><strong>Data validation</strong> - validating completeness and correctness of aggregated data</li>
+</ul>
+<h4 id="3-business-process-support">3. <strong>Business Process Support</strong></h4>
+<ul>
+<li><strong>Complex workflow coordination</strong> - supporting multi-step business processes</li>
+<li><strong>Decision making</strong> - collecting all necessary information for business decisions</li>
+<li><strong>Compliance reporting</strong> - aggregating data for regulatory reporting requirements</li>
+<li><strong>Customer experience</strong> - providing complete customer views from multiple systems</li>
+</ul>
+<h4 id="4-fault-tolerance-and-reliability">4. <strong>Fault Tolerance and Reliability</strong></h4>
+<ul>
+<li><strong>Partial result handling</strong> - processing available data when some sources are unavailable</li>
+<li><strong>Retry coordination</strong> - coordinating retry strategies across multiple operations</li>
+<li><strong>Graceful degradation</strong> - providing best-effort results when complete data isn't available</li>
+<li><strong>State recovery</strong> - recovering aggregation state after system failures</li>
+</ul>
+<h3 id="integration-architecture-applications">Integration Architecture Applications</h3>
+<h4 id="1-api-gateway-and-backend-aggregation">1. <strong>API Gateway and Backend Aggregation</strong></h4>
+<p>Aggregators in API gateways provide:
+- <strong>Backend for Frontend (BFF)</strong> - combining multiple microservice calls into unified responses
+- <strong>Mobile optimization</strong> - reducing round trips by aggregating data for mobile clients
+- <strong>Legacy system integration</strong> - combining data from multiple legacy systems
+- <strong>Cross-cutting data aggregation</strong> - combining business data with metadata, permissions, etc.</p>
+<h4 id="2-data-pipeline-and-etl-processing">2. <strong>Data Pipeline and ETL Processing</strong></h4>
+<p>In data processing workflows:
+- <strong>Batch data collection</strong> - aggregating streaming data into batches
+- <strong>Data warehouse loading</strong> - combining data from multiple sources for analytics
+- <strong>Real-time analytics</strong> - aggregating streaming events for real-time dashboards
+- <strong>Data quality assessment</strong> - collecting data quality metrics across sources</p>
+<h4 id="3-event-sourcing-and-cqrs">3. <strong>Event Sourcing and CQRS</strong></h4>
+<p>In event-driven architectures:
+- <strong>Event stream aggregation</strong> - building read models from event streams
+- <strong>Saga coordination</strong> - collecting saga step completions
+- <strong>Snapshot generation</strong> - aggregating events to create entity snapshots
+- <strong>Cross-aggregate reporting</strong> - combining data across aggregate boundaries</p>
+<h4 id="4-monitoring-and-observability">4. <strong>Monitoring and Observability</strong></h4>
+<p>For system monitoring:
+- <strong>Distributed tracing aggregation</strong> - collecting trace spans across services
+- <strong>Metrics correlation</strong> - combining metrics from multiple monitoring sources
+- <strong>Log aggregation</strong> - collecting and correlating log entries across systems
+- <strong>Health check aggregation</strong> - combining health status from multiple components</p>
+<h2 id="implementation-patterns">Implementation Patterns</h2>
+<h3 id="1-simple-count-based-aggregator">1. <strong>Simple Count-Based Aggregator</strong></h3>
+<pre><code class="language-java">// Aggregate based on expected message count
+@Component
+public class CountBasedAggregator {
+
+    private final Map&lt;String, AggregationState&gt; aggregations = new ConcurrentHashMap&lt;&gt;();
+
+    public Optional&lt;AggregatedResult&gt; aggregate(CorrelatedMessage message) {
+        String correlationId = message.getCorrelationId();
+
+        AggregationState state = aggregations.computeIfAbsent(correlationId, 
+            k -&gt; new AggregationState(message.getExpectedCount()));
+
+        state.addMessage(message);
+
+        if (state.isComplete()) {
+            AggregatedResult result = buildResult(state.getMessages());
+            aggregations.remove(correlationId);
+            return Optional.of(result);
+        }
+
+        return Optional.empty();
+    }
+
+    private AggregatedResult buildResult(List&lt;CorrelatedMessage&gt; messages) {
+        return AggregatedResult.builder()
+            .correlationId(messages.get(0).getCorrelationId())
+            .timestamp(Instant.now())
+            .messageCount(messages.size())
+            .aggregatedData(combineMessages(messages))
+            .build();
+    }
+}
+
+public class AggregationState {
+    private final int expectedCount;
+    private final List&lt;CorrelatedMessage&gt; messages;
+    private final Instant startTime;
+
+    public boolean isComplete() {
+        return messages.size() &gt;= expectedCount;
+    }
+}
+</code></pre>
+<h3 id="2-time-window-aggregator">2. <strong>Time-Window Aggregator</strong></h3>
+<pre><code class="language-java">// Aggregate messages within time windows
+@Component
+public class TimeWindowAggregator {
+
+    private final Map&lt;String, TimeWindowState&gt; windows = new ConcurrentHashMap&lt;&gt;();
+    private final Duration windowDuration;
+
+    @Scheduled(fixedDelay = 1000) // Check every second
+    public void processExpiredWindows() {
+        Instant now = Instant.now();
+
+        windows.entrySet().removeIf(entry -&gt; {
+            TimeWindowState state = entry.getValue();
+            if (state.isExpired(now)) {
+                processAggregatedMessages(entry.getKey(), state);
+                return true;
+            }
+            return false;
+        });
+    }
+
+    public void addMessage(TimeWindowedMessage message) {
+        String windowKey = calculateWindowKey(message);
+
+        TimeWindowState state = windows.computeIfAbsent(windowKey,
+            k -&gt; new TimeWindowState(calculateWindowStart(message.getTimestamp())));
+
+        state.addMessage(message);
+
+        // Check if window should be completed early (e.g., batch size reached)
+        if (state.shouldCompleteEarly()) {
+            processAggregatedMessages(windowKey, state);
+            windows.remove(windowKey);
+        }
+    }
+
+    private void processAggregatedMessages(String windowKey, TimeWindowState state) {
+        AggregatedTimeWindow result = AggregatedTimeWindow.builder()
+            .windowKey(windowKey)
+            .windowStart(state.getWindowStart())
+            .windowEnd(state.getWindowStart().plus(windowDuration))
+            .messageCount(state.getMessageCount())
+            .aggregatedMetrics(calculateMetrics(state.getMessages()))
+            .build();
+
+        // Send aggregated result for processing
+        publishAggregatedResult(result);
+    }
+}
+</code></pre>
+<h3 id="3-content-based-aggregator">3. <strong>Content-Based Aggregator</strong></h3>
+<pre><code class="language-java">// Aggregate based on message content and business rules
+@Component
+public class ContentBasedAggregator {
+
+    @Autowired
+    private CompletionRuleEngine completionRules;
+
+    private final Map&lt;String, ContentAggregationState&gt; aggregations = new ConcurrentHashMap&lt;&gt;();
+
+    public void processMessage(BusinessMessage message) {
+        String correlationKey = extractCorrelationKey(message);
+
+        ContentAggregationState state = aggregations.computeIfAbsent(correlationKey,
+            k -&gt; new ContentAggregationState());
+
+        state.addMessage(message);
+
+        // Check completion rules
+        if (completionRules.isComplete(state)) {
+            BusinessTransaction transaction = buildTransaction(state);
+            publishTransaction(transaction);
+            aggregations.remove(correlationKey);
+        }
+    }
+
+    private BusinessTransaction buildTransaction(ContentAggregationState state) {
+        List&lt;BusinessMessage&gt; messages = state.getMessages();
+
+        return BusinessTransaction.builder()
+            .transactionId(generateTransactionId())
+            .totalAmount(calculateTotalAmount(messages))
+            .participants(extractParticipants(messages))
+            .transactionType(determineTransactionType(messages))
+            .completedAt(Instant.now())
+            .build();
+    }
+}
+
+@Service
+public class CompletionRuleEngine {
+
+    public boolean isComplete(ContentAggregationState state) {
+        List&lt;BusinessMessage&gt; messages = state.getMessages();
+
+        // Rule 1: Must have at least one initiator message
+        boolean hasInitiator = messages.stream()
+            .anyMatch(m -&gt; m.getType() == MessageType.TRANSACTION_INITIATE);
+
+        // Rule 2: All required participants must have responded
+        Set&lt;String&gt; requiredParticipants = extractRequiredParticipants(messages);
+        Set&lt;String&gt; respondedParticipants = extractRespondedParticipants(messages);
+
+        boolean allParticipantsResponded = respondedParticipants.containsAll(requiredParticipants);
+
+        // Rule 3: No pending approval messages
+        boolean noPendingApprovals = messages.stream()
+            .noneMatch(m -&gt; m.getStatus() == MessageStatus.PENDING_APPROVAL);
+
+        return hasInitiator &amp;&amp; allParticipantsResponded &amp;&amp; noPendingApprovals;
+    }
+}
+</code></pre>
+<h3 id="4-streaming-aggregator-with-state">4. <strong>Streaming Aggregator with State</strong></h3>
+<pre><code class="language-java">// Aggregate streaming data with persistent state
+@Component
+public class StreamingAggregator {
+
+    @Autowired
+    private AggregationStateRepository stateRepository;
+
+    @EventListener
+    public void handleStreamEvent(StreamEvent event) {
+        String aggregationKey = event.getAggregationKey();
+
+        AggregationState state = stateRepository.findByKey(aggregationKey)
+            .orElse(new AggregationState(aggregationKey));
+
+        updateAggregationState(state, event);
+        stateRepository.save(state);
+
+        if (shouldEmitResult(state)) {
+            StreamAggregationResult result = buildAggregationResult(state);
+            publishResult(result);
+
+            // Reset or remove state based on aggregation type
+            if (state.isResetAfterEmit()) {
+                state.reset();
+                stateRepository.save(state);
+            } else {
+                stateRepository.delete(state);
+            }
+        }
+    }
+
+    private void updateAggregationState(AggregationState state, StreamEvent event) {
+        state.incrementCount();
+        state.updateSum(event.getValue());
+        state.updateMinMax(event.getValue());
+        state.addToWindow(event);
+        state.updateTimestamp(event.getTimestamp());
+    }
+
+    private boolean shouldEmitResult(AggregationState state) {
+        return state.getCount() &gt;= state.getBatchSize() || 
+               state.hasExceededTimeWindow() ||
+               state.hasSpecialTriggerCondition();
+    }
+}
+</code></pre>
+<h2 id="apache-camel-implementation">Apache Camel Implementation</h2>
+<h3 id="1-simple-message-aggregator">1. <strong>Simple Message Aggregator</strong></h3>
+<pre><code class="language-java">@Component
+public class SimpleAggregatorRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from(&quot;direct:aggregateMessages&quot;)
+            .routeId(&quot;simple-aggregator&quot;)
+            .log(&quot;Received message for aggregation: ${body}&quot;)
+            .aggregate(header(&quot;correlationId&quot;))
+                .completionSize(3) // Complete when 3 messages received
+                .completionTimeout(5000) // Or complete after 5 seconds
+                .strategy(new MessageAggregationStrategy())
+                .to(&quot;direct:processAggregatedResult&quot;);
+
+        from(&quot;direct:processAggregatedResult&quot;)
+            .log(&quot;Processing aggregated result: ${body}&quot;)
+            .process(exchange -&gt; {
+                AggregatedMessages result = exchange.getIn().getBody(AggregatedMessages.class);
+                // Process the aggregated result
+                log.info(&quot;Processed {} messages in aggregation {}&quot;, 
+                    result.getMessages().size(), result.getCorrelationId());
+            });
+    }
+}
+
+public class MessageAggregationStrategy implements AggregationStrategy {
+
+    @Override
+    public Exchange aggregate(Exchange oldExchange, Exchange newExchange) {
+        if (oldExchange == null) {
+            // First message in aggregation
+            AggregatedMessages aggregated = new AggregatedMessages();
+            aggregated.setCorrelationId(newExchange.getIn().getHeader(&quot;correlationId&quot;, String.class));
+            aggregated.addMessage(newExchange.getIn().getBody());
+
+            newExchange.getIn().setBody(aggregated);
+            return newExchange;
+        }
+
+        // Add new message to existing aggregation
+        AggregatedMessages aggregated = oldExchange.getIn().getBody(AggregatedMessages.class);
+        aggregated.addMessage(newExchange.getIn().getBody());
+
+        oldExchange.getIn().setBody(aggregated);
+        return oldExchange;
+    }
+}
+</code></pre>
+<h3 id="2-time-window-aggregator_1">2. <strong>Time-Window Aggregator</strong></h3>
+<pre><code class="language-java">@Component
+public class TimeWindowAggregatorRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from(&quot;direct:timeWindowAggregate&quot;)
+            .routeId(&quot;time-window-aggregator&quot;)
+            .aggregate(header(&quot;windowKey&quot;))
+                .completionInterval(60000) // Complete every 60 seconds
+                .strategy(new TimeWindowAggregationStrategy())
+                .to(&quot;direct:processTimeWindow&quot;);
+
+        from(&quot;direct:processTimeWindow&quot;)
+            .log(&quot;Processing time window: ${body}&quot;)
+            .process(exchange -&gt; {
+                TimeWindowResult window = exchange.getIn().getBody(TimeWindowResult.class);
+
+                // Calculate window statistics
+                WindowStatistics stats = WindowStatistics.builder()
+                    .windowStart(window.getWindowStart())
+                    .windowEnd(window.getWindowEnd())
+                    .messageCount(window.getMessages().size())
+                    .averageValue(calculateAverage(window.getMessages()))
+                    .totalValue(calculateTotal(window.getMessages()))
+                    .build();
+
+                exchange.getIn().setBody(stats);
+            })
+            .to(&quot;direct:publishStatistics&quot;);
+    }
+}
+
+public class TimeWindowAggregationStrategy implements AggregationStrategy {
+
+    @Override
+    public Exchange aggregate(Exchange oldExchange, Exchange newExchange) {
+        Instant now = Instant.now();
+
+        if (oldExchange == null) {
+            TimeWindowResult window = new TimeWindowResult();
+            window.setWindowStart(now);
+            window.addMessage(newExchange.getIn().getBody());
+
+            newExchange.getIn().setBody(window);
+            return newExchange;
+        }
+
+        TimeWindowResult window = oldExchange.getIn().getBody(TimeWindowResult.class);
+        window.addMessage(newExchange.getIn().getBody());
+        window.setLastUpdate(now);
+
+        oldExchange.getIn().setBody(window);
+        return oldExchange;
+    }
+}
+</code></pre>
+<h3 id="3-conditional-completion-aggregator">3. <strong>Conditional Completion Aggregator</strong></h3>
+<pre><code class="language-java">@Component
+public class ConditionalAggregatorRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from(&quot;direct:conditionalAggregate&quot;)
+            .routeId(&quot;conditional-aggregator&quot;)
+            .aggregate(header(&quot;transactionId&quot;))
+                .strategy(new BusinessTransactionAggregationStrategy())
+                .completionPredicate(new TransactionCompletionPredicate())
+                .completionTimeout(30000) // Fallback timeout
+                .to(&quot;direct:processCompletedTransaction&quot;);
+
+        from(&quot;direct:processCompletedTransaction&quot;)
+            .log(&quot;Processing completed transaction: ${body}&quot;)
+            .choice()
+                .when(method(TransactionValidator.class, &quot;isValid&quot;))
+                    .to(&quot;direct:commitTransaction&quot;)
+                .otherwise()
+                    .to(&quot;direct:rejectTransaction&quot;)
+            .end();
+    }
+}
+
+public class TransactionCompletionPredicate implements Predicate {
+
+    @Override
+    public boolean matches(Exchange exchange) {
+        BusinessTransaction transaction = exchange.getIn().getBody(BusinessTransaction.class);
+
+        // Check if all required steps are completed
+        boolean allStepsCompleted = transaction.getSteps().stream()
+            .allMatch(step -&gt; step.getStatus() == StepStatus.COMPLETED);
+
+        // Check if all approvals are received
+        boolean allApprovalsReceived = transaction.getApprovals().size() &gt;= 
+            transaction.getRequiredApprovals();
+
+        // Check if no errors occurred
+        boolean noErrors = transaction.getErrors().isEmpty();
+
+        return allStepsCompleted &amp;&amp; allApprovalsReceived &amp;&amp; noErrors;
+    }
+}
+</code></pre>
+<h3 id="4-scatter-gather-aggregator">4. <strong>Scatter-Gather Aggregator</strong></h3>
+<pre><code class="language-java">@Component
+public class ScatterGatherAggregatorRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from(&quot;direct:scatterGatherRequest&quot;)
+            .routeId(&quot;scatter-gather-aggregator&quot;)
+            .process(exchange -&gt; {
+                // Set correlation ID for tracking
+                String correlationId = UUID.randomUUID().toString();
+                exchange.getIn().setHeader(&quot;correlationId&quot;, correlationId);
+                exchange.getIn().setHeader(&quot;expectedResponses&quot;, 3);
+            })
+            .multicast()
+                .parallelProcessing()
+                .to(&quot;direct:serviceA&quot;, &quot;direct:serviceB&quot;, &quot;direct:serviceC&quot;)
+            .end()
+            .aggregate(header(&quot;correlationId&quot;))
+                .strategy(new ScatterGatherAggregationStrategy())
+                .completionSize(header(&quot;expectedResponses&quot;))
+                .completionTimeout(10000) // 10 second timeout
+                .to(&quot;direct:processGatheredResponses&quot;);
+
+        // Individual service routes
+        from(&quot;direct:serviceA&quot;)
+            .log(&quot;Calling service A&quot;)
+            .process(new ServiceAProcessor())
+            .setHeader(&quot;serviceResponse&quot;, constant(&quot;serviceA&quot;));
+
+        from(&quot;direct:serviceB&quot;)
+            .log(&quot;Calling service B&quot;)
+            .process(new ServiceBProcessor())
+            .setHeader(&quot;serviceResponse&quot;, constant(&quot;serviceB&quot;));
+
+        from(&quot;direct:serviceC&quot;)
+            .log(&quot;Calling service C&quot;)
+            .process(new ServiceCProcessor())
+            .setHeader(&quot;serviceResponse&quot;, constant(&quot;serviceC&quot;));
+
+        from(&quot;direct:processGatheredResponses&quot;)
+            .log(&quot;Processing gathered responses: ${body}&quot;)
+            .process(exchange -&gt; {
+                GatheredResponses responses = exchange.getIn().getBody(GatheredResponses.class);
+
+                // Combine responses into final result
+                CombinedResult result = CombinedResult.builder()
+                    .correlationId(responses.getCorrelationId())
+                    .responseCount(responses.getResponses().size())
+                    .combinedData(combineServiceData(responses.getResponses()))
+                    .processingTime(calculateProcessingTime(responses))
+                    .build();
+
+                exchange.getIn().setBody(result);
+            })
+            .to(&quot;direct:sendFinalResponse&quot;);
+    }
+}
+</code></pre>
+<h3 id="5-persistent-state-aggregator">5. <strong>Persistent State Aggregator</strong></h3>
+<pre><code class="language-java">@Component
+public class PersistentAggregatorRoute extends RouteBuilder {
+
+    @Autowired
+    private AggregationRepository aggregationRepository;
+
+    @Override
+    public void configure() throws Exception {
+        from(&quot;direct:persistentAggregate&quot;)
+            .routeId(&quot;persistent-aggregator&quot;)
+            .aggregate(header(&quot;businessKey&quot;))
+                .strategy(new PersistentAggregationStrategy())
+                .completionPredicate(new BusinessCompletionPredicate())
+                .aggregationRepository(aggregationRepository)
+                .completionTimeout(300000) // 5 minute timeout
+                .to(&quot;direct:processPersistentResult&quot;);
+
+        from(&quot;direct:processPersistentResult&quot;)
+            .log(&quot;Processing persistent aggregation result: ${body}&quot;)
+            .process(exchange -&gt; {
+                PersistentAggregationResult result = 
+                    exchange.getIn().getBody(PersistentAggregationResult.class);
+
+                // Process the long-running aggregation result
+                log.info(&quot;Completed aggregation for key: {} with {} messages&quot;, 
+                    result.getBusinessKey(), result.getMessageCount());
+            })
+            .to(&quot;direct:persistResult&quot;);
+    }
+}
+
+@Configuration
+public class AggregationConfiguration {
+
+    @Bean
+    public AggregationRepository aggregationRepository() {
+        // Use database-backed aggregation repository for persistence
+        return new JdbcAggregationRepository()
+            .setDataSource(dataSource())
+            .setRepositoryName(&quot;aggregation&quot;)
+            .setReturnOldExchange(false);
+    }
+}
+</code></pre>
+<h2 id="best-practices">Best Practices</h2>
+<h3 id="1-memory-and-resource-management">1. <strong>Memory and Resource Management</strong></h3>
+<ul>
+<li>Implement proper timeout mechanisms to prevent memory leaks from incomplete aggregations</li>
+<li>Use persistent storage for long-running aggregations that span system restarts</li>
+<li>Monitor aggregation state size and implement size limits</li>
+<li>Clean up expired aggregations regularly</li>
+<li>Consider using streaming aggregation for very large data sets</li>
+</ul>
+<h3 id="2-correlation-and-completion-strategy">2. <strong>Correlation and Completion Strategy</strong></h3>
+<ul>
+<li>Design robust correlation keys that uniquely identify related messages</li>
+<li>Implement flexible completion criteria (count, timeout, content-based)</li>
+<li>Handle partial results gracefully when some expected messages don't arrive</li>
+<li>Use idempotent aggregation to handle duplicate messages</li>
+<li>Implement compensation logic for failed aggregations</li>
+</ul>
+<h3 id="3-performance-optimization">3. <strong>Performance Optimization</strong></h3>
+<ul>
+<li>Use efficient data structures for aggregation state storage</li>
+<li>Consider parallel processing where aggregations are independent</li>
+<li>Implement batch processing for high-volume scenarios</li>
+<li>Use appropriate caching strategies for frequently accessed aggregation state</li>
+<li>Monitor and optimize aggregation completion criteria</li>
+</ul>
+<h3 id="4-error-handling-and-recovery">4. <strong>Error Handling and Recovery</strong></h3>
+<ul>
+<li>Implement dead letter queues for messages that can't be aggregated</li>
+<li>Provide detailed logging for aggregation lifecycle events</li>
+<li>Handle aggregation timeouts gracefully with partial results</li>
+<li>Implement retry mechanisms for transient failures</li>
+<li>Ensure aggregation state consistency across failures</li>
+</ul>
+<h3 id="5-monitoring-and-observability">5. <strong>Monitoring and Observability</strong></h3>
+<ul>
+<li>Track aggregation metrics (completion rate, average aggregation time, etc.)</li>
+<li>Monitor memory usage and resource consumption</li>
+<li>Implement distributed tracing through aggregation boundaries</li>
+<li>Alert on unusual aggregation patterns or failures</li>
+<li>Provide visibility into aggregation state and progress</li>
+</ul>
+<p>The Aggregator pattern is essential for building sophisticated integration solutions that coordinate distributed operations and provide unified views of data from multiple sources while managing the complexity of temporal coordination and state management.</p>
+
+      <a href="../index.html" class="back-to-top">← Back to All Patterns</a>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <p>©2026 <a href="https://dataintegrationmastery.com/">Data Integration Mastery™</a> — All Rights Reserved</p>
+  </footer>
+</body>
+</html>

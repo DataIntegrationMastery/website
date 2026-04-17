@@ -6,4 +6,57 @@
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
   </url>
+  <url>
+    <loc>https://dataintegrationmastery.com/patterns/</loc>
+    <lastmod>2026-04-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <!-- Resilience Patterns -->
+  <url><loc>https://dataintegrationmastery.com/patterns/resilience-patterns/circuit-breaker.html</loc><lastmod>2026-04-17</lastmod><priority>0.7</priority></url>
+  <url><loc>https://dataintegrationmastery.com/patterns/resilience-patterns/retry-mechanism.html</loc><lastmod>2026-04-17</lastmod><priority>0.7</priority></url>
+  <url><loc>https://dataintegrationmastery.com/patterns/resilience-patterns/timeout.html</loc><lastmod>2026-04-17</lastmod><priority>0.7</priority></url>
+  <url><loc>https://dataintegrationmastery.com/patterns/resilience-patterns/dead-letter-queue.html</loc><lastmod>2026-04-17</lastmod><priority>0.7</priority></url>
+  <url><loc>https://dataintegrationmastery.com/patterns/resilience-patterns/bulkhead.html</loc><lastmod>2026-04-17</lastmod><priority>0.7</priority></url>
+  <url><loc>https://dataintegrationmastery.com/patterns/resilience-patterns/fallback-graceful-degradation.html</loc><lastmod>2026-04-17</lastmod><priority>0.7</priority></url>
+  <!-- Messaging Patterns -->
+  <url><loc>https://dataintegrationmastery.com/patterns/messaging-patterns/request-reply.html</loc><lastmod>2026-04-17</lastmod><priority>0.7</priority></url>
+  <url><loc>https://dataintegrationmastery.com/patterns/messaging-patterns/publish-subscribe.html</loc><lastmod>2026-04-17</lastmod><priority>0.7</priority></url>
+  <url><loc>https://dataintegrationmastery.com/patterns/messaging-patterns/message-queue.html</loc><lastmod>2026-04-17</lastmod><priority>0.7</priority></url>
+  <url><loc>https://dataintegrationmastery.com/patterns/messaging-patterns/event-streaming.html</loc><lastmod>2026-04-17</lastmod><priority>0.7</priority></url>
+  <url><loc>https://dataintegrationmastery.com/patterns/messaging-patterns/correlation-id.html</loc><lastmod>2026-04-17</lastmod><priority>0.7</priority></url>
+  <url><loc>https://dataintegrationmastery.com/patterns/messaging-patterns/message-routing.html</loc><lastmod>2026-04-17</lastmod><priority>0.7</priority></url>
+  <!-- Data Transformation Patterns -->
+  <url><loc>https://dataintegrationmastery.com/patterns/data-transformation-patterns/message-translator.html</loc><lastmod>2026-04-17</lastmod><priority>0.7</priority></url>
+  <url><loc>https://dataintegrationmastery.com/patterns/data-transformation-patterns/content-filter.html</loc><lastmod>2026-04-17</lastmod><priority>0.7</priority></url>
+  <url><loc>https://dataintegrationmastery.com/patterns/data-transformation-patterns/message-router.html</loc><lastmod>2026-04-17</lastmod><priority>0.7</priority></url>
+  <url><loc>https://dataintegrationmastery.com/patterns/data-transformation-patterns/aggregator.html</loc><lastmod>2026-04-17</lastmod><priority>0.7</priority></url>
+  <url><loc>https://dataintegrationmastery.com/patterns/data-transformation-patterns/splitter.html</loc><lastmod>2026-04-17</lastmod><priority>0.7</priority></url>
+  <url><loc>https://dataintegrationmastery.com/patterns/data-transformation-patterns/data-mapper.html</loc><lastmod>2026-04-17</lastmod><priority>0.7</priority></url>
+  <!-- Routing Patterns -->
+  <url><loc>https://dataintegrationmastery.com/patterns/routing-patterns/content-based-router.html</loc><lastmod>2026-04-17</lastmod><priority>0.7</priority></url>
+  <url><loc>https://dataintegrationmastery.com/patterns/routing-patterns/recipient-list.html</loc><lastmod>2026-04-17</lastmod><priority>0.7</priority></url>
+  <url><loc>https://dataintegrationmastery.com/patterns/routing-patterns/load-balancer.html</loc><lastmod>2026-04-17</lastmod><priority>0.7</priority></url>
+  <url><loc>https://dataintegrationmastery.com/patterns/routing-patterns/message-filter.html</loc><lastmod>2026-04-17</lastmod><priority>0.7</priority></url>
+  <url><loc>https://dataintegrationmastery.com/patterns/routing-patterns/dynamic-router.html</loc><lastmod>2026-04-17</lastmod><priority>0.7</priority></url>
+  <!-- Security Patterns -->
+  <url><loc>https://dataintegrationmastery.com/patterns/security-patterns/authentication.html</loc><lastmod>2026-04-17</lastmod><priority>0.7</priority></url>
+  <url><loc>https://dataintegrationmastery.com/patterns/security-patterns/authorization.html</loc><lastmod>2026-04-17</lastmod><priority>0.7</priority></url>
+  <url><loc>https://dataintegrationmastery.com/patterns/security-patterns/encryption.html</loc><lastmod>2026-04-17</lastmod><priority>0.7</priority></url>
+  <url><loc>https://dataintegrationmastery.com/patterns/security-patterns/token-management.html</loc><lastmod>2026-04-17</lastmod><priority>0.7</priority></url>
+  <url><loc>https://dataintegrationmastery.com/patterns/security-patterns/api-security.html</loc><lastmod>2026-04-17</lastmod><priority>0.7</priority></url>
+  <url><loc>https://dataintegrationmastery.com/patterns/security-patterns/secret-management.html</loc><lastmod>2026-04-17</lastmod><priority>0.7</priority></url>
+  <!-- Orchestration Patterns -->
+  <url><loc>https://dataintegrationmastery.com/patterns/orchestration-patterns/saga-pattern.html</loc><lastmod>2026-04-17</lastmod><priority>0.7</priority></url>
+  <url><loc>https://dataintegrationmastery.com/patterns/orchestration-patterns/process-manager.html</loc><lastmod>2026-04-17</lastmod><priority>0.7</priority></url>
+  <url><loc>https://dataintegrationmastery.com/patterns/orchestration-patterns/workflow-engine.html</loc><lastmod>2026-04-17</lastmod><priority>0.7</priority></url>
+  <url><loc>https://dataintegrationmastery.com/patterns/orchestration-patterns/choreography.html</loc><lastmod>2026-04-17</lastmod><priority>0.7</priority></url>
+  <url><loc>https://dataintegrationmastery.com/patterns/orchestration-patterns/compensation-transactions.html</loc><lastmod>2026-04-17</lastmod><priority>0.7</priority></url>
+  <!-- Monitoring & Observability Patterns -->
+  <url><loc>https://dataintegrationmastery.com/patterns/monitoring-observability-patterns/distributed-tracing.html</loc><lastmod>2026-04-17</lastmod><priority>0.7</priority></url>
+  <url><loc>https://dataintegrationmastery.com/patterns/monitoring-observability-patterns/metrics-collection.html</loc><lastmod>2026-04-17</lastmod><priority>0.7</priority></url>
+  <url><loc>https://dataintegrationmastery.com/patterns/monitoring-observability-patterns/health-checks.html</loc><lastmod>2026-04-17</lastmod><priority>0.7</priority></url>
+  <url><loc>https://dataintegrationmastery.com/patterns/monitoring-observability-patterns/logging-strategies.html</loc><lastmod>2026-04-17</lastmod><priority>0.7</priority></url>
+  <url><loc>https://dataintegrationmastery.com/patterns/monitoring-observability-patterns/performance-monitoring.html</loc><lastmod>2026-04-17</lastmod><priority>0.7</priority></url>
+  <url><loc>https://dataintegrationmastery.com/patterns/monitoring-observability-patterns/error-tracking.html</loc><lastmod>2026-04-17</lastmod><priority>0.7</priority></url>
 </urlset>

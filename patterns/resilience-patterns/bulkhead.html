@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bulkhead Pattern — Integration Architecture Patterns | Data Integration Mastery™</title>
+  <meta name="description" content="The Bulkhead pattern is a fundamental isolation strategy in distributed systems that compartmentalizes resources to prevent failures in one part of the syste...">
+  <meta name="keywords" content="bulkhead pattern, integration pattern, resilience patterns, integration architecture, EAI patterns, data integration">
+  <link rel="canonical" href="https://dataintegrationmastery.com/patterns/resilience-patterns/bulkhead.html">
+
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://dataintegrationmastery.com/patterns/resilience-patterns/bulkhead.html">
+  <meta property="og:title" content="Bulkhead Pattern — Integration Architecture Patterns">
+  <meta property="og:description" content="The Bulkhead pattern is a fundamental isolation strategy in distributed systems that compartmentalizes resources to prevent failures in one part of the syste...">
+  <meta property="og:image" content="https://dataintegrationmastery.com/assets/images/logo.png">
+  <meta property="og:site_name" content="Data Integration Mastery">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Bulkhead Pattern — Integration Architecture Patterns">
+  <meta name="twitter:description" content="The Bulkhead pattern is a fundamental isolation strategy in distributed systems that compartmentalizes resources to prevent failures in one part of the syste...">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/docs.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Bulkhead Pattern",
+    "description": "The Bulkhead pattern is a fundamental isolation strategy in distributed systems that compartmentalizes resources to prevent failures in one part of the syste...",
+    "url": "https://dataintegrationmastery.com/patterns/resilience-patterns/bulkhead.html",
+    "author": {
+      "@type": "Person",
+      "name": "Ari Vilkman",
+      "jobTitle": "Integration Architect"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Data Integration Mastery",
+      "url": "https://dataintegrationmastery.com"
+    },
+    "isPartOf": {
+      "@type": "CollectionPage",
+      "name": "Integration Architecture Patterns",
+      "url": "https://dataintegrationmastery.com/patterns/"
+    },
+    "about": {
+      "@type": "Thing",
+      "name": "Bulkhead Pattern"
+    },
+    "inLanguage": "en",
+    "isAccessibleForFree": true
+  }
+  </script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="https://dataintegrationmastery.com/" class="header-brand">
+        <img src="../../assets/images/dim-icon.png" alt="DIM" width="36" height="36">
+        <span class="header-title">Data Integration Mastery™</span>
+      </a>
+      <nav class="header-nav" aria-label="Main navigation">
+        <a href="https://dataintegrationmastery.com/">Home</a>
+        <a href="../index.html">All Patterns</a>
+        <a href="https://dataintegrationmastery.com/#free-course">Free Course</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="docs-layout">
+    <aside class="docs-sidebar" aria-label="Pattern categories">
+      <div class="sidebar-title">Pattern Categories</div>
+<div class="sidebar-section">
+  <a href="../index.html#resilience" class="sidebar-section-title">🛡️ Resilience Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="circuit-breaker.html">Circuit Breaker</a></li>
+    <li><a href="retry-mechanism.html">Retry Mechanism</a></li>
+    <li><a href="timeout.html">Timeout</a></li>
+    <li><a href="dead-letter-queue.html">Dead Letter Queue</a></li>
+    <li><a href="bulkhead.html" class="active">Bulkhead</a></li>
+    <li><a href="fallback-graceful-degradation.html">Fallback / Graceful Degradation</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#messaging" class="sidebar-section-title">📨 Messaging Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../messaging-patterns/request-reply.html">Request-Reply</a></li>
+    <li><a href="../messaging-patterns/publish-subscribe.html">Publish-Subscribe</a></li>
+    <li><a href="../messaging-patterns/message-queue.html">Message Queue</a></li>
+    <li><a href="../messaging-patterns/event-streaming.html">Event Streaming</a></li>
+    <li><a href="../messaging-patterns/correlation-id.html">Correlation ID</a></li>
+    <li><a href="../messaging-patterns/message-routing.html">Message Routing</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#data-transformation" class="sidebar-section-title">🔄 Data Transformation Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../data-transformation-patterns/message-translator.html">Message Translator</a></li>
+    <li><a href="../data-transformation-patterns/content-filter.html">Content Filter</a></li>
+    <li><a href="../data-transformation-patterns/message-router.html">Message Router</a></li>
+    <li><a href="../data-transformation-patterns/aggregator.html">Aggregator</a></li>
+    <li><a href="../data-transformation-patterns/splitter.html">Splitter</a></li>
+    <li><a href="../data-transformation-patterns/data-mapper.html">Data Mapper</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#routing" class="sidebar-section-title">🔀 Routing Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../routing-patterns/content-based-router.html">Content-Based Router</a></li>
+    <li><a href="../routing-patterns/recipient-list.html">Recipient List</a></li>
+    <li><a href="../routing-patterns/load-balancer.html">Load Balancer</a></li>
+    <li><a href="../routing-patterns/message-filter.html">Message Filter</a></li>
+    <li><a href="../routing-patterns/dynamic-router.html">Dynamic Router</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#security" class="sidebar-section-title">🔐 Security Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../security-patterns/authentication.html">Authentication</a></li>
+    <li><a href="../security-patterns/authorization.html">Authorization</a></li>
+    <li><a href="../security-patterns/encryption.html">Encryption</a></li>
+    <li><a href="../security-patterns/token-management.html">Token Management</a></li>
+    <li><a href="../security-patterns/api-security.html">API Security</a></li>
+    <li><a href="../security-patterns/secret-management.html">Secret Management</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#orchestration" class="sidebar-section-title">🎭 Orchestration Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../orchestration-patterns/saga-pattern.html">Saga Pattern</a></li>
+    <li><a href="../orchestration-patterns/process-manager.html">Process Manager</a></li>
+    <li><a href="../orchestration-patterns/workflow-engine.html">Workflow Engine</a></li>
+    <li><a href="../orchestration-patterns/choreography.html">Choreography</a></li>
+    <li><a href="../orchestration-patterns/compensation-transactions.html">Compensation Transactions</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#observability" class="sidebar-section-title">📊 Monitoring & Observability Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../monitoring-observability-patterns/distributed-tracing.html">Distributed Tracing</a></li>
+    <li><a href="../monitoring-observability-patterns/metrics-collection.html">Metrics Collection</a></li>
+    <li><a href="../monitoring-observability-patterns/health-checks.html">Health Checks</a></li>
+    <li><a href="../monitoring-observability-patterns/logging-strategies.html">Logging Strategies</a></li>
+    <li><a href="../monitoring-observability-patterns/performance-monitoring.html">Performance Monitoring</a></li>
+    <li><a href="../monitoring-observability-patterns/error-tracking.html">Error Tracking</a></li>
+  </ul>
+</div>
+
+    </aside>
+
+    <main id="main-content" class="docs-content">
+      <div class="breadcrumb">
+        <a href="https://dataintegrationmastery.com/">Home</a>
+        <span class="sep">›</span>
+        <a href="../index.html">Patterns</a>
+        <span class="sep">›</span>
+        <a href="../index.html#resilience">Resilience Patterns</a>
+        <span class="sep">›</span>
+        <strong>Bulkhead Pattern</strong>
+      </div>
+
+      <h1>Bulkhead Pattern</h1>
+
+      <h2 id="overview">Overview</h2>
+<p>The Bulkhead pattern is a fundamental isolation strategy in distributed systems that compartmentalizes resources to prevent failures in one part of the system from affecting other parts. Named after the watertight compartments in ship hulls that prevent total flooding when one section is breached, the software Bulkhead pattern provides similar protective isolation for system resources and operations.</p>
+<h3 id="theoretical-foundation">Theoretical Foundation</h3>
+<p>The Bulkhead pattern is rooted in <strong>fault isolation theory</strong> and <strong>resource partitioning principles</strong>. It addresses the fundamental challenge that in shared resource environments, a failure or resource exhaustion in one component can cascade to affect unrelated components. The pattern embodies the principle of <strong>"blast radius containment"</strong> - limiting the scope of failures to prevent system-wide impact.</p>
+<h3 id="core-principles">Core Principles</h3>
+<h4 id="1-resource-isolation">1. <strong>Resource Isolation</strong></h4>
+<p>The Bulkhead pattern creates dedicated resource pools for different types of operations, ensuring that resource exhaustion in one area doesn't affect others.</p>
+<h4 id="2-failure-containment">2. <strong>Failure Containment</strong></h4>
+<p>By isolating components and their resources, failures are contained within specific boundaries rather than propagating throughout the entire system.</p>
+<h4 id="3-independent-scaling">3. <strong>Independent Scaling</strong></h4>
+<p>Different resource pools can be scaled independently based on their specific load characteristics and performance requirements.</p>
+<h4 id="4-predictable-performance">4. <strong>Predictable Performance</strong></h4>
+<p>Resource isolation provides predictable performance characteristics by preventing resource contention between different operation types.</p>
+<h3 id="why-bulkheads-are-essential-in-integration-architecture">Why Bulkheads are Essential in Integration Architecture</h3>
+<h4 id="1-multi-tenant-resource-management">1. <strong>Multi-Tenant Resource Management</strong></h4>
+<p>In integration platforms serving multiple clients or services:
+- <strong>Tenant isolation</strong> prevents one client's load from affecting others
+- <strong>Resource fairness</strong> ensures equitable resource distribution
+- <strong>Performance guarantees</strong> can be provided per tenant
+- <strong>Security boundaries</strong> prevent cross-tenant resource access</p>
+<h4 id="2-criticality-based-separation">2. <strong>Criticality-Based Separation</strong></h4>
+<p>Different operations have varying criticality levels:
+- <strong>Critical operations</strong> require dedicated, high-priority resources
+- <strong>Batch processing</strong> can use lower-priority, overflow resources
+- <strong>Background tasks</strong> should not interfere with user-facing operations
+- <strong>Administrative functions</strong> need separate resource allocation</p>
+<h4 id="3-external-dependency-isolation">3. <strong>External Dependency Isolation</strong></h4>
+<p>When integrating with multiple external systems:
+- <strong>Third-party service failures</strong> shouldn't affect internal operations
+- <strong>Rate-limited APIs</strong> require separate resource pools to manage quotas
+- <strong>Variable performance</strong> of external services needs isolation
+- <strong>Security risks</strong> from external dependencies require containment</p>
+<h4 id="4-load-pattern-variance">4. <strong>Load Pattern Variance</strong></h4>
+<p>Different integration patterns have distinct resource requirements:
+- <strong>Real-time processing</strong> requires immediate resource availability
+- <strong>Batch operations</strong> can tolerate higher latency but need sustained throughput
+- <strong>Seasonal workloads</strong> require elastic resource allocation
+- <strong>Emergency procedures</strong> need guaranteed resource availability</p>
+<h3 id="benefits-in-integration-contexts">Benefits in Integration Contexts</h3>
+<h4 id="1-system-resilience">1. <strong>System Resilience</strong></h4>
+<ul>
+<li><strong>Fault isolation</strong> prevents cascading failures across system boundaries</li>
+<li><strong>Graceful degradation</strong> allows partial system operation during failures</li>
+<li><strong>Blast radius limitation</strong> contains the impact of resource exhaustion</li>
+<li><strong>Independent recovery</strong> enables different components to recover separately</li>
+</ul>
+<h4 id="2-performance-predictability">2. <strong>Performance Predictability</strong></h4>
+<ul>
+<li><strong>Resource contention elimination</strong> provides consistent performance</li>
+<li><strong>Service Level Agreement (SLA) compliance</strong> through guaranteed resource allocation</li>
+<li><strong>Latency isolation</strong> prevents slow operations from affecting fast ones</li>
+<li><strong>Throughput guarantees</strong> for critical processing paths</li>
+</ul>
+<h4 id="3-operational-excellence">3. <strong>Operational Excellence</strong></h4>
+<ul>
+<li><strong>Resource monitoring</strong> simplified through clear boundaries</li>
+<li><strong>Capacity planning</strong> more accurate with isolated resource pools</li>
+<li><strong>Troubleshooting efficiency</strong> improved through component isolation</li>
+<li><strong>Deployment independence</strong> allowing separate scaling and updates</li>
+</ul>
+<h4 id="4-security-and-compliance">4. <strong>Security and Compliance</strong></h4>
+<ul>
+<li><strong>Data isolation</strong> between different processing contexts</li>
+<li><strong>Access control</strong> simplified through resource boundaries</li>
+<li><strong>Audit trails</strong> clearer with separated resource usage</li>
+<li><strong>Compliance requirements</strong> easier to meet with proper isolation</li>
+</ul>
+<h3 id="integration-architecture-applications">Integration Architecture Applications</h3>
+<h4 id="1-thread-pool-segregation">1. <strong>Thread Pool Segregation</strong></h4>
+<p>Separate thread pools for different operation types:
+- <strong>API request handling</strong> with dedicated request processing threads
+- <strong>Background processing</strong> with separate worker thread pools
+- <strong>Database operations</strong> with isolated database connection pools
+- <strong>External service calls</strong> with dedicated HTTP client thread pools</p>
+<h4 id="2-connection-pool-isolation">2. <strong>Connection Pool Isolation</strong></h4>
+<p>Separate connection pools for different destinations:
+- <strong>Database connections</strong> segregated by database type or criticality
+- <strong>Message broker connections</strong> separated by message type or destination
+- <strong>HTTP connections</strong> isolated per external service or API
+- <strong>Cache connections</strong> dedicated to different cache usage patterns</p>
+<h4 id="3-memory-partitioning">3. <strong>Memory Partitioning</strong></h4>
+<p>Memory allocation boundaries for different processing types:
+- <strong>Heap space allocation</strong> limited per operation type
+- <strong>Buffer pool segregation</strong> for different I/O operations
+- <strong>Cache space partitioning</strong> based on data access patterns
+- <strong>Temporary storage isolation</strong> for batch processing operations</p>
+<h4 id="4-network-resource-segmentation">4. <strong>Network Resource Segmentation</strong></h4>
+<p>Network bandwidth and connection isolation:
+- <strong>Bandwidth allocation</strong> per service or tenant
+- <strong>Network connection limits</strong> based on operation criticality
+- <strong>Quality of Service (QoS)</strong> enforcement through traffic shaping
+- <strong>Protocol isolation</strong> separating different communication protocols</p>
+<h2 id="how-bulkhead-pattern-works">How Bulkhead Pattern Works</h2>
+<p>The Bulkhead pattern operates through resource partitioning and access control mechanisms:</p>
+<h3 id="resource-partitioning-strategy">Resource Partitioning Strategy</h3>
+<pre><code>Shared Resource Pool (Anti-Pattern)
+    ┌─────────────────────────────────┐
+    │  All Operations Compete         │
+    │  for Same Resources             │
+    │  ┌─────┐ ┌─────┐ ┌─────┐      │
+    │  │Op A │ │Op B │ │Op C │ ...  │
+    │  └─────┘ └─────┘ └─────┘      │
+    └─────────────────────────────────┘
+
+Bulkhead Pattern (Isolation)
+    ┌───────────┐ ┌───────────┐ ┌───────────┐
+    │ Pool A    │ │ Pool B    │ │ Pool C    │
+    │ ┌─────┐   │ │ ┌─────┐   │ │ ┌─────┐   │
+    │ │Op A │   │ │ │Op B │   │ │ │Op C │   │
+    │ └─────┘   │ │ └─────┘   │ │ └─────┘   │
+    └───────────┘ └───────────┘ └───────────┘
+</code></pre>
+<h3 id="bulkhead-implementation-levels">Bulkhead Implementation Levels</h3>
+<h4 id="1-process-level-isolation">1. <strong>Process-Level Isolation</strong></h4>
+<pre><code>Application A ←→ Dedicated JVM Process
+Application B ←→ Dedicated JVM Process
+Application C ←→ Dedicated JVM Process
+</code></pre>
+<h4 id="2-thread-pool-isolation">2. <strong>Thread Pool Isolation</strong></h4>
+<pre><code>Web Requests    → Thread Pool A (20 threads)
+Background Jobs → Thread Pool B (10 threads)
+Admin Tasks     → Thread Pool C (5 threads)
+</code></pre>
+<h4 id="3-connection-pool-isolation">3. <strong>Connection Pool Isolation</strong></h4>
+<pre><code>Database A → Connection Pool A (50 connections)
+Database B → Connection Pool B (30 connections)
+Cache      → Connection Pool C (20 connections)
+</code></pre>
+<h4 id="4-resource-quota-isolation">4. <strong>Resource Quota Isolation</strong></h4>
+<pre><code>Tenant A → CPU: 2 cores, Memory: 4GB, I/O: 100 IOPS
+Tenant B → CPU: 1 core,  Memory: 2GB, I/O: 50 IOPS
+</code></pre>
+<h2 id="key-components">Key Components</h2>
+<h3 id="1-resource-pool-manager">1. Resource Pool Manager</h3>
+<p>Manages isolated resource pools and their allocation:</p>
+<pre><code class="language-java">public class ResourcePoolManager {
+    private final Map&lt;String, ResourcePool&lt;?&gt;&gt; pools = new ConcurrentHashMap&lt;&gt;();
+    private final Map&lt;String, ResourcePoolConfig&gt; configurations = new HashMap&lt;&gt;();
+
+    public &lt;T&gt; ResourcePool&lt;T&gt; createPool(String poolName, 
+                                         ResourcePoolConfig config,
+                                         Supplier&lt;T&gt; resourceFactory) {
+        ResourcePool&lt;T&gt; pool = new ResourcePool&lt;&gt;(
+            poolName, 
+            config, 
+            resourceFactory
+        );
+
+        pools.put(poolName, pool);
+        configurations.put(poolName, config);
+
+        return pool;
+    }
+
+    public &lt;T&gt; Optional&lt;T&gt; acquireResource(String poolName, Duration timeout) {
+        @SuppressWarnings(&quot;unchecked&quot;)
+        ResourcePool&lt;T&gt; pool = (ResourcePool&lt;T&gt;) pools.get(poolName);
+
+        if (pool == null) {
+            throw new IllegalArgumentException(&quot;Unknown pool: &quot; + poolName);
+        }
+
+        return pool.acquire(timeout);
+    }
+
+    public void releaseResource(String poolName, Object resource) {
+        ResourcePool&lt;?&gt; pool = pools.get(poolName);
+        if (pool != null) {
+            pool.release(resource);
+        }
+    }
+
+    public Map&lt;String, PoolStatistics&gt; getPoolStatistics() {
+        return pools.entrySet().stream()
+            .collect(toMap(
+                Map.Entry::getKey,
+                entry -&gt; entry.getValue().getStatistics()
+            ));
+    }
+}
+</code></pre>
+<h3 id="2-resource-pool-implementation">2. Resource Pool Implementation</h3>
+<p>Individual resource pool with isolation guarantees:</p>
+<pre><code class="language-java">public class ResourcePool&lt;T&gt; {
+    private final String poolName;
+    private final ResourcePoolConfig config;
+    private final Supplier&lt;T&gt; resourceFactory;
+    private final BlockingQueue&lt;T&gt; availableResources;
+    private final Set&lt;T&gt; allocatedResources = ConcurrentHashMap.newKeySet();
+    private final AtomicInteger totalResources = new AtomicInteger(0);
+    private final PoolStatistics statistics;
+
+    public ResourcePool(String poolName, 
+                       ResourcePoolConfig config, 
+                       Supplier&lt;T&gt; resourceFactory) {
+        this.poolName = poolName;
+        this.config = config;
+        this.resourceFactory = resourceFactory;
+        this.availableResources = new LinkedBlockingQueue&lt;&gt;();
+        this.statistics = new PoolStatistics(poolName);
+
+        // Pre-populate pool with minimum resources
+        for (int i = 0; i &lt; config.getMinPoolSize(); i++) {
+            T resource = resourceFactory.get();
+            availableResources.offer(resource);
+            totalResources.incrementAndGet();
+        }
+    }
+
+    public Optional&lt;T&gt; acquire(Duration timeout) {
+        statistics.recordAcquisitionAttempt();
+
+        // Try to get existing resource
+        T resource = availableResources.poll();
+
+        // If no resource available, create new one if under limit
+        if (resource == null &amp;&amp; totalResources.get() &lt; config.getMaxPoolSize()) {
+            resource = createNewResource();
+        }
+
+        // If still no resource, wait for one to become available
+        if (resource == null) {
+            try {
+                resource = availableResources.poll(timeout.toMillis(), TimeUnit.MILLISECONDS);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                statistics.recordAcquisitionFailure(&quot;interrupted&quot;);
+                return Optional.empty();
+            }
+        }
+
+        if (resource != null) {
+            allocatedResources.add(resource);
+            statistics.recordAcquisitionSuccess();
+            return Optional.of(resource);
+        } else {
+            statistics.recordAcquisitionFailure(&quot;timeout&quot;);
+            return Optional.empty();
+        }
+    }
+
+    public void release(T resource) {
+        if (allocatedResources.remove(resource)) {
+            if (isResourceHealthy(resource) &amp;&amp; 
+                availableResources.size() &lt; config.getMinPoolSize()) {
+                availableResources.offer(resource);
+            } else {
+                // Resource unhealthy or pool over capacity
+                disposeResource(resource);
+                totalResources.decrementAndGet();
+            }
+            statistics.recordResourceRelease();
+        }
+    }
+
+    private T createNewResource() {
+        try {
+            T resource = resourceFactory.get();
+            totalResources.incrementAndGet();
+            statistics.recordResourceCreation();
+            return resource;
+        } catch (Exception e) {
+            statistics.recordResourceCreationFailure(e.getMessage());
+            return null;
+        }
+    }
+}
+</code></pre>
+<h3 id="3-bulkhead-configuration">3. Bulkhead Configuration</h3>
+<p>Defines isolation policies and resource limits:</p>
+<pre><code class="language-java">@ConfigurationProperties(prefix = &quot;bulkhead&quot;)
+public class BulkheadConfiguration {
+    private Map&lt;String, PoolConfiguration&gt; pools = new HashMap&lt;&gt;();
+
+    @Data
+    public static class PoolConfiguration {
+        private int minSize = 5;
+        private int maxSize = 50;
+        private Duration acquireTimeout = Duration.ofSeconds(30);
+        private Duration maxIdleTime = Duration.ofMinutes(10);
+        private Duration healthCheckInterval = Duration.ofMinutes(5);
+        private boolean enableMetrics = true;
+        private Map&lt;String, String&gt; customProperties = new HashMap&lt;&gt;();
+    }
+
+    public ResourcePoolConfig createPoolConfig(String poolName) {
+        PoolConfiguration config = pools.getOrDefault(
+            poolName, 
+            new PoolConfiguration()
+        );
+
+        return ResourcePoolConfig.builder()
+            .poolName(poolName)
+            .minPoolSize(config.minSize)
+            .maxPoolSize(config.maxSize)
+            .acquireTimeout(config.acquireTimeout)
+            .maxIdleTime(config.maxIdleTime)
+            .healthCheckInterval(config.healthCheckInterval)
+            .enableMetrics(config.enableMetrics)
+            .customProperties(config.customProperties)
+            .build();
+    }
+}
+</code></pre>
+<h3 id="4-bulkhead-executor-service">4. Bulkhead Executor Service</h3>
+<p>Thread pool isolation implementation:</p>
+<pre><code class="language-java">@Component
+public class BulkheadExecutorService {
+    private final Map&lt;String, ExecutorService&gt; executors = new ConcurrentHashMap&lt;&gt;();
+    private final BulkheadConfiguration config;
+    private final MeterRegistry meterRegistry;
+
+    public BulkheadExecutorService(BulkheadConfiguration config, 
+                                  MeterRegistry meterRegistry) {
+        this.config = config;
+        this.meterRegistry = meterRegistry;
+        initializeExecutors();
+    }
+
+    private void initializeExecutors() {
+        config.getPools().forEach((poolName, poolConfig) -&gt; {
+            ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+            executor.setCorePoolSize(poolConfig.getMinSize());
+            executor.setMaxPoolSize(poolConfig.getMaxSize());
+            executor.setQueueCapacity(poolConfig.getMaxSize() * 2);
+            executor.setThreadNamePrefix(poolName + &quot;-&quot;);
+            executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+            executor.initialize();
+
+            // Wrap with monitoring
+            ExecutorService monitoredExecutor = MoreExecutors.listeningDecorator(executor);
+            executors.put(poolName, monitoredExecutor);
+
+            // Register metrics
+            if (poolConfig.isEnableMetrics()) {
+                registerExecutorMetrics(poolName, executor);
+            }
+        });
+    }
+
+    public &lt;T&gt; CompletableFuture&lt;T&gt; executeAsync(String poolName, 
+                                                Callable&lt;T&gt; task) {
+        ExecutorService executor = getExecutor(poolName);
+
+        return CompletableFuture.supplyAsync(() -&gt; {
+            try {
+                return task.call();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }, executor);
+    }
+
+    public void execute(String poolName, Runnable task) {
+        ExecutorService executor = getExecutor(poolName);
+        executor.execute(() -&gt; {
+            recordTaskExecution(poolName);
+            try {
+                task.run();
+                recordTaskSuccess(poolName);
+            } catch (Exception e) {
+                recordTaskFailure(poolName, e);
+                throw e;
+            }
+        });
+    }
+
+    private ExecutorService getExecutor(String poolName) {
+        ExecutorService executor = executors.get(poolName);
+        if (executor == null) {
+            throw new IllegalArgumentException(&quot;Unknown executor pool: &quot; + poolName);
+        }
+        return executor;
+    }
+}
+</code></pre>
+<h2 id="configuration-parameters">Configuration Parameters</h2>
+<h3 id="essential-settings">Essential Settings</h3>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Typical Values</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Pool Size</strong></td>
+<td>Number of resources in isolated pool</td>
+<td>5-100</td>
+</tr>
+<tr>
+<td><strong>Queue Capacity</strong></td>
+<td>Waiting requests per pool</td>
+<td>10-1000</td>
+</tr>
+<tr>
+<td><strong>Timeout</strong></td>
+<td>Maximum wait time for resource acquisition</td>
+<td>1s-60s</td>
+</tr>
+<tr>
+<td><strong>Health Check</strong></td>
+<td>Interval for resource health verification</td>
+<td>1min-15min</td>
+</tr>
+<tr>
+<td><strong>Idle Timeout</strong></td>
+<td>Maximum idle time before resource cleanup</td>
+<td>5min-60min</td>
+</tr>
+</tbody>
+</table>
+<h3 id="example-configuration">Example Configuration</h3>
+<pre><code class="language-properties"># Thread pool bulkheads
+bulkhead.pools.web-requests.min-size=10
+bulkhead.pools.web-requests.max-size=50
+bulkhead.pools.web-requests.queue-capacity=100
+
+bulkhead.pools.background-jobs.min-size=5
+bulkhead.pools.background-jobs.max-size=20
+bulkhead.pools.background-jobs.queue-capacity=500
+
+bulkhead.pools.admin-tasks.min-size=2
+bulkhead.pools.admin-tasks.max-size=10
+bulkhead.pools.admin-tasks.queue-capacity=50
+
+# Database connection bulkheads
+bulkhead.pools.primary-db.min-size=10
+bulkhead.pools.primary-db.max-size=50
+bulkhead.pools.primary-db.acquire-timeout=30s
+
+bulkhead.pools.analytics-db.min-size=5
+bulkhead.pools.analytics-db.max-size=20
+bulkhead.pools.analytics-db.acquire-timeout=60s
+</code></pre>
+<h2 id="implementation-examples">Implementation Examples</h2>
+<h3 id="1-http-client-connection-pool-isolation">1. HTTP Client Connection Pool Isolation</h3>
+<pre><code class="language-java">@Configuration
+public class HttpClientBulkheadConfiguration {
+
+    @Bean(&quot;criticalServiceClient&quot;)
+    public RestTemplate criticalServiceClient() {
+        return createRestTemplate(&quot;critical-service&quot;, 20, 5000, 10000);
+    }
+
+    @Bean(&quot;backgroundServiceClient&quot;)
+    public RestTemplate backgroundServiceClient() {
+        return createRestTemplate(&quot;background-service&quot;, 10, 30000, 60000);
+    }
+
+    @Bean(&quot;analyticsServiceClient&quot;)
+    public RestTemplate analyticsServiceClient() {
+        return createRestTemplate(&quot;analytics-service&quot;, 5, 60000, 120000);
+    }
+
+    private RestTemplate createRestTemplate(String poolName, 
+                                          int maxConnections,
+                                          int connectionTimeout,
+                                          int readTimeout) {
+
+        PoolingHttpClientConnectionManager connectionManager = 
+            new PoolingHttpClientConnectionManager();
+        connectionManager.setMaxTotal(maxConnections);
+        connectionManager.setDefaultMaxPerRoute(maxConnections);
+
+        CloseableHttpClient httpClient = HttpClients.custom()
+            .setConnectionManager(connectionManager)
+            .setDefaultRequestConfig(RequestConfig.custom()
+                .setConnectionRequestTimeout(connectionTimeout)
+                .setConnectTimeout(connectionTimeout)
+                .setSocketTimeout(readTimeout)
+                .build())
+            .build();
+
+        HttpComponentsClientHttpRequestFactory factory = 
+            new HttpComponentsClientHttpRequestFactory(httpClient);
+
+        return new RestTemplate(factory);
+    }
+}
+
+@Service
+public class IsolatedApiService {
+    private final RestTemplate criticalServiceClient;
+    private final RestTemplate backgroundServiceClient;
+
+    public CompletableFuture&lt;String&gt; callCriticalService(String data) {
+        return CompletableFuture.supplyAsync(() -&gt;
+            criticalServiceClient.postForObject(&quot;/critical&quot;, data, String.class)
+        );
+    }
+
+    public CompletableFuture&lt;String&gt; callBackgroundService(String data) {
+        return CompletableFuture.supplyAsync(() -&gt;
+            backgroundServiceClient.postForObject(&quot;/background&quot;, data, String.class)
+        );
+    }
+}
+</code></pre>
+<h3 id="2-database-connection-pool-bulkheads">2. Database Connection Pool Bulkheads</h3>
+<pre><code class="language-java">@Configuration
+public class DatabaseBulkheadConfiguration {
+
+    @Bean(&quot;primaryDataSource&quot;)
+    @ConfigurationProperties(&quot;app.datasource.primary&quot;)
+    public DataSource primaryDataSource() {
+        return createDataSource(&quot;primary-db&quot;, 30, 3);
+    }
+
+    @Bean(&quot;analyticsDataSource&quot;)
+    @ConfigurationProperties(&quot;app.datasource.analytics&quot;)
+    public DataSource analyticsDataSource() {
+        return createDataSource(&quot;analytics-db&quot;, 15, 1);
+    }
+
+    @Bean(&quot;reportingDataSource&quot;)
+    @ConfigurationProperties(&quot;app.datasource.reporting&quot;)
+    public DataSource reportingDataSource() {
+        return createDataSource(&quot;reporting-db&quot;, 10, 2);
+    }
+
+    private DataSource createDataSource(String poolName, 
+                                      int maxPoolSize, 
+                                      int minIdle) {
+        HikariConfig config = new HikariConfig();
+        config.setPoolName(poolName);
+        config.setMaximumPoolSize(maxPoolSize);
+        config.setMinimumIdle(minIdle);
+        config.setConnectionTimeout(30000);
+        config.setIdleTimeout(600000);
+        config.setMaxLifetime(1800000);
+
+        return new HikariDataSource(config);
+    }
+
+    @Bean(&quot;primaryJdbcTemplate&quot;)
+    public JdbcTemplate primaryJdbcTemplate(@Qualifier(&quot;primaryDataSource&quot;) DataSource dataSource) {
+        return new JdbcTemplate(dataSource);
+    }
+
+    @Bean(&quot;analyticsJdbcTemplate&quot;)
+    public JdbcTemplate analyticsJdbcTemplate(@Qualifier(&quot;analyticsDataSource&quot;) DataSource dataSource) {
+        return new JdbcTemplate(dataSource);
+    }
+}
+</code></pre>
+<h3 id="3-message-processing-thread-pool-isolation">3. Message Processing Thread Pool Isolation</h3>
+<pre><code class="language-java">@Configuration
+@EnableAsync
+public class MessageProcessingBulkheadConfiguration {
+
+    @Bean(&quot;criticalMessageExecutor&quot;)
+    public TaskExecutor criticalMessageExecutor() {
+        return createExecutor(&quot;critical-msg&quot;, 10, 20, 50);
+    }
+
+    @Bean(&quot;standardMessageExecutor&quot;)
+    public TaskExecutor standardMessageExecutor() {
+        return createExecutor(&quot;standard-msg&quot;, 5, 15, 100);
+    }
+
+    @Bean(&quot;bulkMessageExecutor&quot;)
+    public TaskExecutor bulkMessageExecutor() {
+        return createExecutor(&quot;bulk-msg&quot;, 3, 10, 500);
+    }
+
+    private TaskExecutor createExecutor(String threadNamePrefix,
+                                      int corePoolSize,
+                                      int maxPoolSize,
+                                      int queueCapacity) {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setThreadNamePrefix(threadNamePrefix + &quot;-&quot;);
+        executor.setCorePoolSize(corePoolSize);
+        executor.setMaxPoolSize(maxPoolSize);
+        executor.setQueueCapacity(queueCapacity);
+        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+        executor.initialize();
+        return executor;
+    }
+}
+
+@Service
+public class IsolatedMessageProcessor {
+
+    @Async(&quot;criticalMessageExecutor&quot;)
+    public CompletableFuture&lt;Void&gt; processCriticalMessage(CriticalMessage message) {
+        // High-priority message processing
+        return CompletableFuture.completedFuture(null);
+    }
+
+    @Async(&quot;standardMessageExecutor&quot;) 
+    public CompletableFuture&lt;Void&gt; processStandardMessage(StandardMessage message) {
+        // Normal message processing
+        return CompletableFuture.completedFuture(null);
+    }
+
+    @Async(&quot;bulkMessageExecutor&quot;)
+    public CompletableFuture&lt;Void&gt; processBulkMessage(List&lt;BulkMessage&gt; messages) {
+        // Bulk message processing
+        return CompletableFuture.completedFuture(null);
+    }
+}
+</code></pre>
+<h3 id="4-custom-resource-pool-bulkhead">4. Custom Resource Pool Bulkhead</h3>
+<pre><code class="language-java">@Component
+public class ExternalServiceBulkhead {
+    private final ResourcePoolManager poolManager;
+
+    public ExternalServiceBulkhead(BulkheadConfiguration config) {
+        this.poolManager = new ResourcePoolManager();
+
+        // Create isolated pools for different external services
+        createServicePool(&quot;service-a&quot;, config, this::createServiceAClient);
+        createServicePool(&quot;service-b&quot;, config, this::createServiceBClient);
+        createServicePool(&quot;analytics&quot;, config, this::createAnalyticsClient);
+    }
+
+    private void createServicePool(String serviceName,
+                                 BulkheadConfiguration config,
+                                 Supplier&lt;ExternalServiceClient&gt; clientFactory) {
+
+        ResourcePoolConfig poolConfig = config.createPoolConfig(serviceName);
+        poolManager.createPool(serviceName, poolConfig, clientFactory);
+    }
+
+    public &lt;T&gt; T executeWithServiceA(Function&lt;ExternalServiceClient, T&gt; operation) {
+        return executeWithService(&quot;service-a&quot;, operation);
+    }
+
+    public &lt;T&gt; T executeWithServiceB(Function&lt;ExternalServiceClient, T&gt; operation) {
+        return executeWithService(&quot;service-b&quot;, operation);
+    }
+
+    private &lt;T&gt; T executeWithService(String serviceName,
+                                   Function&lt;ExternalServiceClient, T&gt; operation) {
+
+        Optional&lt;ExternalServiceClient&gt; client = poolManager.acquireResource(
+            serviceName, 
+            Duration.ofSeconds(30)
+        );
+
+        if (client.isEmpty()) {
+            throw new ResourceAcquisitionException(
+                &quot;Failed to acquire client for service: &quot; + serviceName
+            );
+        }
+
+        try {
+            return operation.apply(client.get());
+        } finally {
+            poolManager.releaseResource(serviceName, client.get());
+        }
+    }
+}
+</code></pre>
+<h2 id="best-practices">Best Practices</h2>
+<h3 id="1-resource-pool-sizing">1. Resource Pool Sizing</h3>
+<pre><code class="language-java">public class BulkheadSizingCalculator {
+
+    public static PoolSizeRecommendation calculateOptimalPoolSize(
+            ServiceProfile serviceProfile) {
+
+        // Base calculation on service characteristics
+        double avgRequestsPerSecond = serviceProfile.getAverageRps();
+        Duration avgResponseTime = serviceProfile.getAverageResponseTime();
+
+        // Little's Law: L = λ * W (Average number in system = arrival rate * average time)
+        int basePoolSize = (int) Math.ceil(
+            avgRequestsPerSecond * avgResponseTime.toSeconds()
+        );
+
+        // Add safety margin for burst traffic (20-50%)
+        int minPoolSize = Math.max(2, basePoolSize / 2);
+        int maxPoolSize = (int) (basePoolSize * 1.5);
+
+        // Consider system constraints
+        int availableMemory = getAvailableMemoryMB();
+        int memoryBasedLimit = availableMemory / serviceProfile.getMemoryPerConnection();
+
+        maxPoolSize = Math.min(maxPoolSize, memoryBasedLimit);
+
+        return PoolSizeRecommendation.builder()
+            .serviceName(serviceProfile.getServiceName())
+            .minPoolSize(minPoolSize)
+            .maxPoolSize(maxPoolSize)
+            .recommendedInitialSize(basePoolSize)
+            .reasoning(generateSizingReasoning(serviceProfile, basePoolSize))
+            .build();
+    }
+}
+</code></pre>
+<h3 id="2-bulkhead-health-monitoring">2. Bulkhead Health Monitoring</h3>
+<pre><code class="language-java">@Component
+public class BulkheadHealthMonitor {
+    private final ResourcePoolManager poolManager;
+    private final AlertingService alertingService;
+    private final MeterRegistry meterRegistry;
+
+    @Scheduled(fixedRate = 60000) // Every minute
+    public void monitorBulkheadHealth() {
+        Map&lt;String, PoolStatistics&gt; stats = poolManager.getPoolStatistics();
+
+        for (Map.Entry&lt;String, PoolStatistics&gt; entry : stats.entrySet()) {
+            String poolName = entry.getKey();
+            PoolStatistics stat = entry.getValue();
+
+            recordPoolMetrics(poolName, stat);
+            checkPoolHealth(poolName, stat);
+        }
+    }
+
+    private void checkPoolHealth(String poolName, PoolStatistics stats) {
+        // Check pool utilization
+        double utilizationRatio = (double) stats.getActiveResources() / 
+                                 stats.getMaxPoolSize();
+
+        if (utilizationRatio &gt; 0.8) {
+            alertingService.sendAlert(
+                AlertLevel.WARNING,
+                &quot;High pool utilization&quot;,
+                String.format(&quot;Pool %s is %d%% utilized&quot;, poolName, 
+                            (int)(utilizationRatio * 100))
+            );
+        }
+
+        // Check acquisition failure rate
+        double failureRate = stats.getAcquisitionFailureRate();
+        if (failureRate &gt; 0.1) { // 10% failure rate
+            alertingService.sendAlert(
+                AlertLevel.HIGH,
+                &quot;High pool acquisition failures&quot;,
+                String.format(&quot;Pool %s has %.1f%% acquisition failure rate&quot;, 
+                            poolName, failureRate * 100)
+            );
+        }
+
+        // Check queue depth
+        int queueDepth = stats.getQueueDepth();
+        if (queueDepth &gt; stats.getMaxPoolSize()) {
+            alertingService.sendAlert(
+                AlertLevel.CRITICAL,
+                &quot;Pool queue backup&quot;,
+                String.format(&quot;Pool %s has %d requests queued&quot;, poolName, queueDepth)
+            );
+        }
+    }
+}
+</code></pre>
+<h3 id="3-dynamic-pool-scaling">3. Dynamic Pool Scaling</h3>
+<pre><code class="language-java">@Component
+public class DynamicBulkheadScaler {
+    private final ResourcePoolManager poolManager;
+
+    @EventListener
+    public void handleLoadIncrease(LoadIncreaseEvent event) {
+        String poolName = event.getPoolName();
+        double loadIncrease = event.getLoadMultiplier();
+
+        PoolStatistics stats = poolManager.getPoolStatistics().get(poolName);
+        if (stats != null) {
+            int currentMax = stats.getMaxPoolSize();
+            int newMax = (int) (currentMax * (1 + loadIncrease));
+
+            // Cap at system limits
+            newMax = Math.min(newMax, getSystemResourceLimit(poolName));
+
+            if (newMax &gt; currentMax) {
+                poolManager.updatePoolSize(poolName, newMax);
+                log.info(&quot;Scaled pool {} from {} to {} due to load increase&quot;, 
+                        poolName, currentMax, newMax);
+            }
+        }
+    }
+
+    @EventListener
+    public void handleLoadDecrease(LoadDecreaseEvent event) {
+        String poolName = event.getPoolName();
+
+        // Gradually scale down during low load periods
+        PoolStatistics stats = poolManager.getPoolStatistics().get(poolName);
+        if (stats != null &amp;&amp; stats.getUtilization() &lt; 0.3) { // Less than 30% utilized
+            int currentMax = stats.getMaxPoolSize();
+            int newMax = Math.max(stats.getMinPoolSize(), 
+                               (int)(currentMax * 0.8));
+
+            if (newMax &lt; currentMax) {
+                poolManager.updatePoolSize(poolName, newMax);
+                log.info(&quot;Scaled down pool {} from {} to {} due to low utilization&quot;, 
+                        poolName, currentMax, newMax);
+            }
+        }
+    }
+}
+</code></pre>
+<h2 id="common-pitfalls">Common Pitfalls</h2>
+<h3 id="1-over-partitioning">1. <strong>Over-Partitioning</strong></h3>
+<p><strong>Problem</strong>: Creating too many small bulkheads reduces overall resource efficiency<br />
+<strong>Solution</strong>: Balance isolation benefits with resource utilization efficiency</p>
+<h3 id="2-inadequate-pool-sizing">2. <strong>Inadequate Pool Sizing</strong></h3>
+<p><strong>Problem</strong>: Pools too small cause resource starvation; too large waste resources<br />
+<strong>Solution</strong>: Use empirical data and performance testing to determine optimal sizes</p>
+<h3 id="3-shared-dependency-bottlenecks">3. <strong>Shared Dependency Bottlenecks</strong></h3>
+<p><strong>Problem</strong>: Bulkheads share underlying dependencies that become bottlenecks<br />
+<strong>Solution</strong>: Identify and isolate shared resources like database connections</p>
+<h3 id="4-poor-failure-handling">4. <strong>Poor Failure Handling</strong></h3>
+<p><strong>Problem</strong>: Resource acquisition failures not handled gracefully<br />
+<strong>Solution</strong>: Implement fallback mechanisms and graceful degradation</p>
+<h3 id="5-missing-monitoring">5. <strong>Missing Monitoring</strong></h3>
+<p><strong>Problem</strong>: No visibility into bulkhead performance and resource utilization<br />
+<strong>Solution</strong>: Implement comprehensive monitoring and alerting for all resource pools</p>
+<h2 id="integration-in-distributed-systems">Integration in Distributed Systems</h2>
+<p>In distributed integration scenarios, Bulkhead Pattern provides:</p>
+<h3 id="service-client-isolation">Service Client Isolation</h3>
+<pre><code class="language-java">@Service
+public class IsolatedIntegrationService {
+
+    @BulkheadResource(pool = &quot;critical-service&quot;)
+    public ContactResponse updateCriticalData(ContactRequest request) {
+        return criticalServiceClient.updateContact(request);
+    }
+
+    @BulkheadResource(pool = &quot;background-service&quot;)
+    public void syncBackgroundData(SyncRequest request) {
+        backgroundServiceClient.synchronize(request);
+    }
+}
+</code></pre>
+<h3 id="database-access-isolation">Database Access Isolation</h3>
+<pre><code class="language-java">@Repository
+public class IsolatedContactRepository {
+
+    @BulkheadConnection(pool = &quot;primary-db&quot;)
+    public void saveContact(ContactData contact) {
+        primaryJdbcTemplate.update(&quot;INSERT INTO contacts ...&quot;, contact);
+    }
+
+    @BulkheadConnection(pool = &quot;analytics-db&quot;)
+    public void recordAnalytics(AnalyticsEvent event) {
+        analyticsJdbcTemplate.update(&quot;INSERT INTO analytics ...&quot;, event);
+    }
+}
+</code></pre>
+<h3 id="message-processing-isolation">Message Processing Isolation</h3>
+<pre><code class="language-java">@Component
+public class IsolatedMessageHandler {
+
+    @BulkheadExecution(pool = &quot;critical-messages&quot;)
+    @EventListener
+    public void handleCriticalMessage(CriticalContactEvent event) {
+        criticalContactService.processCriticalUpdate(event);
+    }
+
+    @BulkheadExecution(pool = &quot;batch-messages&quot;)
+    @EventListener
+    public void handleBatchMessage(BatchContactEvent event) {
+        batchContactService.processBatchUpdate(event);
+    }
+}
+</code></pre>
+<h2 id="conclusion">Conclusion</h2>
+<p>The Bulkhead pattern is essential for building resilient distributed systems that can maintain operation during partial failures and resource contention. It provides:</p>
+<ul>
+<li><strong>Fault Isolation</strong>: Contains failures within specific resource boundaries</li>
+<li><strong>Performance Predictability</strong>: Prevents resource contention between different operations</li>
+<li><strong>Resource Protection</strong>: Ensures critical operations have dedicated resources available</li>
+<li><strong>Independent Scaling</strong>: Allows different components to scale based on their specific needs</li>
+</ul>
+<p>When properly implemented with appropriate pool sizing, monitoring, and health checks, the Bulkhead pattern significantly improves system reliability and enables graceful degradation during stress conditions.</p>
+<h2 id="references">References</h2>
+<ul>
+<li><a href="https://pragprog.com/titles/mnee2/release-it-second-edition/">Release It! - Michael Nygard (Bulkhead Pattern)</a></li>
+<li><a href="https://docs.microsoft.com/en-us/azure/architecture/patterns/bulkhead">Azure Architecture Patterns - Bulkhead</a></li>
+<li><a href="https://resilience4j.readme.io/docs/bulkhead">Resilience4j Bulkhead Documentation</a></li>
+<li><a href="https://github.com/Netflix/Hystrix/wiki/How-it-Works#isolation">Netflix Hystrix Isolation Strategy</a></li>
+</ul>
+
+      <a href="../index.html" class="back-to-top">← Back to All Patterns</a>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <p>©2026 <a href="https://dataintegrationmastery.com/">Data Integration Mastery™</a> — All Rights Reserved</p>
+  </footer>
+</body>
+</html>

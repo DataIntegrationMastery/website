@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Mapper Pattern — Integration Architecture Patterns | Data Integration Mastery™</title>
+  <meta name="description" content="The Data Mapper pattern is a fundamental transformation pattern in enterprise integration architectures that provides sophisticated mapping and conversion ca...">
+  <meta name="keywords" content="data mapper pattern, integration pattern, data transformation patterns, integration architecture, EAI patterns, data integration">
+  <link rel="canonical" href="https://dataintegrationmastery.com/patterns/data-transformation-patterns/data-mapper.html">
+
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://dataintegrationmastery.com/patterns/data-transformation-patterns/data-mapper.html">
+  <meta property="og:title" content="Data Mapper Pattern — Integration Architecture Patterns">
+  <meta property="og:description" content="The Data Mapper pattern is a fundamental transformation pattern in enterprise integration architectures that provides sophisticated mapping and conversion ca...">
+  <meta property="og:image" content="https://dataintegrationmastery.com/assets/images/logo.png">
+  <meta property="og:site_name" content="Data Integration Mastery">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Data Mapper Pattern — Integration Architecture Patterns">
+  <meta name="twitter:description" content="The Data Mapper pattern is a fundamental transformation pattern in enterprise integration architectures that provides sophisticated mapping and conversion ca...">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/docs.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Data Mapper Pattern",
+    "description": "The Data Mapper pattern is a fundamental transformation pattern in enterprise integration architectures that provides sophisticated mapping and conversion ca...",
+    "url": "https://dataintegrationmastery.com/patterns/data-transformation-patterns/data-mapper.html",
+    "author": {
+      "@type": "Person",
+      "name": "Ari Vilkman",
+      "jobTitle": "Integration Architect"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Data Integration Mastery",
+      "url": "https://dataintegrationmastery.com"
+    },
+    "isPartOf": {
+      "@type": "CollectionPage",
+      "name": "Integration Architecture Patterns",
+      "url": "https://dataintegrationmastery.com/patterns/"
+    },
+    "about": {
+      "@type": "Thing",
+      "name": "Data Mapper Pattern"
+    },
+    "inLanguage": "en",
+    "isAccessibleForFree": true
+  }
+  </script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="https://dataintegrationmastery.com/" class="header-brand">
+        <img src="../../assets/images/dim-icon.png" alt="DIM" width="36" height="36">
+        <span class="header-title">Data Integration Mastery™</span>
+      </a>
+      <nav class="header-nav" aria-label="Main navigation">
+        <a href="https://dataintegrationmastery.com/">Home</a>
+        <a href="../index.html">All Patterns</a>
+        <a href="https://dataintegrationmastery.com/#free-course">Free Course</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="docs-layout">
+    <aside class="docs-sidebar" aria-label="Pattern categories">
+      <div class="sidebar-title">Pattern Categories</div>
+<div class="sidebar-section">
+  <a href="../index.html#resilience" class="sidebar-section-title">🛡️ Resilience Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../resilience-patterns/circuit-breaker.html">Circuit Breaker</a></li>
+    <li><a href="../resilience-patterns/retry-mechanism.html">Retry Mechanism</a></li>
+    <li><a href="../resilience-patterns/timeout.html">Timeout</a></li>
+    <li><a href="../resilience-patterns/dead-letter-queue.html">Dead Letter Queue</a></li>
+    <li><a href="../resilience-patterns/bulkhead.html">Bulkhead</a></li>
+    <li><a href="../resilience-patterns/fallback-graceful-degradation.html">Fallback / Graceful Degradation</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#messaging" class="sidebar-section-title">📨 Messaging Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../messaging-patterns/request-reply.html">Request-Reply</a></li>
+    <li><a href="../messaging-patterns/publish-subscribe.html">Publish-Subscribe</a></li>
+    <li><a href="../messaging-patterns/message-queue.html">Message Queue</a></li>
+    <li><a href="../messaging-patterns/event-streaming.html">Event Streaming</a></li>
+    <li><a href="../messaging-patterns/correlation-id.html">Correlation ID</a></li>
+    <li><a href="../messaging-patterns/message-routing.html">Message Routing</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#data-transformation" class="sidebar-section-title">🔄 Data Transformation Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="message-translator.html">Message Translator</a></li>
+    <li><a href="content-filter.html">Content Filter</a></li>
+    <li><a href="message-router.html">Message Router</a></li>
+    <li><a href="aggregator.html">Aggregator</a></li>
+    <li><a href="splitter.html">Splitter</a></li>
+    <li><a href="data-mapper.html" class="active">Data Mapper</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#routing" class="sidebar-section-title">🔀 Routing Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../routing-patterns/content-based-router.html">Content-Based Router</a></li>
+    <li><a href="../routing-patterns/recipient-list.html">Recipient List</a></li>
+    <li><a href="../routing-patterns/load-balancer.html">Load Balancer</a></li>
+    <li><a href="../routing-patterns/message-filter.html">Message Filter</a></li>
+    <li><a href="../routing-patterns/dynamic-router.html">Dynamic Router</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#security" class="sidebar-section-title">🔐 Security Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../security-patterns/authentication.html">Authentication</a></li>
+    <li><a href="../security-patterns/authorization.html">Authorization</a></li>
+    <li><a href="../security-patterns/encryption.html">Encryption</a></li>
+    <li><a href="../security-patterns/token-management.html">Token Management</a></li>
+    <li><a href="../security-patterns/api-security.html">API Security</a></li>
+    <li><a href="../security-patterns/secret-management.html">Secret Management</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#orchestration" class="sidebar-section-title">🎭 Orchestration Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../orchestration-patterns/saga-pattern.html">Saga Pattern</a></li>
+    <li><a href="../orchestration-patterns/process-manager.html">Process Manager</a></li>
+    <li><a href="../orchestration-patterns/workflow-engine.html">Workflow Engine</a></li>
+    <li><a href="../orchestration-patterns/choreography.html">Choreography</a></li>
+    <li><a href="../orchestration-patterns/compensation-transactions.html">Compensation Transactions</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#observability" class="sidebar-section-title">📊 Monitoring & Observability Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../monitoring-observability-patterns/distributed-tracing.html">Distributed Tracing</a></li>
+    <li><a href="../monitoring-observability-patterns/metrics-collection.html">Metrics Collection</a></li>
+    <li><a href="../monitoring-observability-patterns/health-checks.html">Health Checks</a></li>
+    <li><a href="../monitoring-observability-patterns/logging-strategies.html">Logging Strategies</a></li>
+    <li><a href="../monitoring-observability-patterns/performance-monitoring.html">Performance Monitoring</a></li>
+    <li><a href="../monitoring-observability-patterns/error-tracking.html">Error Tracking</a></li>
+  </ul>
+</div>
+
+    </aside>
+
+    <main id="main-content" class="docs-content">
+      <div class="breadcrumb">
+        <a href="https://dataintegrationmastery.com/">Home</a>
+        <span class="sep">›</span>
+        <a href="../index.html">Patterns</a>
+        <span class="sep">›</span>
+        <a href="../index.html#data-transformation">Data Transformation Patterns</a>
+        <span class="sep">›</span>
+        <strong>Data Mapper Pattern</strong>
+      </div>
+
+      <h1>Data Mapper Pattern</h1>
+
+      <h2 id="overview">Overview</h2>
+<p>The Data Mapper pattern is a fundamental transformation pattern in enterprise integration architectures that provides sophisticated mapping and conversion capabilities between different data formats, structures, and representations. Like a skilled translator who not only converts words but also adapts cultural context and meaning, the Data Mapper pattern transforms data while preserving semantic integrity and handling complex structural differences between source and target systems.</p>
+<h3 id="theoretical-foundation">Theoretical Foundation</h3>
+<p>The Data Mapper pattern is grounded in <strong>data transformation theory</strong> and <strong>semantic mapping principles</strong>, specifically addressing the challenge of <strong>structural and semantic impedance mismatch</strong> between different data representations in distributed systems. The pattern embodies the principle of <strong>"lossless transformation"</strong> - converting data between formats while preserving all essential information and maintaining data integrity throughout the transformation process.</p>
+<h3 id="core-principles">Core Principles</h3>
+<h4 id="1-bidirectional-data-transformation">1. <strong>Bidirectional Data Transformation</strong></h4>
+<p>The Data Mapper provides comprehensive transformation capabilities:
+- <strong>Format conversion</strong> - transforming between JSON, XML, CSV, binary formats, and custom protocols
+- <strong>Structural mapping</strong> - converting between different object hierarchies and data structures
+- <strong>Schema adaptation</strong> - adapting data to match target system schema requirements
+- <strong>Protocol mediation</strong> - bridging different communication protocols and data exchange patterns</p>
+<h4 id="2-semantic-preservation">2. <strong>Semantic Preservation</strong></h4>
+<p>During transformation, the pattern maintains data meaning and integrity:
+- <strong>Business rule enforcement</strong> - applying transformation rules that preserve business logic
+- <strong>Data validation</strong> - ensuring transformed data meets target system validation requirements
+- <strong>Semantic enrichment</strong> - adding contextual information during transformation
+- <strong>Constraint preservation</strong> - maintaining data constraints and relationships across transformations</p>
+<h4 id="3-complex-mapping-logic">3. <strong>Complex Mapping Logic</strong></h4>
+<p>The pattern supports sophisticated mapping scenarios:
+- <strong>One-to-many mapping</strong> - splitting single source fields into multiple target fields
+- <strong>Many-to-one mapping</strong> - combining multiple source fields into single target fields
+- <strong>Conditional mapping</strong> - applying different transformation logic based on data conditions
+- <strong>Computed fields</strong> - generating target fields through calculations or business logic</p>
+<h4 id="4-performance-and-scalability">4. <strong>Performance and Scalability</strong></h4>
+<p>The Data Mapper optimizes transformation performance:
+- <strong>Streaming transformation</strong> - processing large datasets without loading entirely into memory
+- <strong>Parallel mapping</strong> - concurrent transformation of independent data elements
+- <strong>Caching strategies</strong> - caching transformation rules and lookup data for better performance
+- <strong>Lazy evaluation</strong> - performing transformations only when data is actually needed</p>
+<h3 id="why-data-mappers-are-essential-in-integration-architecture">Why Data Mappers are Essential in Integration Architecture</h3>
+<h4 id="1-system-heterogeneity-management">1. <strong>System Heterogeneity Management</strong></h4>
+<p>In diverse technology environments, data mappers address:
+- <strong>Legacy system integration</strong> - bridging modern and legacy data formats
+- <strong>Multi-vendor environments</strong> - adapting between different vendor data standards
+- <strong>Technology evolution</strong> - supporting migration between different technology stacks
+- <strong>API versioning</strong> - maintaining compatibility across different API versions</p>
+<h4 id="2-enterprise-application-integration">2. <strong>Enterprise Application Integration</strong></h4>
+<p>For connecting enterprise systems:
+- <strong>ERP integration</strong> - mapping between different ERP system data models
+- <strong>CRM synchronization</strong> - transforming customer data between CRM and other systems
+- <strong>Financial system integration</strong> - converting financial data between accounting standards
+- <strong>Supply chain coordination</strong> - standardizing product and order data across partners</p>
+<h4 id="3-cloud-and-hybrid-architecture">3. <strong>Cloud and Hybrid Architecture</strong></h4>
+<p>In cloud integration scenarios:
+- <strong>Cloud migration</strong> - transforming on-premises data for cloud systems
+- <strong>Multi-cloud integration</strong> - standardizing data across different cloud providers
+- <strong>SaaS integration</strong> - adapting enterprise data for SaaS application consumption
+- <strong>Hybrid data flows</strong> - maintaining data consistency across hybrid environments</p>
+<h4 id="4-data-governance-and-compliance">4. <strong>Data Governance and Compliance</strong></h4>
+<p>For regulatory and governance requirements:
+- <strong>Data standardization</strong> - ensuring consistent data formats across the organization
+- <strong>Privacy protection</strong> - transforming data to comply with privacy regulations
+- <strong>Audit trail maintenance</strong> - preserving transformation history for compliance
+- <strong>Data quality improvement</strong> - cleansing and enriching data during transformation</p>
+<h3 id="benefits-in-integration-contexts">Benefits in Integration Contexts</h3>
+<h4 id="1-system-decoupling">1. <strong>System Decoupling</strong></h4>
+<ul>
+<li><strong>Format independence</strong> - systems don't need to understand each other's native formats</li>
+<li><strong>Schema evolution</strong> - changes in one system don't require changes in connected systems</li>
+<li><strong>Technology flexibility</strong> - easier adoption of new technologies without breaking existing integrations</li>
+<li><strong>Vendor independence</strong> - reduced lock-in to specific vendor data formats</li>
+</ul>
+<h4 id="2-data-quality-enhancement">2. <strong>Data Quality Enhancement</strong></h4>
+<ul>
+<li><strong>Data cleansing</strong> - removing inconsistencies and errors during transformation</li>
+<li><strong>Standardization</strong> - normalizing data to consistent formats and values</li>
+<li><strong>Validation</strong> - ensuring data quality through transformation-time validation</li>
+<li><strong>Enrichment</strong> - adding missing or derived data during transformation</li>
+</ul>
+<h4 id="3-business-agility">3. <strong>Business Agility</strong></h4>
+<ul>
+<li><strong>Rapid integration</strong> - faster connection of new systems through mapping configuration</li>
+<li><strong>Business rule externalization</strong> - business logic embedded in transformation rules</li>
+<li><strong>Dynamic adaptation</strong> - runtime modification of transformation rules</li>
+<li><strong>A/B testing support</strong> - different transformation strategies for different scenarios</li>
+</ul>
+<h4 id="4-operational-efficiency">4. <strong>Operational Efficiency</strong></h4>
+<ul>
+<li><strong>Automated transformation</strong> - reducing manual data conversion efforts</li>
+<li><strong>Error reduction</strong> - eliminating human errors in data transformation</li>
+<li><strong>Processing acceleration</strong> - optimized transformation performance</li>
+<li><strong>Resource optimization</strong> - efficient use of computational resources</li>
+</ul>
+<h3 id="integration-architecture-applications">Integration Architecture Applications</h3>
+<h4 id="1-enterprise-service-bus-esb">1. <strong>Enterprise Service Bus (ESB)</strong></h4>
+<p>Data Mappers in ESB environments provide:
+- <strong>Message transformation</strong> - converting messages between different service formats
+- <strong>Protocol adaptation</strong> - transforming data for different communication protocols
+- <strong>Content enrichment</strong> - adding metadata and context during transformation
+- <strong>Format standardization</strong> - ensuring consistent message formats across the bus</p>
+<h4 id="2-api-management-and-gateway">2. <strong>API Management and Gateway</strong></h4>
+<p>In API gateway implementations:
+- <strong>Request transformation</strong> - adapting incoming requests to backend service formats
+- <strong>Response transformation</strong> - converting backend responses to API specification formats
+- <strong>Version mediation</strong> - supporting multiple API versions through transformation
+- <strong>Client adaptation</strong> - customizing responses for different client types</p>
+<h4 id="3-data-integration-and-etl">3. <strong>Data Integration and ETL</strong></h4>
+<p>For data pipeline implementations:
+- <strong>Source system extraction</strong> - transforming data from various source formats
+- <strong>Data warehouse loading</strong> - converting operational data to analytical formats
+- <strong>Real-time streaming</strong> - transforming streaming data for real-time analytics
+- <strong>Master data management</strong> - standardizing data across multiple master data domains</p>
+<h4 id="4-event-driven-architecture">4. <strong>Event-Driven Architecture</strong></h4>
+<p>In event streaming systems:
+- <strong>Event transformation</strong> - converting events between different schemas
+- <strong>Event enrichment</strong> - adding contextual data to events during transformation
+- <strong>Event filtering</strong> - selecting and transforming relevant event data
+- <strong>Stream processing</strong> - transforming streaming data for downstream consumers</p>
+<h2 id="implementation-patterns">Implementation Patterns</h2>
+<h3 id="1-object-to-object-mapper">1. <strong>Object-to-Object Mapper</strong></h3>
+<pre><code class="language-java">// Direct object mapping with field transformation
+@Component
+public class CustomerDataMapper {
+
+    public TargetCustomer mapToTarget(SourceCustomer source) {
+        return TargetCustomer.builder()
+            .customerId(source.getId())
+            .fullName(combineNames(source.getFirstName(), source.getLastName()))
+            .emailAddress(normalizeEmail(source.getEmail()))
+            .phoneNumber(formatPhoneNumber(source.getPhone()))
+            .address(mapAddress(source.getAddress()))
+            .createdDate(source.getCreationTimestamp().toLocalDate())
+            .isActive(source.getStatus() == CustomerStatus.ACTIVE)
+            .customerType(mapCustomerType(source))
+            .build();
+    }
+
+    public SourceCustomer mapFromTarget(TargetCustomer target) {
+        String[] nameParts = splitFullName(target.getFullName());
+
+        return SourceCustomer.builder()
+            .id(target.getCustomerId())
+            .firstName(nameParts[0])
+            .lastName(nameParts[1])
+            .email(target.getEmailAddress())
+            .phone(target.getPhoneNumber())
+            .address(mapAddressReverse(target.getAddress()))
+            .creationTimestamp(target.getCreatedDate().atStartOfDay())
+            .status(target.isActive() ? CustomerStatus.ACTIVE : CustomerStatus.INACTIVE)
+            .build();
+    }
+
+    private String combineNames(String firstName, String lastName) {
+        return firstName + &quot; &quot; + lastName;
+    }
+
+    private String normalizeEmail(String email) {
+        return email != null ? email.toLowerCase().trim() : null;
+    }
+
+    private String formatPhoneNumber(String phone) {
+        if (phone == null) return null;
+        // Remove all non-digits and format as international number
+        String digits = phone.replaceAll(&quot;\\D&quot;, &quot;&quot;);
+        if (digits.startsWith(&quot;0&quot;)) {
+            digits = &quot;+358&quot; + digits.substring(1); // Finnish format
+        }
+        return digits;
+    }
+
+    private CustomerType mapCustomerType(SourceCustomer source) {
+        if (source.isPremium()) {
+            return CustomerType.PREMIUM;
+        } else if (source.getOrderCount() &gt; 10) {
+            return CustomerType.REGULAR;
+        }
+        return CustomerType.NEW;
+    }
+}
+</code></pre>
+<h3 id="2-configuration-driven-mapper">2. <strong>Configuration-Driven Mapper</strong></h3>
+<pre><code class="language-java">// Flexible mapping based on external configuration
+@Component
+public class ConfigurableDataMapper {
+
+    @Autowired
+    private MappingConfiguration mappingConfig;
+
+    @Autowired
+    private ExpressionEvaluator expressionEvaluator;
+
+    public Map&lt;String, Object&gt; transform(Map&lt;String, Object&gt; sourceData, String mappingName) {
+        Map&lt;String, Object&gt; targetData = new HashMap&lt;&gt;();
+        MappingRules rules = mappingConfig.getMappingRules(mappingName);
+
+        for (FieldMapping fieldMapping : rules.getFieldMappings()) {
+            Object value = extractValue(sourceData, fieldMapping);
+            Object transformedValue = applyTransformations(value, fieldMapping.getTransformations());
+
+            if (transformedValue != null || fieldMapping.isIncludeNulls()) {
+                setNestedValue(targetData, fieldMapping.getTargetField(), transformedValue);
+            }
+        }
+
+        return targetData;
+    }
+
+    private Object extractValue(Map&lt;String, Object&gt; sourceData, FieldMapping fieldMapping) {
+        if (fieldMapping.isExpression()) {
+            return expressionEvaluator.evaluate(fieldMapping.getSourceExpression(), sourceData);
+        } else {
+            return getNestedValue(sourceData, fieldMapping.getSourceField());
+        }
+    }
+
+    private Object applyTransformations(Object value, List&lt;Transformation&gt; transformations) {
+        Object result = value;
+
+        for (Transformation transformation : transformations) {
+            result = transformation.apply(result);
+        }
+
+        return result;
+    }
+
+    private Object getNestedValue(Map&lt;String, Object&gt; data, String path) {
+        String[] pathParts = path.split(&quot;\\.&quot;);
+        Object current = data;
+
+        for (String part : pathParts) {
+            if (current instanceof Map) {
+                current = ((Map&lt;?, ?&gt;) current).get(part);
+            } else {
+                return null;
+            }
+        }
+
+        return current;
+    }
+}
+
+// Configuration classes
+@Configuration
+@ConfigurationProperties(prefix = &quot;mapping&quot;)
+public class MappingConfiguration {
+    private Map&lt;String, MappingRules&gt; rules = new HashMap&lt;&gt;();
+
+    public MappingRules getMappingRules(String mappingName) {
+        return rules.get(mappingName);
+    }
+
+    // getters and setters
+}
+
+public class MappingRules {
+    private List&lt;FieldMapping&gt; fieldMappings;
+    private List&lt;ValidationRule&gt; validationRules;
+
+    // getters and setters
+}
+
+public class FieldMapping {
+    private String sourceField;
+    private String targetField;
+    private String sourceExpression;
+    private List&lt;Transformation&gt; transformations;
+    private boolean isExpression;
+    private boolean includeNulls;
+
+    // getters and setters
+}
+</code></pre>
+<h3 id="3-stream-processing-mapper">3. <strong>Stream Processing Mapper</strong></h3>
+<pre><code class="language-java">// High-performance streaming data transformation
+@Component
+public class StreamingDataMapper {
+
+    @Autowired
+    private TransformationEngine transformationEngine;
+
+    public Flux&lt;TransformedRecord&gt; transformStream(Flux&lt;SourceRecord&gt; sourceStream, 
+                                                   String transformationSpec) {
+        return sourceStream
+            .buffer(1000) // Process in batches for efficiency
+            .flatMap(batch -&gt; transformBatch(batch, transformationSpec))
+            .onErrorContinue((error, record) -&gt; {
+                log.error(&quot;Transformation error for record: {}&quot;, record, error);
+                // Send to error queue or dead letter topic
+            });
+    }
+
+    private Flux&lt;TransformedRecord&gt; transformBatch(List&lt;SourceRecord&gt; batch, 
+                                                   String transformationSpec) {
+        return Flux.fromIterable(batch)
+            .parallel()
+            .runOn(Schedulers.parallel())
+            .map(record -&gt; transformSingleRecord(record, transformationSpec))
+            .filter(Objects::nonNull)
+            .sequential();
+    }
+
+    private TransformedRecord transformSingleRecord(SourceRecord source, String transformationSpec) {
+        try {
+            return transformationEngine.transform(source, transformationSpec);
+        } catch (Exception e) {
+            log.warn(&quot;Failed to transform record: {}&quot;, source.getId(), e);
+            return null; // Will be filtered out
+        }
+    }
+}
+
+@Service
+public class TransformationEngine {
+
+    private final Map&lt;String, Transformer&gt; transformers = new HashMap&lt;&gt;();
+
+    @PostConstruct
+    public void initializeTransformers() {
+        transformers.put(&quot;customer&quot;, new CustomerTransformer());
+        transformers.put(&quot;order&quot;, new OrderTransformer());
+        transformers.put(&quot;product&quot;, new ProductTransformer());
+    }
+
+    public TransformedRecord transform(SourceRecord source, String transformationSpec) {
+        Transformer transformer = transformers.get(transformationSpec);
+        if (transformer == null) {
+            throw new IllegalArgumentException(&quot;Unknown transformation spec: &quot; + transformationSpec);
+        }
+
+        return transformer.transform(source);
+    }
+}
+</code></pre>
+<h3 id="4-multi-format-converter">4. <strong>Multi-Format Converter</strong></h3>
+<pre><code class="language-java">// Convert between different data formats (JSON, XML, CSV, etc.)
+@Component
+public class MultiFormatDataMapper {
+
+    @Autowired
+    private ObjectMapper jsonMapper;
+
+    @Autowired
+    private XmlMapper xmlMapper;
+
+    public String convertFormat(String inputData, DataFormat sourceFormat, 
+                               DataFormat targetFormat, String mappingSchema) throws Exception {
+
+        // Parse input data to intermediate representation
+        Object intermediateData = parseInput(inputData, sourceFormat);
+
+        // Apply transformation if mapping schema is provided
+        if (mappingSchema != null) {
+            intermediateData = applyMapping(intermediateData, mappingSchema);
+        }
+
+        // Convert to target format
+        return formatOutput(intermediateData, targetFormat);
+    }
+
+    private Object parseInput(String inputData, DataFormat sourceFormat) throws Exception {
+        return switch (sourceFormat) {
+            case JSON -&gt; jsonMapper.readValue(inputData, Object.class);
+            case XML -&gt; xmlMapper.readValue(inputData, Object.class);
+            case CSV -&gt; parseCSV(inputData);
+            case YAML -&gt; parseYAML(inputData);
+            default -&gt; throw new UnsupportedOperationException(&quot;Unsupported source format: &quot; + sourceFormat);
+        };
+    }
+
+    private String formatOutput(Object data, DataFormat targetFormat) throws Exception {
+        return switch (targetFormat) {
+            case JSON -&gt; jsonMapper.writeValueAsString(data);
+            case XML -&gt; xmlMapper.writeValueAsString(data);
+            case CSV -&gt; formatAsCSV(data);
+            case YAML -&gt; formatAsYAML(data);
+            default -&gt; throw new UnsupportedOperationException(&quot;Unsupported target format: &quot; + targetFormat);
+        };
+    }
+
+    private Object applyMapping(Object data, String mappingSchema) {
+        // Apply JSONPath or XPath transformations
+        // This could use a rule engine or transformation library
+        return data; // Simplified implementation
+    }
+
+    private List&lt;Map&lt;String, Object&gt;&gt; parseCSV(String csvData) {
+        List&lt;Map&lt;String, Object&gt;&gt; records = new ArrayList&lt;&gt;();
+        String[] lines = csvData.split(&quot;\n&quot;);
+
+        if (lines.length &lt; 2) return records;
+
+        String[] headers = lines[0].split(&quot;,&quot;);
+
+        for (int i = 1; i &lt; lines.length; i++) {
+            String[] values = lines[i].split(&quot;,&quot;);
+            Map&lt;String, Object&gt; record = new HashMap&lt;&gt;();
+
+            for (int j = 0; j &lt; headers.length &amp;&amp; j &lt; values.length; j++) {
+                record.put(headers[j].trim(), values[j].trim());
+            }
+
+            records.add(record);
+        }
+
+        return records;
+    }
+}
+
+public enum DataFormat {
+    JSON, XML, CSV, YAML, BINARY
+}
+</code></pre>
+<h2 id="apache-camel-implementation">Apache Camel Implementation</h2>
+<h3 id="1-simple-data-transformation-route">1. <strong>Simple Data Transformation Route</strong></h3>
+<pre><code class="language-java">@Component
+public class DataMappingRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from(&quot;direct:transformData&quot;)
+            .routeId(&quot;data-transformation&quot;)
+            .log(&quot;Starting data transformation: ${header.transformationType}&quot;)
+            .choice()
+                .when(header(&quot;transformationType&quot;).isEqualTo(&quot;CUSTOMER&quot;))
+                    .to(&quot;direct:transformCustomer&quot;)
+                .when(header(&quot;transformationType&quot;).isEqualTo(&quot;ORDER&quot;))
+                    .to(&quot;direct:transformOrder&quot;)
+                .when(header(&quot;transformationType&quot;).isEqualTo(&quot;PRODUCT&quot;))
+                    .to(&quot;direct:transformProduct&quot;)
+                .otherwise()
+                    .to(&quot;direct:genericTransform&quot;)
+            .end();
+
+        from(&quot;direct:transformCustomer&quot;)
+            .log(&quot;Transforming customer data&quot;)
+            .process(exchange -&gt; {
+                SourceCustomer source = exchange.getIn().getBody(SourceCustomer.class);
+                TargetCustomer target = mapCustomer(source);
+                exchange.getIn().setBody(target);
+            })
+            .marshal().json()
+            .to(&quot;direct:sendTransformed&quot;);
+    }
+
+    private TargetCustomer mapCustomer(SourceCustomer source) {
+        return TargetCustomer.builder()
+            .id(source.getCustomerId())
+            .name(source.getFirstName() + &quot; &quot; + source.getLastName())
+            .email(source.getEmailAddress())
+            .active(source.isEnabled())
+            .build();
+    }
+}
+</code></pre>
+<h3 id="2-json-to-xml-transformation">2. <strong>JSON to XML Transformation</strong></h3>
+<pre><code class="language-java">@Component
+public class JSONToXMLMappingRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from(&quot;direct:jsonToXml&quot;)
+            .routeId(&quot;json-to-xml-mapper&quot;)
+            .log(&quot;Converting JSON to XML&quot;)
+            .unmarshal().json()
+            .process(exchange -&gt; {
+                Map&lt;String, Object&gt; jsonData = exchange.getIn().getBody(Map.class);
+
+                // Apply business transformations
+                Map&lt;String, Object&gt; transformedData = applyBusinessRules(jsonData);
+
+                // Convert to XML-friendly structure
+                XMLData xmlData = createXMLStructure(transformedData);
+                exchange.getIn().setBody(xmlData);
+            })
+            .marshal().jaxb()
+            .log(&quot;XML transformation completed&quot;)
+            .to(&quot;direct:sendXMLData&quot;);
+    }
+
+    private Map&lt;String, Object&gt; applyBusinessRules(Map&lt;String, Object&gt; data) {
+        Map&lt;String, Object&gt; transformed = new HashMap&lt;&gt;(data);
+
+        // Apply date formatting
+        if (data.containsKey(&quot;timestamp&quot;)) {
+            String isoDate = formatDateForXML((String) data.get(&quot;timestamp&quot;));
+            transformed.put(&quot;formattedDate&quot;, isoDate);
+        }
+
+        // Normalize phone numbers
+        if (data.containsKey(&quot;phone&quot;)) {
+            String normalizedPhone = normalizePhoneNumber((String) data.get(&quot;phone&quot;));
+            transformed.put(&quot;phone&quot;, normalizedPhone);
+        }
+
+        return transformed;
+    }
+}
+</code></pre>
+<h3 id="3-database-result-set-mapping">3. <strong>Database Result Set Mapping</strong></h3>
+<pre><code class="language-java">@Component
+public class DatabaseMappingRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from(&quot;direct:mapDatabaseResults&quot;)
+            .routeId(&quot;database-result-mapper&quot;)
+            .log(&quot;Mapping database results&quot;)
+            .process(exchange -&gt; {
+                List&lt;Map&lt;String, Object&gt;&gt; dbResults = exchange.getIn().getBody(List.class);
+                List&lt;APIResponseDto&gt; apiResponses = new ArrayList&lt;&gt;();
+
+                for (Map&lt;String, Object&gt; row : dbResults) {
+                    APIResponseDto response = mapDatabaseRow(row);
+                    apiResponses.add(response);
+                }
+
+                exchange.getIn().setBody(apiResponses);
+            })
+            .marshal().json()
+            .to(&quot;direct:sendAPIResponse&quot;);
+    }
+
+    private APIResponseDto mapDatabaseRow(Map&lt;String, Object&gt; row) {
+        return APIResponseDto.builder()
+            .id((String) row.get(&quot;ID&quot;))
+            .name((String) row.get(&quot;FULL_NAME&quot;))
+            .email((String) row.get(&quot;EMAIL_ADDRESS&quot;))
+            .createdAt(formatTimestamp((Timestamp) row.get(&quot;CREATED_DATE&quot;)))
+            .status(mapStatus((String) row.get(&quot;STATUS_CODE&quot;)))
+            .build();
+    }
+
+    private String mapStatus(String statusCode) {
+        return switch (statusCode) {
+            case &quot;A&quot; -&gt; &quot;ACTIVE&quot;;
+            case &quot;I&quot; -&gt; &quot;INACTIVE&quot;;
+            case &quot;P&quot; -&gt; &quot;PENDING&quot;;
+            default -&gt; &quot;UNKNOWN&quot;;
+        };
+    }
+}
+</code></pre>
+<h3 id="4-dynamic-field-mapping-route">4. <strong>Dynamic Field Mapping Route</strong></h3>
+<pre><code class="language-java">@Component
+public class DynamicMappingRoute extends RouteBuilder {
+
+    @Autowired
+    private FieldMappingService fieldMappingService;
+
+    @Override
+    public void configure() throws Exception {
+        from(&quot;direct:dynamicMapping&quot;)
+            .routeId(&quot;dynamic-field-mapper&quot;)
+            .log(&quot;Applying dynamic field mapping&quot;)
+            .process(exchange -&gt; {
+                Map&lt;String, Object&gt; sourceData = exchange.getIn().getBody(Map.class);
+                String mappingProfile = exchange.getIn().getHeader(&quot;mappingProfile&quot;, String.class);
+
+                Map&lt;String, Object&gt; targetData = applyDynamicMapping(sourceData, mappingProfile);
+                exchange.getIn().setBody(targetData);
+            })
+            .choice()
+                .when(header(&quot;outputFormat&quot;).isEqualTo(&quot;JSON&quot;))
+                    .marshal().json()
+                .when(header(&quot;outputFormat&quot;).isEqualTo(&quot;XML&quot;))
+                    .marshal().jaxb()
+                .otherwise()
+                    .log(&quot;Using default output format&quot;)
+            .end()
+            .to(&quot;direct:sendMappedData&quot;);
+    }
+
+    private Map&lt;String, Object&gt; applyDynamicMapping(Map&lt;String, Object&gt; sourceData, 
+                                                    String mappingProfile) {
+
+        Map&lt;String, Object&gt; targetData = new HashMap&lt;&gt;();
+        MappingConfiguration config = fieldMappingService.getMappingConfiguration(mappingProfile);
+
+        for (FieldMapping mapping : config.getFieldMappings()) {
+            Object sourceValue = extractSourceValue(sourceData, mapping.getSourcePath());
+            Object transformedValue = applyFieldTransformations(sourceValue, mapping.getTransformations());
+
+            if (transformedValue != null) {
+                setTargetValue(targetData, mapping.getTargetPath(), transformedValue);
+            }
+        }
+
+        return targetData;
+    }
+
+    private Object extractSourceValue(Map&lt;String, Object&gt; data, String path) {
+        String[] pathSegments = path.split(&quot;\\.&quot;);
+        Object current = data;
+
+        for (String segment : pathSegments) {
+            if (current instanceof Map) {
+                current = ((Map&lt;?, ?&gt;) current).get(segment);
+            } else {
+                return null;
+            }
+        }
+
+        return current;
+    }
+}
+</code></pre>
+<h3 id="5-batch-file-processing-with-mapping">5. <strong>Batch File Processing with Mapping</strong></h3>
+<pre><code class="language-java">@Component
+public class BatchFileMappingRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from(&quot;file:input?include=*.csv&quot;)
+            .routeId(&quot;batch-file-mapper&quot;)
+            .log(&quot;Processing batch file: ${header.CamelFileName}&quot;)
+            .process(exchange -&gt; {
+                String fileName = exchange.getIn().getHeader(&quot;CamelFileName&quot;, String.class);
+                String mappingType = determineMappingType(fileName);
+                exchange.getIn().setHeader(&quot;mappingType&quot;, mappingType);
+            })
+            .split(body().tokenize(&quot;\n&quot;))
+                .skipFirst(1) // Skip header
+                .streaming()
+                .process(exchange -&gt; {
+                    String csvLine = exchange.getIn().getBody(String.class);
+                    String mappingType = exchange.getIn().getHeader(&quot;mappingType&quot;, String.class);
+
+                    Map&lt;String, Object&gt; record = parseCSVLine(csvLine);
+                    Map&lt;String, Object&gt; mappedRecord = applyRecordMapping(record, mappingType);
+
+                    exchange.getIn().setBody(mappedRecord);
+                })
+                .marshal().json()
+                .to(&quot;direct:sendBatchRecord&quot;)
+            .end()
+            .log(&quot;Batch file processing completed: ${header.CamelFileName}&quot;);
+    }
+
+    private String determineMappingType(String fileName) {
+        if (fileName.startsWith(&quot;customer_&quot;)) {
+            return &quot;CUSTOMER_IMPORT&quot;;
+        } else if (fileName.startsWith(&quot;order_&quot;)) {
+            return &quot;ORDER_IMPORT&quot;;
+        }
+        return &quot;GENERIC_IMPORT&quot;;
+    }
+
+    private Map&lt;String, Object&gt; parseCSVLine(String csvLine) {
+        String[] fields = csvLine.split(&quot;,&quot;);
+        Map&lt;String, Object&gt; record = new HashMap&lt;&gt;();
+
+        // Basic CSV parsing - in real implementation, use proper CSV library
+        for (int i = 0; i &lt; fields.length; i++) {
+            record.put(&quot;field_&quot; + i, fields[i].trim());
+        }
+
+        return record;
+    }
+
+    private Map&lt;String, Object&gt; applyRecordMapping(Map&lt;String, Object&gt; record, String mappingType) {
+        // Apply mapping based on type
+        return switch (mappingType) {
+            case &quot;CUSTOMER_IMPORT&quot; -&gt; mapCustomerRecord(record);
+            case &quot;ORDER_IMPORT&quot; -&gt; mapOrderRecord(record);
+            default -&gt; record;
+        };
+    }
+}
+</code></pre>
+<h2 id="best-practices">Best Practices</h2>
+<h3 id="1-mapping-design-and-maintainability">1. <strong>Mapping Design and Maintainability</strong></h3>
+<ul>
+<li>Keep mapping logic externalized and configurable when possible</li>
+<li>Use declarative mapping approaches for simple transformations</li>
+<li>Implement mapping validation and testing frameworks</li>
+<li>Document mapping rules and business logic clearly</li>
+<li>Version mapping configurations for change management</li>
+</ul>
+<h3 id="2-performance-optimization">2. <strong>Performance Optimization</strong></h3>
+<ul>
+<li>Use streaming approaches for large data transformations</li>
+<li>Implement caching for frequently used mapping rules and lookup data</li>
+<li>Consider parallel processing for independent data elements</li>
+<li>Optimize memory usage by avoiding unnecessary object creation</li>
+<li>Monitor transformation performance and identify bottlenecks</li>
+</ul>
+<h3 id="3-error-handling-and-data-quality">3. <strong>Error Handling and Data Quality</strong></h3>
+<ul>
+<li>Implement comprehensive validation during transformation</li>
+<li>Provide meaningful error messages for transformation failures</li>
+<li>Use dead letter queues for data that cannot be transformed</li>
+<li>Maintain audit trails of transformation operations</li>
+<li>Implement data quality checks and reporting</li>
+</ul>
+<h3 id="4-flexibility-and-extensibility">4. <strong>Flexibility and Extensibility</strong></h3>
+<ul>
+<li>Design mapping frameworks that support runtime configuration changes</li>
+<li>Implement plugin architectures for custom transformation logic</li>
+<li>Support conditional and context-aware transformations</li>
+<li>Provide mapping testing and simulation capabilities</li>
+<li>Enable mapping rule composition and reuse</li>
+</ul>
+<h3 id="5-security-and-compliance">5. <strong>Security and Compliance</strong></h3>
+<ul>
+<li>Implement secure handling of sensitive data during transformation</li>
+<li>Provide data masking and anonymization capabilities</li>
+<li>Maintain compliance with data protection regulations</li>
+<li>Audit transformation operations for security compliance</li>
+<li>Encrypt sensitive transformation configurations</li>
+</ul>
+<p>The Data Mapper pattern is essential for building robust, flexible integration solutions that can handle the complexity of data transformation in heterogeneous enterprise environments while maintaining data integrity and supporting business requirements.</p>
+
+      <a href="../index.html" class="back-to-top">← Back to All Patterns</a>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <p>©2026 <a href="https://dataintegrationmastery.com/">Data Integration Mastery™</a> — All Rights Reserved</p>
+  </footer>
+</body>
+</html>

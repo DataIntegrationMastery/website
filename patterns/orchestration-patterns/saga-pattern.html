@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Saga Pattern — Integration Architecture Patterns | Data Integration Mastery™</title>
+  <meta name="description" content="The Saga pattern is a sophisticated distributed transaction management mechanism in enterprise integration architectures that coordinates long-running busine...">
+  <meta name="keywords" content="saga pattern, integration pattern, orchestration patterns, integration architecture, EAI patterns, data integration">
+  <link rel="canonical" href="https://dataintegrationmastery.com/patterns/orchestration-patterns/saga-pattern.html">
+
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://dataintegrationmastery.com/patterns/orchestration-patterns/saga-pattern.html">
+  <meta property="og:title" content="Saga Pattern — Integration Architecture Patterns">
+  <meta property="og:description" content="The Saga pattern is a sophisticated distributed transaction management mechanism in enterprise integration architectures that coordinates long-running busine...">
+  <meta property="og:image" content="https://dataintegrationmastery.com/assets/images/logo.png">
+  <meta property="og:site_name" content="Data Integration Mastery">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Saga Pattern — Integration Architecture Patterns">
+  <meta name="twitter:description" content="The Saga pattern is a sophisticated distributed transaction management mechanism in enterprise integration architectures that coordinates long-running busine...">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/docs.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Saga Pattern",
+    "description": "The Saga pattern is a sophisticated distributed transaction management mechanism in enterprise integration architectures that coordinates long-running busine...",
+    "url": "https://dataintegrationmastery.com/patterns/orchestration-patterns/saga-pattern.html",
+    "author": {
+      "@type": "Person",
+      "name": "Ari Vilkman",
+      "jobTitle": "Integration Architect"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Data Integration Mastery",
+      "url": "https://dataintegrationmastery.com"
+    },
+    "isPartOf": {
+      "@type": "CollectionPage",
+      "name": "Integration Architecture Patterns",
+      "url": "https://dataintegrationmastery.com/patterns/"
+    },
+    "about": {
+      "@type": "Thing",
+      "name": "Saga Pattern"
+    },
+    "inLanguage": "en",
+    "isAccessibleForFree": true
+  }
+  </script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="https://dataintegrationmastery.com/" class="header-brand">
+        <img src="../../assets/images/dim-icon.png" alt="DIM" width="36" height="36">
+        <span class="header-title">Data Integration Mastery™</span>
+      </a>
+      <nav class="header-nav" aria-label="Main navigation">
+        <a href="https://dataintegrationmastery.com/">Home</a>
+        <a href="../index.html">All Patterns</a>
+        <a href="https://dataintegrationmastery.com/#free-course">Free Course</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="docs-layout">
+    <aside class="docs-sidebar" aria-label="Pattern categories">
+      <div class="sidebar-title">Pattern Categories</div>
+<div class="sidebar-section">
+  <a href="../index.html#resilience" class="sidebar-section-title">🛡️ Resilience Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../resilience-patterns/circuit-breaker.html">Circuit Breaker</a></li>
+    <li><a href="../resilience-patterns/retry-mechanism.html">Retry Mechanism</a></li>
+    <li><a href="../resilience-patterns/timeout.html">Timeout</a></li>
+    <li><a href="../resilience-patterns/dead-letter-queue.html">Dead Letter Queue</a></li>
+    <li><a href="../resilience-patterns/bulkhead.html">Bulkhead</a></li>
+    <li><a href="../resilience-patterns/fallback-graceful-degradation.html">Fallback / Graceful Degradation</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#messaging" class="sidebar-section-title">📨 Messaging Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../messaging-patterns/request-reply.html">Request-Reply</a></li>
+    <li><a href="../messaging-patterns/publish-subscribe.html">Publish-Subscribe</a></li>
+    <li><a href="../messaging-patterns/message-queue.html">Message Queue</a></li>
+    <li><a href="../messaging-patterns/event-streaming.html">Event Streaming</a></li>
+    <li><a href="../messaging-patterns/correlation-id.html">Correlation ID</a></li>
+    <li><a href="../messaging-patterns/message-routing.html">Message Routing</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#data-transformation" class="sidebar-section-title">🔄 Data Transformation Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../data-transformation-patterns/message-translator.html">Message Translator</a></li>
+    <li><a href="../data-transformation-patterns/content-filter.html">Content Filter</a></li>
+    <li><a href="../data-transformation-patterns/message-router.html">Message Router</a></li>
+    <li><a href="../data-transformation-patterns/aggregator.html">Aggregator</a></li>
+    <li><a href="../data-transformation-patterns/splitter.html">Splitter</a></li>
+    <li><a href="../data-transformation-patterns/data-mapper.html">Data Mapper</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#routing" class="sidebar-section-title">🔀 Routing Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../routing-patterns/content-based-router.html">Content-Based Router</a></li>
+    <li><a href="../routing-patterns/recipient-list.html">Recipient List</a></li>
+    <li><a href="../routing-patterns/load-balancer.html">Load Balancer</a></li>
+    <li><a href="../routing-patterns/message-filter.html">Message Filter</a></li>
+    <li><a href="../routing-patterns/dynamic-router.html">Dynamic Router</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#security" class="sidebar-section-title">🔐 Security Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../security-patterns/authentication.html">Authentication</a></li>
+    <li><a href="../security-patterns/authorization.html">Authorization</a></li>
+    <li><a href="../security-patterns/encryption.html">Encryption</a></li>
+    <li><a href="../security-patterns/token-management.html">Token Management</a></li>
+    <li><a href="../security-patterns/api-security.html">API Security</a></li>
+    <li><a href="../security-patterns/secret-management.html">Secret Management</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#orchestration" class="sidebar-section-title">🎭 Orchestration Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="saga-pattern.html" class="active">Saga Pattern</a></li>
+    <li><a href="process-manager.html">Process Manager</a></li>
+    <li><a href="workflow-engine.html">Workflow Engine</a></li>
+    <li><a href="choreography.html">Choreography</a></li>
+    <li><a href="compensation-transactions.html">Compensation Transactions</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#observability" class="sidebar-section-title">📊 Monitoring & Observability Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../monitoring-observability-patterns/distributed-tracing.html">Distributed Tracing</a></li>
+    <li><a href="../monitoring-observability-patterns/metrics-collection.html">Metrics Collection</a></li>
+    <li><a href="../monitoring-observability-patterns/health-checks.html">Health Checks</a></li>
+    <li><a href="../monitoring-observability-patterns/logging-strategies.html">Logging Strategies</a></li>
+    <li><a href="../monitoring-observability-patterns/performance-monitoring.html">Performance Monitoring</a></li>
+    <li><a href="../monitoring-observability-patterns/error-tracking.html">Error Tracking</a></li>
+  </ul>
+</div>
+
+    </aside>
+
+    <main id="main-content" class="docs-content">
+      <div class="breadcrumb">
+        <a href="https://dataintegrationmastery.com/">Home</a>
+        <span class="sep">›</span>
+        <a href="../index.html">Patterns</a>
+        <span class="sep">›</span>
+        <a href="../index.html#orchestration">Orchestration Patterns</a>
+        <span class="sep">›</span>
+        <strong>Saga Pattern</strong>
+      </div>
+
+      <h1>Saga Pattern</h1>
+
+      <h2 id="overview">Overview</h2>
+<p>The Saga pattern is a sophisticated distributed transaction management mechanism in enterprise integration architectures that coordinates long-running business processes across multiple services by breaking them into a sequence of local transactions. Like a carefully choreographed performance where each act must complete successfully for the story to progress, or where compensating actions must undo previous acts if something goes wrong, the Saga pattern ensures data consistency in distributed systems without requiring traditional ACID transactions. This pattern is essential for managing complex business workflows that span multiple services, databases, and external systems while maintaining system reliability and business process integrity.</p>
+<h3 id="theoretical-foundation">Theoretical Foundation</h3>
+<p>The Saga pattern is grounded in <strong>distributed systems theory</strong> and <strong>transaction processing principles</strong>, specifically addressing the challenges of <strong>maintaining consistency</strong> and <strong>managing failures</strong> in loosely coupled, distributed environments. The pattern incorporates concepts from <strong>compensating transactions</strong>, <strong>eventual consistency</strong>, <strong>workflow management</strong>, and <strong>fault tolerance</strong> to provide a robust framework for handling long-running business processes that cannot be managed by traditional two-phase commit protocols due to their distributed nature and extended duration.</p>
+<h3 id="core-principles">Core Principles</h3>
+<h4 id="1-transaction-decomposition">1. <strong>Transaction Decomposition</strong></h4>
+<p>Breaking complex transactions into manageable, atomic units:
+- <strong>Local transactions</strong> - each service manages its own data using local ACID transactions
+- <strong>Sequential execution</strong> - transactions execute in a predetermined order with clear dependencies
+- <strong>Compensating actions</strong> - each transaction has a corresponding compensation operation for rollback
+- <strong>Idempotency</strong> - transactions and compensations can be safely retried without side effects</p>
+<h4 id="2-coordination-strategies">2. <strong>Coordination Strategies</strong></h4>
+<p>Two primary approaches for managing saga execution:
+- <strong>Choreography-based sagas</strong> - services coordinate directly with each other through events
+- <strong>Orchestration-based sagas</strong> - a central coordinator manages the saga execution flow
+- <strong>Hybrid approaches</strong> - combining choreography and orchestration for optimal flexibility
+- <strong>State management</strong> - tracking saga progress and handling intermediate states</p>
+<h4 id="3-failure-handling">3. <strong>Failure Handling</strong></h4>
+<p>Comprehensive strategies for dealing with failures and inconsistencies:
+- <strong>Forward recovery</strong> - attempting to complete the saga despite failures
+- <strong>Backward recovery</strong> - compensating completed transactions to restore consistency
+- <strong>Semantic rollback</strong> - using business logic to undo the effects of completed transactions
+- <strong>Partial compensation</strong> - handling scenarios where some compensations may also fail</p>
+<h4 id="4-consistency-models">4. <strong>Consistency Models</strong></h4>
+<p>Understanding the consistency guarantees provided by sagas:
+- <strong>Eventual consistency</strong> - the system will reach a consistent state eventually
+- <strong>Compensating consistency</strong> - using compensation to maintain business invariants
+- <strong>Semantic atomicity</strong> - maintaining business-level atomicity without technical atomicity
+- <strong>Isolation relaxation</strong> - accepting intermediate states visible to other transactions</p>
+<h3 id="why-saga-pattern-is-essential-in-integration-architecture">Why Saga Pattern is Essential in Integration Architecture</h3>
+<h4 id="1-distributed-transaction-management">1. <strong>Distributed Transaction Management</strong></h4>
+<p>In microservices and distributed architectures, the Saga pattern provides:
+- <strong>Cross-service transactions</strong> - coordinating transactions across multiple independent services
+- <strong>Long-running processes</strong> - managing business workflows that may take hours, days, or weeks
+- <strong>System decoupling</strong> - avoiding tight coupling between services through asynchronous coordination
+- <strong>Scalability support</strong> - enabling horizontal scaling without distributed locking mechanisms</p>
+<h4 id="2-business-process-automation">2. <strong>Business Process Automation</strong></h4>
+<p>For complex business workflows:
+- <strong>Order processing</strong> - managing multi-step order fulfillment across inventory, payment, and shipping
+- <strong>Account opening</strong> - coordinating identity verification, credit checks, and account creation
+- <strong>Insurance claims</strong> - handling complex approval workflows with multiple stakeholders
+- <strong>Supply chain management</strong> - orchestrating procurement, manufacturing, and distribution processes</p>
+<h4 id="3-system-resilience">3. <strong>System Resilience</strong></h4>
+<p>Enhancing system reliability and fault tolerance:
+- <strong>Failure isolation</strong> - limiting the impact of failures to specific transaction steps
+- <strong>Recovery mechanisms</strong> - providing clear paths for both forward and backward recovery
+- <strong>Partial success handling</strong> - managing scenarios where some operations succeed while others fail
+- <strong>Graceful degradation</strong> - maintaining system functionality despite component failures</p>
+<h4 id="4-integration-flexibility">4. <strong>Integration Flexibility</strong></h4>
+<p>Supporting various integration scenarios:
+- <strong>Legacy system integration</strong> - coordinating with systems that don't support modern transaction protocols
+- <strong>External service coordination</strong> - managing interactions with third-party services and APIs
+- <strong>Multi-cloud orchestration</strong> - coordinating processes across multiple cloud providers
+- <strong>Hybrid environment support</strong> - managing workflows that span on-premises and cloud systems</p>
+<h3 id="benefits-in-integration-contexts">Benefits in Integration Contexts</h3>
+<h4 id="1-technical-advantages">1. <strong>Technical Advantages</strong></h4>
+<ul>
+<li><strong>No distributed locking</strong> - avoiding performance bottlenecks and deadlock scenarios</li>
+<li><strong>Loose coupling</strong> - services remain independent and can evolve separately</li>
+<li><strong>Fault tolerance</strong> - system continues operating despite individual service failures</li>
+<li><strong>Scalability</strong> - supporting high-throughput scenarios through asynchronous processing</li>
+</ul>
+<h4 id="2-business-value">2. <strong>Business Value</strong></h4>
+<ul>
+<li><strong>Process visibility</strong> - providing clear tracking and monitoring of business workflows</li>
+<li><strong>Compliance support</strong> - maintaining audit trails and supporting regulatory requirements</li>
+<li><strong>Business agility</strong> - enabling rapid changes to business processes without system redesign</li>
+<li><strong>Customer experience</strong> - ensuring reliable completion of customer-initiated processes</li>
+</ul>
+<h4 id="3-operational-excellence">3. <strong>Operational Excellence</strong></h4>
+<ul>
+<li><strong>Monitoring and observability</strong> - clear visibility into transaction progress and health</li>
+<li><strong>Error handling</strong> - systematic approaches to handling and recovering from failures</li>
+<li><strong>Testing capabilities</strong> - ability to test complex scenarios including failure conditions</li>
+<li><strong>Maintenance support</strong> - clear separation of concerns for easier system maintenance</li>
+</ul>
+<h4 id="4-integration-enablement">4. <strong>Integration Enablement</strong></h4>
+<ul>
+<li><strong>Service orchestration</strong> - coordinating complex multi-service workflows</li>
+<li><strong>Event-driven architecture</strong> - supporting reactive, event-based system designs</li>
+<li><strong>API composition</strong> - combining multiple API calls into cohesive business operations</li>
+<li><strong>Data consistency</strong> - maintaining consistency across distributed data stores</li>
+</ul>
+<h3 id="integration-architecture-applications">Integration Architecture Applications</h3>
+<h4 id="1-e-commerce-and-retail">1. <strong>E-commerce and Retail</strong></h4>
+<p>Saga applications in retail scenarios:
+- <strong>Order processing sagas</strong> - coordinating inventory reservation, payment processing, and fulfillment
+- <strong>Return and refund sagas</strong> - managing complex return workflows with inventory, payment, and customer service
+- <strong>Promotion and pricing sagas</strong> - updating prices and promotions across multiple channels and systems
+- <strong>Customer onboarding sagas</strong> - coordinating account creation, verification, and initial setup</p>
+<h4 id="2-financial-services">2. <strong>Financial Services</strong></h4>
+<p>In banking and financial applications:
+- <strong>Loan origination sagas</strong> - managing application processing, credit checks, approval, and account setup
+- <strong>Payment processing sagas</strong> - coordinating complex payment workflows with multiple parties
+- <strong>Account transfer sagas</strong> - handling money transfers with fraud detection and compliance checks
+- <strong>Trading settlement sagas</strong> - managing multi-step securities trading and settlement processes</p>
+<h4 id="3-healthcare-and-insurance">3. <strong>Healthcare and Insurance</strong></h4>
+<p>For healthcare workflow management:
+- <strong>Patient admission sagas</strong> - coordinating registration, insurance verification, and care planning
+- <strong>Claims processing sagas</strong> - managing insurance claim workflows with multiple approval stages
+- <strong>Prescription fulfillment sagas</strong> - coordinating doctor orders, pharmacy fulfillment, and insurance processing
+- <strong>Treatment plan sagas</strong> - orchestrating complex, multi-provider treatment workflows</p>
+<h4 id="4-supply-chain-and-manufacturing">4. <strong>Supply Chain and Manufacturing</strong></h4>
+<p>In operational workflows:
+- <strong>Procurement sagas</strong> - managing purchase orders, supplier coordination, and delivery tracking
+- <strong>Manufacturing sagas</strong> - coordinating production planning, resource allocation, and quality control
+- <strong>Shipping and logistics sagas</strong> - managing complex shipping workflows with multiple carriers and tracking
+- <strong>Vendor onboarding sagas</strong> - coordinating supplier qualification, contract negotiation, and system setup</p>
+<h2 id="implementation-patterns">Implementation Patterns</h2>
+<h3 id="1-orchestration-based-saga-implementation">1. <strong>Orchestration-Based Saga Implementation</strong></h3>
+<pre><code class="language-java">// Central saga coordinator that manages the entire workflow
+@Service
+public class OrderProcessingSagaOrchestrator {
+
+    @Autowired
+    private InventoryService inventoryService;
+
+    @Autowired
+    private PaymentService paymentService;
+
+    @Autowired
+    private ShippingService shippingService;
+
+    @Autowired
+    private SagaStateRepository sagaStateRepository;
+
+    public void processOrder(OrderSagaRequest request) {
+        String sagaId = UUID.randomUUID().toString();
+
+        SagaState sagaState = SagaState.builder()
+            .sagaId(sagaId)
+            .orderId(request.getOrderId())
+            .currentStep(SagaStep.INVENTORY_RESERVATION)
+            .status(SagaStatus.IN_PROGRESS)
+            .startTime(Instant.now())
+            .context(request.toMap())
+            .build();
+
+        sagaStateRepository.save(sagaState);
+
+        try {
+            executeOrderSaga(sagaState);
+        } catch (Exception e) {
+            log.error(&quot;Saga execution failed: {}&quot;, sagaId, e);
+            compensateOrderSaga(sagaState);
+        }
+    }
+
+    private void executeOrderSaga(SagaState sagaState) {
+        Map&lt;String, Object&gt; context = sagaState.getContext();
+
+        switch (sagaState.getCurrentStep()) {
+            case INVENTORY_RESERVATION:
+                executeInventoryReservation(sagaState, context);
+                break;
+            case PAYMENT_PROCESSING:
+                executePaymentProcessing(sagaState, context);
+                break;
+            case SHIPPING_ARRANGEMENT:
+                executeShippingArrangement(sagaState, context);
+                break;
+            case ORDER_COMPLETION:
+                completeOrderSaga(sagaState);
+                break;
+        }
+    }
+
+    private void executeInventoryReservation(SagaState sagaState, Map&lt;String, Object&gt; context) {
+        try {
+            String orderId = (String) context.get(&quot;orderId&quot;);
+            List&lt;OrderItem&gt; items = (List&lt;OrderItem&gt;) context.get(&quot;items&quot;);
+
+            InventoryReservationResult result = inventoryService.reserveInventory(orderId, items);
+
+            if (result.isSuccess()) {
+                // Store reservation details for potential compensation
+                context.put(&quot;inventoryReservationId&quot;, result.getReservationId());
+                context.put(&quot;reservedItems&quot;, result.getReservedItems());
+
+                // Move to next step
+                sagaState.setCurrentStep(SagaStep.PAYMENT_PROCESSING);
+                sagaStateRepository.save(sagaState);
+
+                // Continue with payment processing
+                executePaymentProcessing(sagaState, context);
+            } else {
+                throw new SagaExecutionException(&quot;Inventory reservation failed: &quot; + result.getErrorMessage());
+            }
+
+        } catch (Exception e) {
+            sagaState.setStatus(SagaStatus.COMPENSATION_REQUIRED);
+            sagaStateRepository.save(sagaState);
+            throw new SagaExecutionException(&quot;Inventory reservation step failed&quot;, e);
+        }
+    }
+
+    private void executePaymentProcessing(SagaState sagaState, Map&lt;String, Object&gt; context) {
+        try {
+            String orderId = (String) context.get(&quot;orderId&quot;);
+            PaymentInfo paymentInfo = (PaymentInfo) context.get(&quot;paymentInfo&quot;);
+            BigDecimal amount = (BigDecimal) context.get(&quot;totalAmount&quot;);
+
+            PaymentResult result = paymentService.processPayment(orderId, paymentInfo, amount);
+
+            if (result.isSuccess()) {
+                // Store payment details for potential compensation
+                context.put(&quot;paymentTransactionId&quot;, result.getTransactionId());
+                context.put(&quot;paymentAmount&quot;, amount);
+
+                // Move to next step
+                sagaState.setCurrentStep(SagaStep.SHIPPING_ARRANGEMENT);
+                sagaStateRepository.save(sagaState);
+
+                // Continue with shipping
+                executeShippingArrangement(sagaState, context);
+            } else {
+                throw new SagaExecutionException(&quot;Payment processing failed: &quot; + result.getErrorMessage());
+            }
+
+        } catch (Exception e) {
+            sagaState.setStatus(SagaStatus.COMPENSATION_REQUIRED);
+            sagaStateRepository.save(sagaState);
+            throw new SagaExecutionException(&quot;Payment processing step failed&quot;, e);
+        }
+    }
+
+    private void executeShippingArrangement(SagaState sagaState, Map&lt;String, Object&gt; context) {
+        try {
+            String orderId = (String) context.get(&quot;orderId&quot;);
+            Address shippingAddress = (Address) context.get(&quot;shippingAddress&quot;);
+            List&lt;OrderItem&gt; items = (List&lt;OrderItem&gt;) context.get(&quot;reservedItems&quot;);
+
+            ShippingResult result = shippingService.arrangeShipping(orderId, shippingAddress, items);
+
+            if (result.isSuccess()) {
+                // Store shipping details
+                context.put(&quot;shippingTrackingNumber&quot;, result.getTrackingNumber());
+                context.put(&quot;estimatedDelivery&quot;, result.getEstimatedDelivery());
+
+                // Move to completion
+                sagaState.setCurrentStep(SagaStep.ORDER_COMPLETION);
+                sagaStateRepository.save(sagaState);
+
+                completeOrderSaga(sagaState);
+            } else {
+                throw new SagaExecutionException(&quot;Shipping arrangement failed: &quot; + result.getErrorMessage());
+            }
+
+        } catch (Exception e) {
+            sagaState.setStatus(SagaStatus.COMPENSATION_REQUIRED);
+            sagaStateRepository.save(sagaState);
+            throw new SagaExecutionException(&quot;Shipping arrangement step failed&quot;, e);
+        }
+    }
+
+    private void completeOrderSaga(SagaState sagaState) {
+        sagaState.setStatus(SagaStatus.COMPLETED);
+        sagaState.setEndTime(Instant.now());
+        sagaStateRepository.save(sagaState);
+
+        // Publish order completion event
+        orderEventPublisher.publishOrderCompleted(sagaState.getOrderId());
+
+        log.info(&quot;Order saga completed successfully: {}&quot;, sagaState.getSagaId());
+    }
+
+    private void compensateOrderSaga(SagaState sagaState) {
+        log.warn(&quot;Starting compensation for saga: {}&quot;, sagaState.getSagaId());
+
+        Map&lt;String, Object&gt; context = sagaState.getContext();
+
+        // Compensate in reverse order
+        switch (sagaState.getCurrentStep()) {
+            case SHIPPING_ARRANGEMENT:
+                compensateShipping(context);
+                // Fall through to compensate payment
+            case PAYMENT_PROCESSING:
+                compensatePayment(context);
+                // Fall through to compensate inventory
+            case INVENTORY_RESERVATION:
+                compensateInventory(context);
+                break;
+        }
+
+        sagaState.setStatus(SagaStatus.COMPENSATED);
+        sagaState.setEndTime(Instant.now());
+        sagaStateRepository.save(sagaState);
+
+        // Publish order failed event
+        orderEventPublisher.publishOrderFailed(sagaState.getOrderId());
+
+        log.info(&quot;Order saga compensated: {}&quot;, sagaState.getSagaId());
+    }
+
+    private void compensateInventory(Map&lt;String, Object&gt; context) {
+        try {
+            String reservationId = (String) context.get(&quot;inventoryReservationId&quot;);
+            if (reservationId != null) {
+                inventoryService.cancelReservation(reservationId);
+                log.info(&quot;Inventory reservation compensated: {}&quot;, reservationId);
+            }
+        } catch (Exception e) {
+            log.error(&quot;Failed to compensate inventory reservation&quot;, e);
+            // In real implementation, this would trigger manual intervention or retry
+        }
+    }
+
+    private void compensatePayment(Map&lt;String, Object&gt; context) {
+        try {
+            String transactionId = (String) context.get(&quot;paymentTransactionId&quot;);
+            BigDecimal amount = (BigDecimal) context.get(&quot;paymentAmount&quot;);
+
+            if (transactionId != null) {
+                paymentService.refundPayment(transactionId, amount);
+                log.info(&quot;Payment compensated: {}&quot;, transactionId);
+            }
+        } catch (Exception e) {
+            log.error(&quot;Failed to compensate payment&quot;, e);
+            // This might require manual intervention or alternative compensation
+        }
+    }
+
+    private void compensateShipping(Map&lt;String, Object&gt; context) {
+        try {
+            String trackingNumber = (String) context.get(&quot;shippingTrackingNumber&quot;);
+            if (trackingNumber != null) {
+                shippingService.cancelShipment(trackingNumber);
+                log.info(&quot;Shipping compensated: {}&quot;, trackingNumber);
+            }
+        } catch (Exception e) {
+            log.error(&quot;Failed to compensate shipping&quot;, e);
+        }
+    }
+}
+
+@Entity
+public class SagaState {
+    @Id
+    private String sagaId;
+    private String orderId;
+
+    @Enumerated(EnumType.STRING)
+    private SagaStep currentStep;
+
+    @Enumerated(EnumType.STRING)
+    private SagaStatus status;
+
+    private Instant startTime;
+    private Instant endTime;
+
+    @ElementCollection
+    @MapKeyColumn(name = &quot;context_key&quot;)
+    @Column(name = &quot;context_value&quot;, columnDefinition = &quot;TEXT&quot;)
+    private Map&lt;String, Object&gt; context = new HashMap&lt;&gt;();
+
+    // Getters, setters, and builder
+}
+
+public enum SagaStep {
+    INVENTORY_RESERVATION,
+    PAYMENT_PROCESSING,
+    SHIPPING_ARRANGEMENT,
+    ORDER_COMPLETION
+}
+
+public enum SagaStatus {
+    IN_PROGRESS,
+    COMPLETED,
+    COMPENSATION_REQUIRED,
+    COMPENSATED,
+    FAILED
+}
+</code></pre>
+<h3 id="2-choreography-based-saga-implementation">2. <strong>Choreography-Based Saga Implementation</strong></h3>
+<pre><code class="language-java">// Event-driven saga where services coordinate through events
+@Service
+public class OrderProcessingChoreographySaga {
+
+    @Autowired
+    private DomainEventPublisher eventPublisher;
+
+    @Autowired
+    private SagaStateRepository sagaStateRepository;
+
+    @EventHandler
+    public void handleOrderCreated(OrderCreatedEvent event) {
+        String sagaId = UUID.randomUUID().toString();
+
+        SagaState sagaState = SagaState.builder()
+            .sagaId(sagaId)
+            .orderId(event.getOrderId())
+            .status(SagaStatus.IN_PROGRESS)
+            .startTime(Instant.now())
+            .build();
+
+        sagaStateRepository.save(sagaState);
+
+        // Publish event to start inventory reservation
+        eventPublisher.publish(InventoryReservationRequested.builder()
+            .sagaId(sagaId)
+            .orderId(event.getOrderId())
+            .items(event.getItems())
+            .build());
+    }
+
+    @EventHandler
+    public void handleInventoryReserved(InventoryReservedEvent event) {
+        SagaState sagaState = sagaStateRepository.findBySagaId(event.getSagaId());
+
+        if (sagaState != null &amp;&amp; sagaState.getStatus() == SagaStatus.IN_PROGRESS) {
+            // Store reservation details
+            sagaState.getContext().put(&quot;inventoryReservationId&quot;, event.getReservationId());
+            sagaStateRepository.save(sagaState);
+
+            // Publish payment processing request
+            eventPublisher.publish(PaymentProcessingRequested.builder()
+                .sagaId(event.getSagaId())
+                .orderId(sagaState.getOrderId())
+                .amount(event.getTotalAmount())
+                .paymentInfo(event.getPaymentInfo())
+                .build());
+        }
+    }
+
+    @EventHandler
+    public void handlePaymentProcessed(PaymentProcessedEvent event) {
+        SagaState sagaState = sagaStateRepository.findBySagaId(event.getSagaId());
+
+        if (sagaState != null &amp;&amp; sagaState.getStatus() == SagaStatus.IN_PROGRESS) {
+            // Store payment details
+            sagaState.getContext().put(&quot;paymentTransactionId&quot;, event.getTransactionId());
+            sagaStateRepository.save(sagaState);
+
+            // Publish shipping arrangement request
+            eventPublisher.publish(ShippingArrangementRequested.builder()
+                .sagaId(event.getSagaId())
+                .orderId(sagaState.getOrderId())
+                .shippingAddress(event.getShippingAddress())
+                .items(event.getItems())
+                .build());
+        }
+    }
+
+    @EventHandler
+    public void handleShippingArranged(ShippingArrangedEvent event) {
+        SagaState sagaState = sagaStateRepository.findBySagaId(event.getSagaId());
+
+        if (sagaState != null &amp;&amp; sagaState.getStatus() == SagaStatus.IN_PROGRESS) {
+            // Complete the saga
+            sagaState.setStatus(SagaStatus.COMPLETED);
+            sagaState.setEndTime(Instant.now());
+            sagaState.getContext().put(&quot;trackingNumber&quot;, event.getTrackingNumber());
+            sagaStateRepository.save(sagaState);
+
+            // Publish order completion event
+            eventPublisher.publish(OrderCompletedEvent.builder()
+                .sagaId(event.getSagaId())
+                .orderId(sagaState.getOrderId())
+                .trackingNumber(event.getTrackingNumber())
+                .build());
+        }
+    }
+
+    // Compensation event handlers
+    @EventHandler
+    public void handleInventoryReservationFailed(InventoryReservationFailedEvent event) {
+        compensateOrderSaga(event.getSagaId(), &quot;Inventory reservation failed&quot;);
+    }
+
+    @EventHandler
+    public void handlePaymentProcessingFailed(PaymentProcessingFailedEvent event) {
+        SagaState sagaState = sagaStateRepository.findBySagaId(event.getSagaId());
+
+        // Compensate inventory reservation
+        String reservationId = (String) sagaState.getContext().get(&quot;inventoryReservationId&quot;);
+        if (reservationId != null) {
+            eventPublisher.publish(InventoryReservationCancellationRequested.builder()
+                .reservationId(reservationId)
+                .reason(&quot;Payment processing failed&quot;)
+                .build());
+        }
+
+        compensateOrderSaga(event.getSagaId(), &quot;Payment processing failed&quot;);
+    }
+
+    @EventHandler
+    public void handleShippingArrangementFailed(ShippingArrangementFailedEvent event) {
+        SagaState sagaState = sagaStateRepository.findBySagaId(event.getSagaId());
+
+        // Compensate payment
+        String transactionId = (String) sagaState.getContext().get(&quot;paymentTransactionId&quot;);
+        if (transactionId != null) {
+            eventPublisher.publish(PaymentRefundRequested.builder()
+                .transactionId(transactionId)
+                .reason(&quot;Shipping arrangement failed&quot;)
+                .build());
+        }
+
+        // Compensate inventory
+        String reservationId = (String) sagaState.getContext().get(&quot;inventoryReservationId&quot;);
+        if (reservationId != null) {
+            eventPublisher.publish(InventoryReservationCancellationRequested.builder()
+                .reservationId(reservationId)
+                .reason(&quot;Shipping arrangement failed&quot;)
+                .build());
+        }
+
+        compensateOrderSaga(event.getSagaId(), &quot;Shipping arrangement failed&quot;);
+    }
+
+    private void compensateOrderSaga(String sagaId, String reason) {
+        SagaState sagaState = sagaStateRepository.findBySagaId(sagaId);
+
+        if (sagaState != null) {
+            sagaState.setStatus(SagaStatus.COMPENSATED);
+            sagaState.setEndTime(Instant.now());
+            sagaState.getContext().put(&quot;compensationReason&quot;, reason);
+            sagaStateRepository.save(sagaState);
+
+            eventPublisher.publish(OrderFailedEvent.builder()
+                .sagaId(sagaId)
+                .orderId(sagaState.getOrderId())
+                .reason(reason)
+                .build());
+        }
+    }
+}
+</code></pre>
+<h3 id="3-saga-state-machine-implementation">3. <strong>Saga State Machine Implementation</strong></h3>
+<pre><code class="language-java">// State machine-based saga implementation for complex workflows
+@Component
+public class OrderSagaStateMachine {
+
+    @Autowired
+    private StateMachineFactory&lt;SagaState, SagaEvent&gt; stateMachineFactory;
+
+    @Autowired
+    private SagaStateRepository sagaStateRepository;
+
+    public void startSaga(OrderCreatedEvent orderEvent) {
+        StateMachine&lt;SagaState, SagaEvent&gt; stateMachine = stateMachineFactory.getStateMachine();
+
+        // Configure saga context
+        SagaContext context = SagaContext.builder()
+            .orderId(orderEvent.getOrderId())
+            .items(orderEvent.getItems())
+            .paymentInfo(orderEvent.getPaymentInfo())
+            .shippingAddress(orderEvent.getShippingAddress())
+            .build();
+
+        stateMachine.getExtendedState().getVariables().put(&quot;sagaContext&quot;, context);
+
+        // Start the state machine
+        stateMachine.start();
+        stateMachine.sendEvent(SagaEvent.START_SAGA);
+    }
+
+    @Configuration
+    @EnableStateMachine
+    public static class SagaStateMachineConfig extends StateMachineConfigurerAdapter&lt;SagaState, SagaEvent&gt; {
+
+        @Override
+        public void configure(StateMachineStateConfigurer&lt;SagaState, SagaEvent&gt; states) throws Exception {
+            states
+                .withStates()
+                    .initial(SagaState.INITIAL)
+                    .state(SagaState.RESERVING_INVENTORY)
+                    .state(SagaState.PROCESSING_PAYMENT)
+                    .state(SagaState.ARRANGING_SHIPPING)
+                    .state(SagaState.COMPLETED)
+                    .state(SagaState.COMPENSATING)
+                    .end(SagaState.COMPENSATED);
+        }
+
+        @Override
+        public void configure(StateMachineTransitionConfigurer&lt;SagaState, SagaEvent&gt; transitions) throws Exception {
+            transitions
+                .withExternal()
+                    .source(SagaState.INITIAL).target(SagaState.RESERVING_INVENTORY)
+                    .event(SagaEvent.START_SAGA)
+                    .action(reserveInventoryAction())
+                .and()
+                .withExternal()
+                    .source(SagaState.RESERVING_INVENTORY).target(SagaState.PROCESSING_PAYMENT)
+                    .event(SagaEvent.INVENTORY_RESERVED)
+                    .action(processPaymentAction())
+                .and()
+                .withExternal()
+                    .source(SagaState.PROCESSING_PAYMENT).target(SagaState.ARRANGING_SHIPPING)
+                    .event(SagaEvent.PAYMENT_PROCESSED)
+                    .action(arrangeShippingAction())
+                .and()
+                .withExternal()
+                    .source(SagaState.ARRANGING_SHIPPING).target(SagaState.COMPLETED)
+                    .event(SagaEvent.SHIPPING_ARRANGED)
+                    .action(completeSagaAction())
+                .and()
+                // Compensation transitions
+                .withExternal()
+                    .source(SagaState.RESERVING_INVENTORY).target(SagaState.COMPENSATED)
+                    .event(SagaEvent.INVENTORY_RESERVATION_FAILED)
+                .and()
+                .withExternal()
+                    .source(SagaState.PROCESSING_PAYMENT).target(SagaState.COMPENSATING)
+                    .event(SagaEvent.PAYMENT_PROCESSING_FAILED)
+                    .action(compensateInventoryAction())
+                .and()
+                .withExternal()
+                    .source(SagaState.ARRANGING_SHIPPING).target(SagaState.COMPENSATING)
+                    .event(SagaEvent.SHIPPING_ARRANGEMENT_FAILED)
+                    .action(compensatePaymentAndInventoryAction());
+        }
+
+        @Bean
+        public Action&lt;SagaState, SagaEvent&gt; reserveInventoryAction() {
+            return context -&gt; {
+                SagaContext sagaContext = context.getExtendedState().get(&quot;sagaContext&quot;, SagaContext.class);
+
+                try {
+                    InventoryReservationResult result = inventoryService.reserveInventory(
+                        sagaContext.getOrderId(), 
+                        sagaContext.getItems()
+                    );
+
+                    if (result.isSuccess()) {
+                        sagaContext.setInventoryReservationId(result.getReservationId());
+                        context.getStateMachine().sendEvent(SagaEvent.INVENTORY_RESERVED);
+                    } else {
+                        context.getStateMachine().sendEvent(SagaEvent.INVENTORY_RESERVATION_FAILED);
+                    }
+
+                } catch (Exception e) {
+                    log.error(&quot;Inventory reservation failed&quot;, e);
+                    context.getStateMachine().sendEvent(SagaEvent.INVENTORY_RESERVATION_FAILED);
+                }
+            };
+        }
+
+        @Bean
+        public Action&lt;SagaState, SagaEvent&gt; processPaymentAction() {
+            return context -&gt; {
+                SagaContext sagaContext = context.getExtendedState().get(&quot;sagaContext&quot;, SagaContext.class);
+
+                try {
+                    PaymentResult result = paymentService.processPayment(
+                        sagaContext.getOrderId(),
+                        sagaContext.getPaymentInfo(),
+                        sagaContext.getTotalAmount()
+                    );
+
+                    if (result.isSuccess()) {
+                        sagaContext.setPaymentTransactionId(result.getTransactionId());
+                        context.getStateMachine().sendEvent(SagaEvent.PAYMENT_PROCESSED);
+                    } else {
+                        context.getStateMachine().sendEvent(SagaEvent.PAYMENT_PROCESSING_FAILED);
+                    }
+
+                } catch (Exception e) {
+                    log.error(&quot;Payment processing failed&quot;, e);
+                    context.getStateMachine().sendEvent(SagaEvent.PAYMENT_PROCESSING_FAILED);
+                }
+            };
+        }
+    }
+}
+
+public enum SagaEvent {
+    START_SAGA,
+    INVENTORY_RESERVED,
+    INVENTORY_RESERVATION_FAILED,
+    PAYMENT_PROCESSED,
+    PAYMENT_PROCESSING_FAILED,
+    SHIPPING_ARRANGED,
+    SHIPPING_ARRANGEMENT_FAILED,
+    COMPENSATION_COMPLETED
+}
+</code></pre>
+<h3 id="4-distributed-saga-coordination">4. <strong>Distributed Saga Coordination</strong></h3>
+<pre><code class="language-java">// Distributed saga implementation using message queues for coordination
+@Service
+public class DistributedSagaCoordinator {
+
+    @Autowired
+    private MessageQueueService messageQueueService;
+
+    @Autowired
+    private SagaDefinitionRepository sagaDefinitionRepository;
+
+    @Autowired
+    private SagaInstanceRepository sagaInstanceRepository;
+
+    public String startSaga(String sagaDefinitionId, Map&lt;String, Object&gt; initialContext) {
+        SagaDefinition definition = sagaDefinitionRepository.findById(sagaDefinitionId)
+            .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Saga definition not found: &quot; + sagaDefinitionId));
+
+        String sagaInstanceId = UUID.randomUUID().toString();
+
+        SagaInstance instance = SagaInstance.builder()
+            .instanceId(sagaInstanceId)
+            .definitionId(sagaDefinitionId)
+            .status(SagaInstanceStatus.ACTIVE)
+            .currentStepIndex(0)
+            .context(new HashMap&lt;&gt;(initialContext))
+            .startTime(Instant.now())
+            .build();
+
+        sagaInstanceRepository.save(instance);
+
+        // Start execution with first step
+        executeSagaStep(instance, definition);
+
+        return sagaInstanceId;
+    }
+
+    private void executeSagaStep(SagaInstance instance, SagaDefinition definition) {
+        if (instance.getCurrentStepIndex() &gt;= definition.getSteps().size()) {
+            // Saga completed successfully
+            completeSaga(instance);
+            return;
+        }
+
+        SagaStep step = definition.getSteps().get(instance.getCurrentStepIndex());
+
+        try {
+            // Send message to execute step
+            SagaStepExecutionMessage message = SagaStepExecutionMessage.builder()
+                .sagaInstanceId(instance.getInstanceId())
+                .stepId(step.getStepId())
+                .serviceEndpoint(step.getServiceEndpoint())
+                .operation(step.getOperation())
+                .inputData(prepareStepInput(step, instance.getContext()))
+                .compensationData(prepareCompensationData(step, instance.getContext()))
+                .build();
+
+            messageQueueService.sendMessage(step.getServiceQueue(), message);
+
+            // Update instance status
+            instance.setStatus(SagaInstanceStatus.WAITING_FOR_RESPONSE);
+            sagaInstanceRepository.save(instance);
+
+        } catch (Exception e) {
+            log.error(&quot;Failed to execute saga step: {}&quot;, step.getStepId(), e);
+            startCompensation(instance, definition);
+        }
+    }
+
+    @MessageListener(queues = &quot;saga-step-response&quot;)
+    public void handleSagaStepResponse(SagaStepResponseMessage response) {
+        SagaInstance instance = sagaInstanceRepository.findByInstanceId(response.getSagaInstanceId());
+        SagaDefinition definition = sagaDefinitionRepository.findById(instance.getDefinitionId()).orElseThrow();
+
+        if (response.isSuccess()) {
+            // Update context with step results
+            instance.getContext().putAll(response.getOutputData());
+
+            // Move to next step
+            instance.setCurrentStepIndex(instance.getCurrentStepIndex() + 1);
+            instance.setStatus(SagaInstanceStatus.ACTIVE);
+            sagaInstanceRepository.save(instance);
+
+            // Continue execution
+            executeSagaStep(instance, definition);
+
+        } else {
+            // Step failed, start compensation
+            log.warn(&quot;Saga step failed: {} - {}&quot;, response.getStepId(), response.getErrorMessage());
+            startCompensation(instance, definition);
+        }
+    }
+
+    private void startCompensation(SagaInstance instance, SagaDefinition definition) {
+        instance.setStatus(SagaInstanceStatus.COMPENSATING);
+        sagaInstanceRepository.save(instance);
+
+        // Compensate completed steps in reverse order
+        int currentStep = instance.getCurrentStepIndex() - 1; // Last completed step
+
+        compensateSagaStep(instance, definition, currentStep);
+    }
+
+    private void compensateSagaStep(SagaInstance instance, SagaDefinition definition, int stepIndex) {
+        if (stepIndex &lt; 0) {
+            // All compensations completed
+            instance.setStatus(SagaInstanceStatus.COMPENSATED);
+            instance.setEndTime(Instant.now());
+            sagaInstanceRepository.save(instance);
+
+            publishSagaCompensated(instance);
+            return;
+        }
+
+        SagaStep step = definition.getSteps().get(stepIndex);
+
+        if (step.getCompensationOperation() != null) {
+            try {
+                SagaStepCompensationMessage message = SagaStepCompensationMessage.builder()
+                    .sagaInstanceId(instance.getInstanceId())
+                    .stepId(step.getStepId())
+                    .compensationOperation(step.getCompensationOperation())
+                    .compensationData(instance.getContext())
+                    .build();
+
+                messageQueueService.sendMessage(step.getServiceQueue(), message);
+
+            } catch (Exception e) {
+                log.error(&quot;Failed to send compensation message for step: {}&quot;, step.getStepId(), e);
+                // Continue with next compensation
+                compensateSagaStep(instance, definition, stepIndex - 1);
+            }
+        } else {
+            // No compensation needed, move to previous step
+            compensateSagaStep(instance, definition, stepIndex - 1);
+        }
+    }
+
+    @MessageListener(queues = &quot;saga-compensation-response&quot;)
+    public void handleSagaCompensationResponse(SagaCompensationResponseMessage response) {
+        SagaInstance instance = sagaInstanceRepository.findByInstanceId(response.getSagaInstanceId());
+        SagaDefinition definition = sagaDefinitionRepository.findById(instance.getDefinitionId()).orElseThrow();
+
+        if (!response.isSuccess()) {
+            log.error(&quot;Compensation failed for step: {} - {}&quot;, 
+                response.getStepId(), response.getErrorMessage());
+            // In real implementation, this might trigger manual intervention
+        }
+
+        // Find current step being compensated
+        int currentStepIndex = definition.getSteps().stream()
+            .mapToInt(step -&gt; step.getStepId().equals(response.getStepId()) ? 
+                definition.getSteps().indexOf(step) : -1)
+            .filter(index -&gt; index &gt;= 0)
+            .findFirst()
+            .orElse(-1);
+
+        // Continue with previous step compensation
+        compensateSagaStep(instance, definition, currentStepIndex - 1);
+    }
+}
+
+@Entity
+public class SagaDefinition {
+    @Id
+    private String definitionId;
+    private String name;
+    private String description;
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OrderBy(&quot;stepOrder&quot;)
+    private List&lt;SagaStep&gt; steps = new ArrayList&lt;&gt;();
+
+    // Getters and setters
+}
+
+@Entity
+public class SagaStep {
+    @Id
+    private String stepId;
+    private String serviceEndpoint;
+    private String serviceQueue;
+    private String operation;
+    private String compensationOperation;
+    private int stepOrder;
+    private Map&lt;String, Object&gt; stepConfiguration = new HashMap&lt;&gt;();
+
+    // Getters and setters
+}
+
+@Entity
+public class SagaInstance {
+    @Id
+    private String instanceId;
+    private String definitionId;
+
+    @Enumerated(EnumType.STRING)
+    private SagaInstanceStatus status;
+
+    private int currentStepIndex;
+    private Instant startTime;
+    private Instant endTime;
+
+    @ElementCollection
+    private Map&lt;String, Object&gt; context = new HashMap&lt;&gt;();
+
+    // Getters and setters
+}
+
+public enum SagaInstanceStatus {
+    ACTIVE,
+    WAITING_FOR_RESPONSE,
+    COMPLETED,
+    COMPENSATING,
+    COMPENSATED,
+    FAILED
+}
+</code></pre>
+<h2 id="apache-camel-implementation">Apache Camel Implementation</h2>
+<h3 id="1-orchestration-based-saga-route">1. <strong>Orchestration-Based Saga Route</strong></h3>
+<pre><code class="language-java">@Component
+public class SagaOrchestrationRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from(&quot;direct:startOrderSaga&quot;)
+            .routeId(&quot;order-saga-orchestration&quot;)
+            .log(&quot;Starting order saga for order: ${body.orderId}&quot;)
+            .process(exchange -&gt; {
+                OrderSagaRequest request = exchange.getIn().getBody(OrderSagaRequest.class);
+                String sagaId = UUID.randomUUID().toString();
+
+                exchange.setProperty(&quot;sagaId&quot;, sagaId);
+                exchange.setProperty(&quot;orderId&quot;, request.getOrderId());
+                exchange.setProperty(&quot;orderItems&quot;, request.getItems());
+                exchange.setProperty(&quot;paymentInfo&quot;, request.getPaymentInfo());
+                exchange.setProperty(&quot;shippingAddress&quot;, request.getShippingAddress());
+            })
+            .to(&quot;direct:reserveInventory&quot;)
+            .to(&quot;direct:processPayment&quot;)
+            .to(&quot;direct:arrangeShipping&quot;)
+            .to(&quot;direct:completeSaga&quot;)
+            .onException(Exception.class)
+                .handled(true)
+                .to(&quot;direct:compensateSaga&quot;)
+            .end();
+
+        from(&quot;direct:reserveInventory&quot;)
+            .log(&quot;Reserving inventory for saga: ${exchangeProperty.sagaId}&quot;)
+            .process(exchange -&gt; {
+                String orderId = exchange.getProperty(&quot;orderId&quot;, String.class);
+                @SuppressWarnings(&quot;unchecked&quot;)
+                List&lt;OrderItem&gt; items = exchange.getProperty(&quot;orderItems&quot;, List.class);
+
+                InventoryReservationResult result = inventoryService.reserveInventory(orderId, items);
+
+                if (!result.isSuccess()) {
+                    throw new SagaStepException(&quot;Inventory reservation failed: &quot; + result.getErrorMessage());
+                }
+
+                exchange.setProperty(&quot;inventoryReservationId&quot;, result.getReservationId());
+            })
+            .log(&quot;Inventory reserved successfully: ${exchangeProperty.inventoryReservationId}&quot;);
+
+        from(&quot;direct:processPayment&quot;)
+            .log(&quot;Processing payment for saga: ${exchangeProperty.sagaId}&quot;)
+            .process(exchange -&gt; {
+                String orderId = exchange.getProperty(&quot;orderId&quot;, String.class);
+                PaymentInfo paymentInfo = exchange.getProperty(&quot;paymentInfo&quot;, PaymentInfo.class);
+                BigDecimal totalAmount = calculateTotalAmount(exchange.getProperty(&quot;orderItems&quot;));
+
+                PaymentResult result = paymentService.processPayment(orderId, paymentInfo, totalAmount);
+
+                if (!result.isSuccess()) {
+                    throw new SagaStepException(&quot;Payment processing failed: &quot; + result.getErrorMessage());
+                }
+
+                exchange.setProperty(&quot;paymentTransactionId&quot;, result.getTransactionId());
+            })
+            .log(&quot;Payment processed successfully: ${exchangeProperty.paymentTransactionId}&quot;);
+
+        from(&quot;direct:arrangeShipping&quot;)
+            .log(&quot;Arranging shipping for saga: ${exchangeProperty.sagaId}&quot;)
+            .process(exchange -&gt; {
+                String orderId = exchange.getProperty(&quot;orderId&quot;, String.class);
+                Address shippingAddress = exchange.getProperty(&quot;shippingAddress&quot;, Address.class);
+                @SuppressWarnings(&quot;unchecked&quot;)
+                List&lt;OrderItem&gt; items = exchange.getProperty(&quot;orderItems&quot;, List.class);
+
+                ShippingResult result = shippingService.arrangeShipping(orderId, shippingAddress, items);
+
+                if (!result.isSuccess()) {
+                    throw new SagaStepException(&quot;Shipping arrangement failed: &quot; + result.getErrorMessage());
+                }
+
+                exchange.setProperty(&quot;trackingNumber&quot;, result.getTrackingNumber());
+            })
+            .log(&quot;Shipping arranged successfully: ${exchangeProperty.trackingNumber}&quot;);
+
+        from(&quot;direct:completeSaga&quot;)
+            .log(&quot;Completing saga: ${exchangeProperty.sagaId}&quot;)
+            .process(exchange -&gt; {
+                String sagaId = exchange.getProperty(&quot;sagaId&quot;, String.class);
+                String orderId = exchange.getProperty(&quot;orderId&quot;, String.class);
+                String trackingNumber = exchange.getProperty(&quot;trackingNumber&quot;, String.class);
+
+                // Publish order completed event
+                OrderCompletedEvent event = OrderCompletedEvent.builder()
+                    .sagaId(sagaId)
+                    .orderId(orderId)
+                    .trackingNumber(trackingNumber)
+                    .completedAt(Instant.now())
+                    .build();
+
+                eventPublisher.publish(event);
+
+                exchange.getIn().setBody(event);
+            })
+            .log(&quot;Saga completed successfully: ${exchangeProperty.sagaId}&quot;);
+
+        // Compensation route
+        from(&quot;direct:compensateSaga&quot;)
+            .log(&quot;Starting compensation for saga: ${exchangeProperty.sagaId}&quot;)
+            .doTry()
+                .to(&quot;direct:compensateShipping&quot;)
+            .doCatch(Exception.class)
+                .log(&quot;Shipping compensation failed&quot;)
+            .doFinally()
+                .to(&quot;direct:compensatePayment&quot;)
+            .end()
+            .doTry()
+                .to(&quot;direct:compensatePayment&quot;)
+            .doCatch(Exception.class)
+                .log(&quot;Payment compensation failed&quot;)
+            .doFinally()
+                .to(&quot;direct:compensateInventory&quot;)
+            .end()
+            .process(exchange -&gt; {
+                String sagaId = exchange.getProperty(&quot;sagaId&quot;, String.class);
+                String orderId = exchange.getProperty(&quot;orderId&quot;, String.class);
+
+                OrderFailedEvent event = OrderFailedEvent.builder()
+                    .sagaId(sagaId)
+                    .orderId(orderId)
+                    .reason(&quot;Saga compensation completed&quot;)
+                    .failedAt(Instant.now())
+                    .build();
+
+                eventPublisher.publish(event);
+            })
+            .log(&quot;Saga compensation completed: ${exchangeProperty.sagaId}&quot;);
+    }
+}
+</code></pre>
+<h3 id="2-choreography-based-saga-route">2. <strong>Choreography-Based Saga Route</strong></h3>
+<pre><code class="language-java">@Component
+public class SagaChoreographyRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        // Order created event handler
+        from(&quot;kafka:order-events?groupId=saga-choreography&quot;)
+            .routeId(&quot;saga-choreography-order-created&quot;)
+            .unmarshal().json(JsonLibrary.Jackson, OrderCreatedEvent.class)
+            .filter(simple(&quot;${body.eventType} == 'ORDER_CREATED'&quot;))
+            .process(exchange -&gt; {
+                OrderCreatedEvent event = exchange.getIn().getBody(OrderCreatedEvent.class);
+                String sagaId = UUID.randomUUID().toString();
+
+                // Store saga state
+                SagaState sagaState = SagaState.builder()
+                    .sagaId(sagaId)
+                    .orderId(event.getOrderId())
+                    .status(SagaStatus.IN_PROGRESS)
+                    .startTime(Instant.now())
+                    .build();
+
+                sagaStateRepository.save(sagaState);
+
+                // Create inventory reservation request
+                InventoryReservationRequested reservationRequest = InventoryReservationRequested.builder()
+                    .sagaId(sagaId)
+                    .orderId(event.getOrderId())
+                    .items(event.getItems())
+                    .build();
+
+                exchange.getIn().setBody(reservationRequest);
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to(&quot;kafka:inventory-commands&quot;)
+            .log(&quot;Inventory reservation requested for saga: ${body.sagaId}&quot;);
+
+        // Inventory reserved event handler
+        from(&quot;kafka:inventory-events?groupId=saga-choreography&quot;)
+            .routeId(&quot;saga-choreography-inventory-reserved&quot;)
+            .unmarshal().json(JsonLibrary.Jackson, InventoryReservedEvent.class)
+            .filter(simple(&quot;${body.eventType} == 'INVENTORY_RESERVED'&quot;))
+            .process(exchange -&gt; {
+                InventoryReservedEvent event = exchange.getIn().getBody(InventoryReservedEvent.class);
+
+                // Update saga state
+                SagaState sagaState = sagaStateRepository.findBySagaId(event.getSagaId());
+                if (sagaState != null &amp;&amp; sagaState.getStatus() == SagaStatus.IN_PROGRESS) {
+                    sagaState.getContext().put(&quot;inventoryReservationId&quot;, event.getReservationId());
+                    sagaStateRepository.save(sagaState);
+
+                    // Create payment processing request
+                    PaymentProcessingRequested paymentRequest = PaymentProcessingRequested.builder()
+                        .sagaId(event.getSagaId())
+                        .orderId(sagaState.getOrderId())
+                        .amount(event.getTotalAmount())
+                        .paymentInfo(event.getPaymentInfo())
+                        .build();
+
+                    exchange.getIn().setBody(paymentRequest);
+                } else {
+                    exchange.setProperty(Exchange.ROUTE_STOP, true);
+                }
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to(&quot;kafka:payment-commands&quot;)
+            .log(&quot;Payment processing requested for saga: ${body.sagaId}&quot;);
+
+        // Payment processed event handler
+        from(&quot;kafka:payment-events?groupId=saga-choreography&quot;)
+            .routeId(&quot;saga-choreography-payment-processed&quot;)
+            .unmarshal().json(JsonLibrary.Jackson, PaymentProcessedEvent.class)
+            .filter(simple(&quot;${body.eventType} == 'PAYMENT_PROCESSED'&quot;))
+            .process(exchange -&gt; {
+                PaymentProcessedEvent event = exchange.getIn().getBody(PaymentProcessedEvent.class);
+
+                SagaState sagaState = sagaStateRepository.findBySagaId(event.getSagaId());
+                if (sagaState != null &amp;&amp; sagaState.getStatus() == SagaStatus.IN_PROGRESS) {
+                    sagaState.getContext().put(&quot;paymentTransactionId&quot;, event.getTransactionId());
+                    sagaStateRepository.save(sagaState);
+
+                    ShippingArrangementRequested shippingRequest = ShippingArrangementRequested.builder()
+                        .sagaId(event.getSagaId())
+                        .orderId(sagaState.getOrderId())
+                        .shippingAddress(event.getShippingAddress())
+                        .items(event.getItems())
+                        .build();
+
+                    exchange.getIn().setBody(shippingRequest);
+                } else {
+                    exchange.setProperty(Exchange.ROUTE_STOP, true);
+                }
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to(&quot;kafka:shipping-commands&quot;)
+            .log(&quot;Shipping arrangement requested for saga: ${body.sagaId}&quot;);
+
+        // Shipping arranged event handler
+        from(&quot;kafka:shipping-events?groupId=saga-choreography&quot;)
+            .routeId(&quot;saga-choreography-shipping-arranged&quot;)
+            .unmarshal().json(JsonLibrary.Jackson, ShippingArrangedEvent.class)
+            .filter(simple(&quot;${body.eventType} == 'SHIPPING_ARRANGED'&quot;))
+            .process(exchange -&gt; {
+                ShippingArrangedEvent event = exchange.getIn().getBody(ShippingArrangedEvent.class);
+
+                SagaState sagaState = sagaStateRepository.findBySagaId(event.getSagaId());
+                if (sagaState != null &amp;&amp; sagaState.getStatus() == SagaStatus.IN_PROGRESS) {
+                    // Complete saga
+                    sagaState.setStatus(SagaStatus.COMPLETED);
+                    sagaState.setEndTime(Instant.now());
+                    sagaState.getContext().put(&quot;trackingNumber&quot;, event.getTrackingNumber());
+                    sagaStateRepository.save(sagaState);
+
+                    OrderCompletedEvent completedEvent = OrderCompletedEvent.builder()
+                        .sagaId(event.getSagaId())
+                        .orderId(sagaState.getOrderId())
+                        .trackingNumber(event.getTrackingNumber())
+                        .completedAt(Instant.now())
+                        .build();
+
+                    exchange.getIn().setBody(completedEvent);
+                } else {
+                    exchange.setProperty(Exchange.ROUTE_STOP, true);
+                }
+            })
+            .marshal().json(JsonLibrary.Jackson)
+            .to(&quot;kafka:order-events&quot;)
+            .log(&quot;Order saga completed: ${body.sagaId}&quot;);
+
+        // Failure handling routes
+        from(&quot;kafka:inventory-events?groupId=saga-choreography-failures&quot;)
+            .routeId(&quot;saga-choreography-inventory-failed&quot;)
+            .unmarshal().json(JsonLibrary.Jackson, InventoryReservationFailedEvent.class)
+            .filter(simple(&quot;${body.eventType} == 'INVENTORY_RESERVATION_FAILED'&quot;))
+            .to(&quot;direct:handleSagaFailure&quot;)
+            .log(&quot;Saga failed at inventory reservation: ${body.sagaId}&quot;);
+
+        from(&quot;kafka:payment-events?groupId=saga-choreography-failures&quot;)
+            .routeId(&quot;saga-choreography-payment-failed&quot;)
+            .unmarshal().json(JsonLibrary.Jackson, PaymentProcessingFailedEvent.class)
+            .filter(simple(&quot;${body.eventType} == 'PAYMENT_PROCESSING_FAILED'&quot;))
+            .to(&quot;direct:compensateInventoryInChoreography&quot;)
+            .to(&quot;direct:handleSagaFailure&quot;)
+            .log(&quot;Saga failed at payment processing: ${body.sagaId}&quot;);
+    }
+}
+</code></pre>
+<h2 id="best-practices">Best Practices</h2>
+<h3 id="1-saga-design-and-architecture">1. <strong>Saga Design and Architecture</strong></h3>
+<ul>
+<li>Design sagas to be idempotent to handle duplicate execution safely</li>
+<li>Keep saga steps as small and focused as possible to minimize failure impact</li>
+<li>Use correlation IDs to track messages and events across saga execution</li>
+<li>Implement proper timeout handling for long-running saga steps</li>
+<li>Design compensating actions to be semantically correct, not just technically correct</li>
+</ul>
+<h3 id="2-state-management-and-persistence">2. <strong>State Management and Persistence</strong></h3>
+<ul>
+<li>Persist saga state consistently to handle coordinator failures</li>
+<li>Use event sourcing for saga state to provide complete audit trails</li>
+<li>Implement saga state snapshots for performance in long-running sagas</li>
+<li>Design for saga recovery and resumption after system failures</li>
+<li>Maintain saga execution history for debugging and monitoring</li>
+</ul>
+<h3 id="3-error-handling-and-compensation">3. <strong>Error Handling and Compensation</strong></h3>
+<ul>
+<li>Design compensations to handle partial failures and retries</li>
+<li>Implement compensation timeouts and failure handling</li>
+<li>Use semantic locks to prevent conflicting operations during compensation</li>
+<li>Plan for scenarios where compensation actions may also fail</li>
+<li>Implement human intervention workflows for unrecoverable failures</li>
+</ul>
+<h3 id="4-performance-and-scalability">4. <strong>Performance and Scalability</strong></h3>
+<ul>
+<li>Use asynchronous messaging for saga coordination to improve scalability</li>
+<li>Implement saga step parallelization where business logic allows</li>
+<li>Use distributed saga coordination for high-availability scenarios</li>
+<li>Monitor saga execution times and optimize slow steps</li>
+<li>Implement saga step caching where appropriate and safe</li>
+</ul>
+<h3 id="5-monitoring-and-observability">5. <strong>Monitoring and Observability</strong></h3>
+<ul>
+<li>Implement comprehensive logging for all saga execution steps</li>
+<li>Provide real-time dashboards for saga execution monitoring</li>
+<li>Create alerts for saga failures and timeout scenarios</li>
+<li>Track saga completion rates and performance metrics</li>
+<li>Implement saga execution tracing for complex debugging scenarios</li>
+</ul>
+<h3 id="6-testing-and-validation">6. <strong>Testing and Validation</strong></h3>
+<ul>
+<li>Create comprehensive test suites including failure scenario testing</li>
+<li>Implement saga simulation and testing environments</li>
+<li>Test compensation logic thoroughly including cascade compensation scenarios</li>
+<li>Use chaos engineering to validate saga resilience</li>
+<li>Implement automated saga regression testing for critical business processes</li>
+</ul>
+<p>The Saga pattern is essential for managing complex, long-running business processes in distributed enterprise integration architectures, providing the foundation for reliable, scalable, and maintainable transaction coordination without the limitations of traditional distributed transaction mechanisms.</p>
+
+      <a href="../index.html" class="back-to-top">← Back to All Patterns</a>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <p>©2026 <a href="https://dataintegrationmastery.com/">Data Integration Mastery™</a> — All Rights Reserved</p>
+  </footer>
+</body>
+</html>

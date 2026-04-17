@@ -1,0 +1,1331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Authorization Pattern — Integration Architecture Patterns | Data Integration Mastery™</title>
+  <meta name="description" content="The Authorization pattern is a critical security mechanism in enterprise integration architectures that determines what actions authenticated users, services...">
+  <meta name="keywords" content="authorization pattern, integration pattern, security patterns, integration architecture, EAI patterns, data integration">
+  <link rel="canonical" href="https://dataintegrationmastery.com/patterns/security-patterns/authorization.html">
+
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://dataintegrationmastery.com/patterns/security-patterns/authorization.html">
+  <meta property="og:title" content="Authorization Pattern — Integration Architecture Patterns">
+  <meta property="og:description" content="The Authorization pattern is a critical security mechanism in enterprise integration architectures that determines what actions authenticated users, services...">
+  <meta property="og:image" content="https://dataintegrationmastery.com/assets/images/logo.png">
+  <meta property="og:site_name" content="Data Integration Mastery">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Authorization Pattern — Integration Architecture Patterns">
+  <meta name="twitter:description" content="The Authorization pattern is a critical security mechanism in enterprise integration architectures that determines what actions authenticated users, services...">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/docs.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Authorization Pattern",
+    "description": "The Authorization pattern is a critical security mechanism in enterprise integration architectures that determines what actions authenticated users, services...",
+    "url": "https://dataintegrationmastery.com/patterns/security-patterns/authorization.html",
+    "author": {
+      "@type": "Person",
+      "name": "Ari Vilkman",
+      "jobTitle": "Integration Architect"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Data Integration Mastery",
+      "url": "https://dataintegrationmastery.com"
+    },
+    "isPartOf": {
+      "@type": "CollectionPage",
+      "name": "Integration Architecture Patterns",
+      "url": "https://dataintegrationmastery.com/patterns/"
+    },
+    "about": {
+      "@type": "Thing",
+      "name": "Authorization Pattern"
+    },
+    "inLanguage": "en",
+    "isAccessibleForFree": true
+  }
+  </script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="https://dataintegrationmastery.com/" class="header-brand">
+        <img src="../../assets/images/dim-icon.png" alt="DIM" width="36" height="36">
+        <span class="header-title">Data Integration Mastery™</span>
+      </a>
+      <nav class="header-nav" aria-label="Main navigation">
+        <a href="https://dataintegrationmastery.com/">Home</a>
+        <a href="../index.html">All Patterns</a>
+        <a href="https://dataintegrationmastery.com/#free-course">Free Course</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="docs-layout">
+    <aside class="docs-sidebar" aria-label="Pattern categories">
+      <div class="sidebar-title">Pattern Categories</div>
+<div class="sidebar-section">
+  <a href="../index.html#resilience" class="sidebar-section-title">🛡️ Resilience Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../resilience-patterns/circuit-breaker.html">Circuit Breaker</a></li>
+    <li><a href="../resilience-patterns/retry-mechanism.html">Retry Mechanism</a></li>
+    <li><a href="../resilience-patterns/timeout.html">Timeout</a></li>
+    <li><a href="../resilience-patterns/dead-letter-queue.html">Dead Letter Queue</a></li>
+    <li><a href="../resilience-patterns/bulkhead.html">Bulkhead</a></li>
+    <li><a href="../resilience-patterns/fallback-graceful-degradation.html">Fallback / Graceful Degradation</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#messaging" class="sidebar-section-title">📨 Messaging Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../messaging-patterns/request-reply.html">Request-Reply</a></li>
+    <li><a href="../messaging-patterns/publish-subscribe.html">Publish-Subscribe</a></li>
+    <li><a href="../messaging-patterns/message-queue.html">Message Queue</a></li>
+    <li><a href="../messaging-patterns/event-streaming.html">Event Streaming</a></li>
+    <li><a href="../messaging-patterns/correlation-id.html">Correlation ID</a></li>
+    <li><a href="../messaging-patterns/message-routing.html">Message Routing</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#data-transformation" class="sidebar-section-title">🔄 Data Transformation Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../data-transformation-patterns/message-translator.html">Message Translator</a></li>
+    <li><a href="../data-transformation-patterns/content-filter.html">Content Filter</a></li>
+    <li><a href="../data-transformation-patterns/message-router.html">Message Router</a></li>
+    <li><a href="../data-transformation-patterns/aggregator.html">Aggregator</a></li>
+    <li><a href="../data-transformation-patterns/splitter.html">Splitter</a></li>
+    <li><a href="../data-transformation-patterns/data-mapper.html">Data Mapper</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#routing" class="sidebar-section-title">🔀 Routing Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../routing-patterns/content-based-router.html">Content-Based Router</a></li>
+    <li><a href="../routing-patterns/recipient-list.html">Recipient List</a></li>
+    <li><a href="../routing-patterns/load-balancer.html">Load Balancer</a></li>
+    <li><a href="../routing-patterns/message-filter.html">Message Filter</a></li>
+    <li><a href="../routing-patterns/dynamic-router.html">Dynamic Router</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#security" class="sidebar-section-title">🔐 Security Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="authentication.html">Authentication</a></li>
+    <li><a href="authorization.html" class="active">Authorization</a></li>
+    <li><a href="encryption.html">Encryption</a></li>
+    <li><a href="token-management.html">Token Management</a></li>
+    <li><a href="api-security.html">API Security</a></li>
+    <li><a href="secret-management.html">Secret Management</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#orchestration" class="sidebar-section-title">🎭 Orchestration Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../orchestration-patterns/saga-pattern.html">Saga Pattern</a></li>
+    <li><a href="../orchestration-patterns/process-manager.html">Process Manager</a></li>
+    <li><a href="../orchestration-patterns/workflow-engine.html">Workflow Engine</a></li>
+    <li><a href="../orchestration-patterns/choreography.html">Choreography</a></li>
+    <li><a href="../orchestration-patterns/compensation-transactions.html">Compensation Transactions</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#observability" class="sidebar-section-title">📊 Monitoring & Observability Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../monitoring-observability-patterns/distributed-tracing.html">Distributed Tracing</a></li>
+    <li><a href="../monitoring-observability-patterns/metrics-collection.html">Metrics Collection</a></li>
+    <li><a href="../monitoring-observability-patterns/health-checks.html">Health Checks</a></li>
+    <li><a href="../monitoring-observability-patterns/logging-strategies.html">Logging Strategies</a></li>
+    <li><a href="../monitoring-observability-patterns/performance-monitoring.html">Performance Monitoring</a></li>
+    <li><a href="../monitoring-observability-patterns/error-tracking.html">Error Tracking</a></li>
+  </ul>
+</div>
+
+    </aside>
+
+    <main id="main-content" class="docs-content">
+      <div class="breadcrumb">
+        <a href="https://dataintegrationmastery.com/">Home</a>
+        <span class="sep">›</span>
+        <a href="../index.html">Patterns</a>
+        <span class="sep">›</span>
+        <a href="../index.html#security">Security Patterns</a>
+        <span class="sep">›</span>
+        <strong>Authorization Pattern</strong>
+      </div>
+
+      <h1>Authorization Pattern</h1>
+
+      <h2 id="overview">Overview</h2>
+<p>The Authorization pattern is a critical security mechanism in enterprise integration architectures that determines what actions authenticated users, services, and systems are permitted to perform on specific resources. While authentication answers "who are you?", authorization addresses "what are you allowed to do?". Like a building security system that not only verifies identity at entrance but also controls which floors, rooms, and resources each person can access, authorization ensures that verified entities can only perform actions and access resources appropriate to their role, permissions, and security context.</p>
+<h3 id="theoretical-foundation">Theoretical Foundation</h3>
+<p>The Authorization pattern is grounded in <strong>access control theory</strong> and <strong>security policy enforcement</strong>, specifically addressing the challenges of <strong>resource protection</strong> and <strong>privilege management</strong> in distributed systems. The pattern incorporates concepts from <strong>role-based access control (RBAC)</strong>, <strong>attribute-based access control (ABAC)</strong>, <strong>discretionary access control (DAC)</strong>, and <strong>mandatory access control (MAC)</strong> to provide comprehensive, flexible, and scalable mechanisms for controlling resource access and operation permissions.</p>
+<h3 id="core-principles">Core Principles</h3>
+<h4 id="1-access-control-models">1. <strong>Access Control Models</strong></h4>
+<p>Authorization implements various access control paradigms:
+- <strong>Role-Based Access Control (RBAC)</strong> - permissions granted through role assignments
+- <strong>Attribute-Based Access Control (ABAC)</strong> - permissions based on user, resource, and environmental attributes
+- <strong>Discretionary Access Control (DAC)</strong> - resource owners control access permissions
+- <strong>Mandatory Access Control (MAC)</strong> - system-enforced access based on security labels and classifications</p>
+<h4 id="2-permission-management">2. <strong>Permission Management</strong></h4>
+<p>Systematic control of resource access and operations:
+- <strong>Resource identification</strong> - unique identification of protected resources and endpoints
+- <strong>Action specification</strong> - defining granular operations that can be performed on resources
+- <strong>Permission assignment</strong> - linking users, roles, and resources with specific allowed actions
+- <strong>Inheritance and delegation</strong> - supporting hierarchical permission structures and temporary access grants</p>
+<h4 id="3-policy-enforcement">3. <strong>Policy Enforcement</strong></h4>
+<p>Consistent application of authorization policies:
+- <strong>Policy definition</strong> - expressing access control rules in structured, readable formats
+- <strong>Policy evaluation</strong> - real-time assessment of access requests against defined policies
+- <strong>Policy administration</strong> - centralized management of access control rules and permissions
+- <strong>Policy auditing</strong> - tracking and reviewing policy applications and access decisions</p>
+<h4 id="4-contextual-authorization">4. <strong>Contextual Authorization</strong></h4>
+<p>Considering environmental and situational factors:
+- <strong>Time-based access</strong> - restricting access to specific time windows or schedules
+- <strong>Location-based access</strong> - controlling access based on geographic or network location
+- <strong>Resource state</strong> - considering the current state of resources in access decisions
+- <strong>Risk-based decisions</strong> - adapting authorization based on assessed risk levels</p>
+<h3 id="why-authorization-is-essential-in-integration-architecture">Why Authorization is Essential in Integration Architecture</h3>
+<h4 id="1-security-enforcement">1. <strong>Security Enforcement</strong></h4>
+<p>Authorization provides essential security controls:
+- <strong>Principle of least privilege</strong> - ensuring users and services have only necessary permissions
+- <strong>Data protection</strong> - preventing unauthorized access to sensitive information
+- <strong>System integrity</strong> - protecting critical system functions from unauthorized modification
+- <strong>Attack surface reduction</strong> - limiting potential damage from compromised accounts</p>
+<h4 id="2-compliance-requirements">2. <strong>Compliance Requirements</strong></h4>
+<p>For meeting regulatory and industry standards:
+- <strong>Data privacy regulations</strong> - ensuring only authorized personnel access personal data
+- <strong>Financial compliance</strong> - controlling access to financial data and transaction systems
+- <strong>Healthcare regulations</strong> - protecting patient data through strict access controls
+- <strong>Industry standards</strong> - meeting sector-specific authorization requirements</p>
+<h4 id="3-business-process-protection">3. <strong>Business Process Protection</strong></h4>
+<p>Securing business operations and workflows:
+- <strong>Workflow integrity</strong> - ensuring only authorized roles can perform specific business actions
+- <strong>Data consistency</strong> - preventing unauthorized modifications that could corrupt business data
+- <strong>Operational security</strong> - protecting critical business processes from unauthorized interference
+- <strong>Business continuity</strong> - maintaining service availability through proper access controls</p>
+<h4 id="4-multi-tenant-support">4. <strong>Multi-Tenant Support</strong></h4>
+<p>Enabling secure shared systems:
+- <strong>Tenant isolation</strong> - ensuring each tenant can only access their own resources
+- <strong>Resource segregation</strong> - preventing cross-tenant data access and modifications
+- <strong>Administrative boundaries</strong> - controlling administrative access within tenant boundaries
+- <strong>Compliance separation</strong> - maintaining separate compliance domains for different tenants</p>
+<h3 id="benefits-in-integration-contexts">Benefits in Integration Contexts</h3>
+<h4 id="1-enhanced-security-posture">1. <strong>Enhanced Security Posture</strong></h4>
+<ul>
+<li><strong>Fine-grained control</strong> - precise control over resource access and operations</li>
+<li><strong>Defense in depth</strong> - multiple layers of authorization checks</li>
+<li><strong>Risk mitigation</strong> - reducing impact of security breaches through limited access</li>
+<li><strong>Compliance demonstration</strong> - showing adherence to security best practices</li>
+</ul>
+<h4 id="2-operational-efficiency">2. <strong>Operational Efficiency</strong></h4>
+<ul>
+<li><strong>Automated access control</strong> - reducing manual access management overhead</li>
+<li><strong>Self-service capabilities</strong> - enabling users to request and manage appropriate access</li>
+<li><strong>Centralized management</strong> - unified control of access policies across systems</li>
+<li><strong>Scalable administration</strong> - supporting growth without proportional administrative overhead</li>
+</ul>
+<h4 id="3-business-value">3. <strong>Business Value</strong></h4>
+<ul>
+<li><strong>Trust enhancement</strong> - building customer confidence through robust access controls</li>
+<li><strong>Risk reduction</strong> - minimizing potential losses from unauthorized access</li>
+<li><strong>Productivity improvement</strong> - enabling users to access needed resources efficiently</li>
+<li><strong>Competitive advantage</strong> - demonstrating superior security capabilities</li>
+</ul>
+<h4 id="4-integration-enablement">4. <strong>Integration Enablement</strong></h4>
+<ul>
+<li><strong>Secure APIs</strong> - protecting API endpoints through proper authorization</li>
+<li><strong>Service integration</strong> - enabling secure service-to-service communication</li>
+<li><strong>Partner access</strong> - controlling external partner access to internal resources</li>
+<li><strong>Cloud adoption</strong> - facilitating secure integration with cloud services</li>
+</ul>
+<h3 id="integration-architecture-applications">Integration Architecture Applications</h3>
+<h4 id="1-api-gateway-authorization">1. <strong>API Gateway Authorization</strong></h4>
+<p>Authorization in API management provides:
+- <strong>Endpoint protection</strong> - controlling access to specific API endpoints and operations
+- <strong>Rate limiting enforcement</strong> - applying different rate limits based on user permissions
+- <strong>Scope-based access</strong> - restricting API access based on OAuth scopes and permissions
+- <strong>Client authorization</strong> - controlling which client applications can access specific APIs</p>
+<h4 id="2-microservices-security">2. <strong>Microservices Security</strong></h4>
+<p>In distributed microservices architectures:
+- <strong>Service-to-service authorization</strong> - controlling inter-service communication permissions
+- <strong>Method-level security</strong> - protecting individual service methods and operations
+- <strong>Resource-based access</strong> - controlling access to specific data entities and resources
+- <strong>Cross-service policies</strong> - maintaining consistent authorization across service boundaries</p>
+<h4 id="3-enterprise-application-integration">3. <strong>Enterprise Application Integration</strong></h4>
+<p>For connecting enterprise systems:
+- <strong>System-level authorization</strong> - controlling which systems can access specific integration endpoints
+- <strong>Data access control</strong> - restricting access to sensitive enterprise data
+- <strong>Workflow authorization</strong> - ensuring only authorized users can trigger business processes
+- <strong>Legacy system protection</strong> - adding authorization layers to existing systems</p>
+<h4 id="4-cloud-and-hybrid-environments">4. <strong>Cloud and Hybrid Environments</strong></h4>
+<p>For cloud integrations:
+- <strong>Multi-cloud authorization</strong> - managing access across multiple cloud providers
+- <strong>Hybrid access control</strong> - coordinating authorization between cloud and on-premises systems
+- <strong>Cloud service permissions</strong> - controlling access to cloud platform services and resources
+- <strong>Cross-environment policies</strong> - maintaining consistent authorization across deployment environments</p>
+<h2 id="implementation-patterns">Implementation Patterns</h2>
+<h3 id="1-role-based-access-control-rbac">1. <strong>Role-Based Access Control (RBAC)</strong></h3>
+<pre><code class="language-java">// Role-based authorization implementation
+@Service
+public class RBACAuthorizationService {
+
+    @Autowired
+    private UserRoleService userRoleService;
+
+    @Autowired
+    private RolePermissionService rolePermissionService;
+
+    @Autowired
+    private ResourceService resourceService;
+
+    public AuthorizationResult authorize(String userId, String resourceId, String action) {
+        try {
+            // Get user roles
+            Set&lt;Role&gt; userRoles = userRoleService.getUserRoles(userId);
+
+            if (userRoles.isEmpty()) {
+                return AuthorizationResult.denied(&quot;User has no roles assigned&quot;);
+            }
+
+            // Get resource information
+            Resource resource = resourceService.getResource(resourceId);
+
+            if (resource == null) {
+                return AuthorizationResult.denied(&quot;Resource not found&quot;);
+            }
+
+            // Check if any user role has permission for the action on this resource
+            for (Role role : userRoles) {
+                Set&lt;Permission&gt; rolePermissions = rolePermissionService.getRolePermissions(role.getId());
+
+                if (hasPermission(rolePermissions, resource, action)) {
+                    return AuthorizationResult.allowed(
+                        &quot;Access granted via role: &quot; + role.getName(),
+                        role
+                    );
+                }
+            }
+
+            return AuthorizationResult.denied(
+                &quot;No role provides required permission for action '&quot; + action + 
+                &quot;' on resource '&quot; + resourceId + &quot;'&quot;
+            );
+
+        } catch (Exception e) {
+            log.error(&quot;Authorization error for user {} on resource {}&quot;, userId, resourceId, e);
+            return AuthorizationResult.error(&quot;Authorization service unavailable&quot;);
+        }
+    }
+
+    private boolean hasPermission(Set&lt;Permission&gt; permissions, Resource resource, String action) {
+        return permissions.stream().anyMatch(permission -&gt; 
+            permission.appliesToResource(resource) &amp;&amp; 
+            permission.allowsAction(action)
+        );
+    }
+
+    public AuthorizationResult authorizeWithHierarchy(String userId, String resourceId, String action) {
+        // Check direct authorization
+        AuthorizationResult directResult = authorize(userId, resourceId, action);
+
+        if (directResult.isAllowed()) {
+            return directResult;
+        }
+
+        // Check hierarchical permissions (parent resources)
+        Resource resource = resourceService.getResource(resourceId);
+        Resource parentResource = resource.getParent();
+
+        while (parentResource != null) {
+            AuthorizationResult hierarchicalResult = authorize(userId, parentResource.getId(), action);
+
+            if (hierarchicalResult.isAllowed()) {
+                return AuthorizationResult.allowed(
+                    &quot;Access granted via parent resource: &quot; + parentResource.getId(),
+                    hierarchicalResult.getGrantingRole()
+                );
+            }
+
+            parentResource = parentResource.getParent();
+        }
+
+        return directResult; // Return original denial reason
+    }
+}
+
+@Entity
+public class Permission {
+    private String id;
+    private String name;
+    private String resourceType;
+    private String resourcePattern; // Regex or glob pattern
+    private Set&lt;String&gt; allowedActions;
+    private Map&lt;String, String&gt; constraints; // Additional constraints
+
+    public boolean appliesToResource(Resource resource) {
+        // Check if resource type matches
+        if (!resourceType.equals(&quot;*&quot;) &amp;&amp; !resourceType.equals(resource.getType())) {
+            return false;
+        }
+
+        // Check if resource path matches pattern
+        return resource.getPath().matches(resourcePattern);
+    }
+
+    public boolean allowsAction(String action) {
+        return allowedActions.contains(&quot;*&quot;) || allowedActions.contains(action);
+    }
+
+    public boolean meetsConstraints(Map&lt;String, Object&gt; context) {
+        return constraints.entrySet().stream().allMatch(constraint -&gt; {
+            String contextValue = String.valueOf(context.get(constraint.getKey()));
+            return constraint.getValue().equals(contextValue);
+        });
+    }
+}
+
+@Service
+public class RoleHierarchyService {
+
+    public Set&lt;Role&gt; getEffectiveRoles(String userId) {
+        Set&lt;Role&gt; directRoles = userRoleService.getDirectUserRoles(userId);
+        Set&lt;Role&gt; effectiveRoles = new HashSet&lt;&gt;(directRoles);
+
+        // Add inherited roles from role hierarchy
+        for (Role role : directRoles) {
+            effectiveRoles.addAll(getInheritedRoles(role));
+        }
+
+        return effectiveRoles;
+    }
+
+    private Set&lt;Role&gt; getInheritedRoles(Role role) {
+        Set&lt;Role&gt; inheritedRoles = new HashSet&lt;&gt;();
+
+        for (Role parentRole : role.getParentRoles()) {
+            inheritedRoles.add(parentRole);
+            inheritedRoles.addAll(getInheritedRoles(parentRole)); // Recursive inheritance
+        }
+
+        return inheritedRoles;
+    }
+}
+</code></pre>
+<h3 id="2-attribute-based-access-control-abac">2. <strong>Attribute-Based Access Control (ABAC)</strong></h3>
+<pre><code class="language-java">// Attribute-based authorization with policy evaluation
+@Service
+public class ABACAuthorizationService {
+
+    @Autowired
+    private PolicyEngine policyEngine;
+
+    @Autowired
+    private AttributeService attributeService;
+
+    public AuthorizationResult authorize(AuthorizationRequest request) {
+        try {
+            // Build evaluation context with all relevant attributes
+            EvaluationContext context = buildEvaluationContext(request);
+
+            // Get applicable policies for this request
+            List&lt;Policy&gt; applicablePolicies = policyEngine.getApplicablePolicies(
+                request.getResourceType(),
+                request.getAction()
+            );
+
+            // Evaluate policies in priority order
+            for (Policy policy : applicablePolicies) {
+                PolicyResult result = policy.evaluate(context);
+
+                if (result.isDecisive()) {
+                    return convertToAuthorizationResult(result, policy);
+                }
+            }
+
+            // Default deny if no policy grants access
+            return AuthorizationResult.denied(&quot;No policy grants access to requested resource&quot;);
+
+        } catch (Exception e) {
+            log.error(&quot;ABAC authorization error&quot;, e);
+            return AuthorizationResult.error(&quot;Authorization evaluation failed&quot;);
+        }
+    }
+
+    private EvaluationContext buildEvaluationContext(AuthorizationRequest request) {
+        EvaluationContext.Builder builder = EvaluationContext.builder();
+
+        // Subject attributes (user/service requesting access)
+        Map&lt;String, Object&gt; subjectAttributes = attributeService.getSubjectAttributes(request.getSubjectId());
+        builder.subjectAttributes(subjectAttributes);
+
+        // Resource attributes
+        Map&lt;String, Object&gt; resourceAttributes = attributeService.getResourceAttributes(request.getResourceId());
+        builder.resourceAttributes(resourceAttributes);
+
+        // Action attributes
+        Map&lt;String, Object&gt; actionAttributes = Map.of(
+            &quot;action&quot;, request.getAction(),
+            &quot;method&quot;, request.getMethod(),
+            &quot;severity&quot;, determineActionSeverity(request.getAction())
+        );
+        builder.actionAttributes(actionAttributes);
+
+        // Environment attributes
+        Map&lt;String, Object&gt; environmentAttributes = buildEnvironmentAttributes(request);
+        builder.environmentAttributes(environmentAttributes);
+
+        return builder.build();
+    }
+
+    private Map&lt;String, Object&gt; buildEnvironmentAttributes(AuthorizationRequest request) {
+        Map&lt;String, Object&gt; envAttributes = new HashMap&lt;&gt;();
+
+        // Time attributes
+        ZonedDateTime now = ZonedDateTime.now();
+        envAttributes.put(&quot;currentTime&quot;, now);
+        envAttributes.put(&quot;dayOfWeek&quot;, now.getDayOfWeek().toString());
+        envAttributes.put(&quot;hourOfDay&quot;, now.getHour());
+        envAttributes.put(&quot;isBusinessHours&quot;, isBusinessHours(now));
+
+        // Location attributes
+        if (request.getClientIP() != null) {
+            Location location = geoLocationService.getLocation(request.getClientIP());
+            envAttributes.put(&quot;country&quot;, location.getCountry());
+            envAttributes.put(&quot;region&quot;, location.getRegion());
+            envAttributes.put(&quot;isHighRiskLocation&quot;, securityService.isHighRiskLocation(location));
+        }
+
+        // System attributes
+        envAttributes.put(&quot;systemLoad&quot;, systemMonitor.getCurrentLoad());
+        envAttributes.put(&quot;securityLevel&quot;, securityService.getCurrentSecurityLevel());
+
+        return envAttributes;
+    }
+}
+
+@Component
+public class PolicyEngine {
+
+    private final List&lt;Policy&gt; policies = new ArrayList&lt;&gt;();
+
+    @PostConstruct
+    public void loadPolicies() {
+        // Load policies from configuration
+        policies.addAll(policyLoader.loadPolicies());
+    }
+
+    public List&lt;Policy&gt; getApplicablePolicies(String resourceType, String action) {
+        return policies.stream()
+            .filter(policy -&gt; policy.appliesTo(resourceType, action))
+            .sorted(Comparator.comparing(Policy::getPriority))
+            .collect(Collectors.toList());
+    }
+}
+
+@Component
+public class XACMLPolicy implements Policy {
+
+    private final PolicyDocument policyDocument;
+    private final ExpressionEvaluator evaluator;
+
+    @Override
+    public PolicyResult evaluate(EvaluationContext context) {
+        try {
+            // Evaluate policy conditions
+            boolean targetMatches = evaluateTarget(context);
+            if (!targetMatches) {
+                return PolicyResult.notApplicable();
+            }
+
+            // Evaluate policy rules
+            for (Rule rule : policyDocument.getRules()) {
+                RuleResult ruleResult = evaluateRule(rule, context);
+
+                if (ruleResult.isDecisive()) {
+                    return PolicyResult.fromRuleResult(ruleResult);
+                }
+            }
+
+            // Apply combining algorithm if no decisive rule result
+            return applyCombiningAlgorithm(context);
+
+        } catch (Exception e) {
+            log.error(&quot;Policy evaluation error&quot;, e);
+            return PolicyResult.indeterminate(&quot;Policy evaluation failed&quot;);
+        }
+    }
+
+    private boolean evaluateTarget(EvaluationContext context) {
+        Target target = policyDocument.getTarget();
+
+        if (target == null) {
+            return true; // No target means policy applies to all
+        }
+
+        return evaluator.evaluateBoolean(target.getExpression(), context);
+    }
+
+    private RuleResult evaluateRule(Rule rule, EvaluationContext context) {
+        // Check rule target
+        if (rule.getTarget() != null &amp;&amp; !evaluateTarget(context, rule.getTarget())) {
+            return RuleResult.notApplicable();
+        }
+
+        // Evaluate rule condition
+        if (rule.getCondition() != null) {
+            boolean conditionMet = evaluator.evaluateBoolean(rule.getCondition(), context);
+
+            if (!conditionMet) {
+                return RuleResult.notApplicable();
+            }
+        }
+
+        // Apply rule effect
+        return RuleResult.decisive(rule.getEffect());
+    }
+}
+
+// Policy definition using builder pattern
+@Component
+public class PolicyBuilder {
+
+    public Policy createDataAccessPolicy() {
+        return Policy.builder()
+            .name(&quot;Data Access Control Policy&quot;)
+            .target(Target.builder()
+                .resourceType(&quot;data&quot;)
+                .action(&quot;read&quot;)
+                .build())
+            .rules(Arrays.asList(
+                Rule.builder()
+                    .name(&quot;Allow data owners&quot;)
+                    .condition(&quot;subject.id == resource.owner&quot;)
+                    .effect(Effect.PERMIT)
+                    .build(),
+
+                Rule.builder()
+                    .name(&quot;Allow managers during business hours&quot;)
+                    .condition(&quot;subject.role == 'manager' &amp;&amp; environment.isBusinessHours == true&quot;)
+                    .effect(Effect.PERMIT)
+                    .build(),
+
+                Rule.builder()
+                    .name(&quot;Deny sensitive data access from high-risk locations&quot;)
+                    .condition(&quot;resource.classification == 'sensitive' &amp;&amp; environment.isHighRiskLocation == true&quot;)
+                    .effect(Effect.DENY)
+                    .build()
+            ))
+            .combiningAlgorithm(CombiningAlgorithm.DENY_OVERRIDES)
+            .build();
+    }
+}
+</code></pre>
+<h3 id="3-resource-based-authorization">3. <strong>Resource-Based Authorization</strong></h3>
+<pre><code class="language-java">// Fine-grained resource-based authorization
+@Service
+public class ResourceBasedAuthorizationService {
+
+    @Autowired
+    private ResourcePermissionRepository permissionRepository;
+
+    @Autowired
+    private ResourceHierarchyService hierarchyService;
+
+    public AuthorizationResult authorizeResourceAccess(String userId, String resourceId, String action) {
+        try {
+            // Direct resource permissions
+            AuthorizationResult directResult = checkDirectPermissions(userId, resourceId, action);
+
+            if (directResult.isAllowed()) {
+                return directResult;
+            }
+
+            // Check inherited permissions from parent resources
+            AuthorizationResult inheritedResult = checkInheritedPermissions(userId, resourceId, action);
+
+            if (inheritedResult.isAllowed()) {
+                return inheritedResult;
+            }
+
+            // Check group permissions
+            AuthorizationResult groupResult = checkGroupPermissions(userId, resourceId, action);
+
+            if (groupResult.isAllowed()) {
+                return groupResult;
+            }
+
+            // Check role-based permissions as fallback
+            return checkRoleBasedPermissions(userId, resourceId, action);
+
+        } catch (Exception e) {
+            log.error(&quot;Resource authorization error&quot;, e);
+            return AuthorizationResult.error(&quot;Authorization check failed&quot;);
+        }
+    }
+
+    private AuthorizationResult checkDirectPermissions(String userId, String resourceId, String action) {
+        Optional&lt;ResourcePermission&gt; permission = permissionRepository
+            .findByUserIdAndResourceIdAndAction(userId, resourceId, action);
+
+        if (permission.isPresent()) {
+            ResourcePermission perm = permission.get();
+
+            if (perm.isGranted() &amp;&amp; !perm.isExpired()) {
+                return AuthorizationResult.allowed(
+                    &quot;Direct resource permission granted&quot;,
+                    Map.of(&quot;permissionId&quot;, perm.getId(), &quot;grantedBy&quot;, perm.getGrantedBy())
+                );
+            }
+        }
+
+        return AuthorizationResult.denied(&quot;No direct resource permission found&quot;);
+    }
+
+    private AuthorizationResult checkInheritedPermissions(String userId, String resourceId, String action) {
+        List&lt;String&gt; parentResources = hierarchyService.getParentResourceIds(resourceId);
+
+        for (String parentResourceId : parentResources) {
+            Optional&lt;ResourcePermission&gt; permission = permissionRepository
+                .findByUserIdAndResourceIdAndAction(userId, parentResourceId, action);
+
+            if (permission.isPresent()) {
+                ResourcePermission perm = permission.get();
+
+                if (perm.isGranted() &amp;&amp; !perm.isExpired() &amp;&amp; perm.isInheritable()) {
+                    return AuthorizationResult.allowed(
+                        &quot;Inherited permission from parent resource: &quot; + parentResourceId,
+                        Map.of(&quot;parentResource&quot;, parentResourceId, &quot;permissionId&quot;, perm.getId())
+                    );
+                }
+            }
+        }
+
+        return AuthorizationResult.denied(&quot;No inherited permissions found&quot;);
+    }
+
+    private AuthorizationResult checkGroupPermissions(String userId, String resourceId, String action) {
+        Set&lt;String&gt; userGroups = groupService.getUserGroups(userId);
+
+        for (String groupId : userGroups) {
+            Optional&lt;ResourcePermission&gt; permission = permissionRepository
+                .findByGroupIdAndResourceIdAndAction(groupId, resourceId, action);
+
+            if (permission.isPresent()) {
+                ResourcePermission perm = permission.get();
+
+                if (perm.isGranted() &amp;&amp; !perm.isExpired()) {
+                    return AuthorizationResult.allowed(
+                        &quot;Group permission granted via group: &quot; + groupId,
+                        Map.of(&quot;groupId&quot;, groupId, &quot;permissionId&quot;, perm.getId())
+                    );
+                }
+            }
+        }
+
+        return AuthorizationResult.denied(&quot;No group permissions found&quot;);
+    }
+}
+
+@Entity
+public class ResourcePermission {
+    private String id;
+    private String subjectId; // User or group ID
+    private SubjectType subjectType; // USER or GROUP
+    private String resourceId;
+    private String action;
+    private boolean granted;
+    private boolean inheritable;
+    private Instant grantedAt;
+    private Instant expiresAt;
+    private String grantedBy;
+    private Map&lt;String, String&gt; conditions; // Additional conditions
+
+    public boolean isExpired() {
+        return expiresAt != null &amp;&amp; Instant.now().isAfter(expiresAt);
+    }
+
+    public boolean meetsConditions(Map&lt;String, Object&gt; context) {
+        if (conditions == null || conditions.isEmpty()) {
+            return true;
+        }
+
+        return conditions.entrySet().stream().allMatch(condition -&gt; {
+            String contextValue = String.valueOf(context.get(condition.getKey()));
+            return condition.getValue().equals(contextValue);
+        });
+    }
+}
+
+@Service
+public class ResourcePermissionManager {
+
+    public void grantPermission(PermissionGrant grant) {
+        // Validate grant request
+        validatePermissionGrant(grant);
+
+        // Create permission record
+        ResourcePermission permission = ResourcePermission.builder()
+            .subjectId(grant.getSubjectId())
+            .subjectType(grant.getSubjectType())
+            .resourceId(grant.getResourceId())
+            .action(grant.getAction())
+            .granted(true)
+            .inheritable(grant.isInheritable())
+            .grantedAt(Instant.now())
+            .expiresAt(grant.getExpiresAt())
+            .grantedBy(grant.getGrantedBy())
+            .conditions(grant.getConditions())
+            .build();
+
+        permissionRepository.save(permission);
+
+        // Audit the permission grant
+        auditService.recordPermissionGrant(permission);
+
+        log.info(&quot;Permission granted: {} can {} on {}&quot;, 
+                grant.getSubjectId(), grant.getAction(), grant.getResourceId());
+    }
+
+    public void revokePermission(String subjectId, String resourceId, String action) {
+        Optional&lt;ResourcePermission&gt; permission = permissionRepository
+            .findBySubjectIdAndResourceIdAndAction(subjectId, resourceId, action);
+
+        if (permission.isPresent()) {
+            ResourcePermission perm = permission.get();
+            perm.setGranted(false);
+            perm.setRevokedAt(Instant.now());
+
+            permissionRepository.save(perm);
+
+            auditService.recordPermissionRevocation(perm);
+
+            log.info(&quot;Permission revoked: {} can no longer {} on {}&quot;, 
+                    subjectId, action, resourceId);
+        }
+    }
+}
+</code></pre>
+<h3 id="4-dynamic-authorization-with-context">4. <strong>Dynamic Authorization with Context</strong></h3>
+<pre><code class="language-java">// Context-aware dynamic authorization
+@Service
+public class ContextAwareAuthorizationService {
+
+    @Autowired
+    private PolicyEvaluationEngine evaluationEngine;
+
+    @Autowired
+    private RiskAssessmentService riskService;
+
+    public AuthorizationResult authorizeWithContext(AuthorizationRequest request) {
+        // Build comprehensive authorization context
+        AuthorizationContext context = buildAuthorizationContext(request);
+
+        // Assess risk level for this request
+        RiskLevel riskLevel = riskService.assessRisk(context);
+        context.setRiskLevel(riskLevel);
+
+        // Apply risk-based authorization policies
+        AuthorizationResult riskBasedResult = applyRiskBasedPolicies(context);
+
+        if (riskBasedResult.isDenied()) {
+            return riskBasedResult;
+        }
+
+        // Apply time-based restrictions
+        AuthorizationResult timeBasedResult = applyTimeBasedRestrictions(context);
+
+        if (timeBasedResult.isDenied()) {
+            return timeBasedResult;
+        }
+
+        // Apply location-based restrictions
+        AuthorizationResult locationBasedResult = applyLocationBasedRestrictions(context);
+
+        if (locationBasedResult.isDenied()) {
+            return locationBasedResult;
+        }
+
+        // Apply standard authorization policies
+        return applyStandardPolicies(context);
+    }
+
+    private AuthorizationContext buildAuthorizationContext(AuthorizationRequest request) {
+        return AuthorizationContext.builder()
+            .subjectId(request.getSubjectId())
+            .resourceId(request.getResourceId())
+            .action(request.getAction())
+            .timestamp(Instant.now())
+            .clientIP(request.getClientIP())
+            .userAgent(request.getUserAgent())
+            .sessionId(request.getSessionId())
+            .requestAttributes(request.getAttributes())
+            .build();
+    }
+
+    private AuthorizationResult applyRiskBasedPolicies(AuthorizationContext context) {
+        RiskLevel riskLevel = context.getRiskLevel();
+
+        switch (riskLevel) {
+            case HIGH:
+                return AuthorizationResult.denied(
+                    &quot;Access denied due to high risk assessment: &quot; + 
+                    context.getRiskLevel().getReasons()
+                );
+
+            case MEDIUM:
+                // Require additional authentication or approval
+                if (!hasAdditionalAuthentication(context)) {
+                    return AuthorizationResult.conditionalDenial(
+                        &quot;Additional authentication required for medium-risk access&quot;,
+                        Map.of(&quot;requireMFA&quot;, true, &quot;riskLevel&quot;, riskLevel)
+                    );
+                }
+                break;
+
+            case LOW:
+                // Standard processing
+                break;
+        }
+
+        return AuthorizationResult.allow();
+    }
+
+    private AuthorizationResult applyTimeBasedRestrictions(AuthorizationContext context) {
+        String subjectId = context.getSubjectId();
+        String resourceId = context.getResourceId();
+
+        // Get time-based restrictions for subject and resource
+        Set&lt;TimeRestriction&gt; restrictions = restrictionService.getTimeRestrictions(subjectId, resourceId);
+
+        ZonedDateTime currentTime = context.getTimestamp().atZone(ZoneId.systemDefault());
+
+        for (TimeRestriction restriction : restrictions) {
+            if (!restriction.isAllowedAt(currentTime)) {
+                return AuthorizationResult.denied(
+                    &quot;Access denied due to time restriction: &quot; + restriction.getDescription()
+                );
+            }
+        }
+
+        return AuthorizationResult.allow();
+    }
+
+    private AuthorizationResult applyLocationBasedRestrictions(AuthorizationContext context) {
+        String clientIP = context.getClientIP();
+
+        if (clientIP == null) {
+            return AuthorizationResult.allow(); // No location restriction if IP unknown
+        }
+
+        Location location = geoLocationService.getLocation(clientIP);
+
+        // Check country restrictions
+        Set&lt;String&gt; allowedCountries = restrictionService.getAllowedCountries(
+            context.getSubjectId(), 
+            context.getResourceId()
+        );
+
+        if (!allowedCountries.isEmpty() &amp;&amp; !allowedCountries.contains(location.getCountry())) {
+            return AuthorizationResult.denied(
+                &quot;Access denied from country: &quot; + location.getCountry()
+            );
+        }
+
+        // Check high-risk location restrictions
+        if (securityService.isHighRiskLocation(location)) {
+            String resourceClassification = resourceService.getClassification(context.getResourceId());
+
+            if (&quot;SENSITIVE&quot;.equals(resourceClassification) || &quot;CONFIDENTIAL&quot;.equals(resourceClassification)) {
+                return AuthorizationResult.denied(
+                    &quot;Access to &quot; + resourceClassification + &quot; resource denied from high-risk location&quot;
+                );
+            }
+        }
+
+        return AuthorizationResult.allow();
+    }
+}
+
+@Service
+public class RiskAssessmentService {
+
+    public RiskLevel assessRisk(AuthorizationContext context) {
+        RiskScore score = RiskScore.builder()
+            .baseScore(0.0)
+            .build();
+
+        // Location-based risk
+        Location location = geoLocationService.getLocation(context.getClientIP());
+        if (securityService.isHighRiskLocation(location)) {
+            score.addRisk(0.3, &quot;High-risk geographic location&quot;);
+        }
+
+        // Time-based risk
+        if (isUnusualTime(context)) {
+            score.addRisk(0.2, &quot;Access outside normal hours&quot;);
+        }
+
+        // Behavior-based risk
+        if (behaviorAnalysis.isAnomalous(context)) {
+            score.addRisk(0.4, &quot;Anomalous user behavior detected&quot;);
+        }
+
+        // Resource sensitivity risk
+        String classification = resourceService.getClassification(context.getResourceId());
+        if (&quot;CONFIDENTIAL&quot;.equals(classification)) {
+            score.addRisk(0.2, &quot;Access to confidential resource&quot;);
+        }
+
+        // Device/session risk
+        if (!deviceService.isTrustedDevice(context.getSessionId())) {
+            score.addRisk(0.3, &quot;Untrusted device&quot;);
+        }
+
+        return determineRiskLevel(score);
+    }
+
+    private RiskLevel determineRiskLevel(RiskScore score) {
+        if (score.getTotalScore() &gt;= 0.7) {
+            return RiskLevel.HIGH;
+        } else if (score.getTotalScore() &gt;= 0.4) {
+            return RiskLevel.MEDIUM;
+        } else {
+            return RiskLevel.LOW;
+        }
+    }
+}
+</code></pre>
+<h2 id="apache-camel-implementation">Apache Camel Implementation</h2>
+<h3 id="1-rbac-authorization-route">1. <strong>RBAC Authorization Route</strong></h3>
+<pre><code class="language-java">@Component
+public class RBACAuthorizationRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from(&quot;direct:rbacAuthorization&quot;)
+            .routeId(&quot;rbac-authorization-route&quot;)
+            .process(exchange -&gt; {
+                String userId = exchange.getIn().getHeader(&quot;authenticated-user&quot;, String.class);
+                String resourceId = exchange.getIn().getHeader(&quot;resource-id&quot;, String.class);
+                String action = exchange.getIn().getHeader(&quot;action&quot;, String.class);
+
+                if (userId == null || resourceId == null || action == null) {
+                    throw new UnauthorizedException(&quot;Missing required authorization parameters&quot;);
+                }
+
+                AuthorizationResult result = rbacAuthorizationService.authorize(userId, resourceId, action);
+
+                if (!result.isAllowed()) {
+                    throw new UnauthorizedException(&quot;Access denied: &quot; + result.getMessage());
+                }
+
+                // Set authorization context in headers
+                exchange.getIn().setHeader(&quot;authorization-granted&quot;, true);
+                exchange.getIn().setHeader(&quot;granting-role&quot;, result.getGrantingRole());
+                exchange.getIn().setHeader(&quot;authorization-reason&quot;, result.getMessage());
+            })
+            .log(&quot;Authorization granted for user ${header.authenticated-user} on resource ${header.resource-id}&quot;)
+            .to(&quot;direct:processAuthorizedRequest&quot;);
+    }
+}
+</code></pre>
+<h3 id="2-abac-policy-evaluation-route">2. <strong>ABAC Policy Evaluation Route</strong></h3>
+<pre><code class="language-java">@Component
+public class ABACAuthorizationRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from(&quot;direct:abacAuthorization&quot;)
+            .routeId(&quot;abac-authorization-route&quot;)
+            .process(exchange -&gt; {
+                // Build authorization request from headers and body
+                AuthorizationRequest request = AuthorizationRequest.builder()
+                    .subjectId(exchange.getIn().getHeader(&quot;authenticated-user&quot;, String.class))
+                    .resourceId(exchange.getIn().getHeader(&quot;resource-id&quot;, String.class))
+                    .action(exchange.getIn().getHeader(&quot;action&quot;, String.class))
+                    .clientIP(exchange.getIn().getHeader(&quot;X-Forwarded-For&quot;, String.class))
+                    .userAgent(exchange.getIn().getHeader(&quot;User-Agent&quot;, String.class))
+                    .attributes(extractRequestAttributes(exchange))
+                    .build();
+
+                // Evaluate ABAC policies
+                AuthorizationResult result = abacAuthorizationService.authorize(request);
+
+                if (!result.isAllowed()) {
+                    throw new UnauthorizedException(&quot;Access denied: &quot; + result.getMessage());
+                }
+
+                // Set policy evaluation results in headers
+                exchange.getIn().setHeader(&quot;authorization-granted&quot;, true);
+                exchange.getIn().setHeader(&quot;policy-result&quot;, result);
+            })
+            .log(&quot;ABAC authorization completed for ${header.authenticated-user}&quot;)
+            .to(&quot;direct:processABACAuthorizedRequest&quot;);
+    }
+
+    private Map&lt;String, Object&gt; extractRequestAttributes(Exchange exchange) {
+        Map&lt;String, Object&gt; attributes = new HashMap&lt;&gt;();
+
+        // Extract relevant attributes from message
+        Object body = exchange.getIn().getBody();
+        if (body instanceof Map) {
+            Map&lt;?, ?&gt; bodyMap = (Map&lt;?, ?&gt;) body;
+            attributes.put(&quot;requestData&quot;, bodyMap);
+            attributes.put(&quot;dataSize&quot;, bodyMap.size());
+        }
+
+        // Add request metadata
+        attributes.put(&quot;timestamp&quot;, Instant.now());
+        attributes.put(&quot;method&quot;, exchange.getIn().getHeader(Exchange.HTTP_METHOD));
+
+        return attributes;
+    }
+}
+</code></pre>
+<h3 id="3-multi-level-authorization-route">3. <strong>Multi-Level Authorization Route</strong></h3>
+<pre><code class="language-java">@Component
+public class MultiLevelAuthorizationRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from(&quot;direct:multiLevelAuthorization&quot;)
+            .routeId(&quot;multi-level-authorization-route&quot;)
+            .choice()
+                // High-sensitivity resources require additional checks
+                .when(header(&quot;resource-classification&quot;).isEqualTo(&quot;CONFIDENTIAL&quot;))
+                    .to(&quot;direct:confidentialResourceAuth&quot;)
+
+                // Standard resources use standard authorization
+                .when(header(&quot;resource-classification&quot;).in(&quot;PUBLIC&quot;, &quot;INTERNAL&quot;))
+                    .to(&quot;direct:standardResourceAuth&quot;)
+
+                // Sensitive resources require enhanced authorization
+                .when(header(&quot;resource-classification&quot;).isEqualTo(&quot;SENSITIVE&quot;))
+                    .to(&quot;direct:sensitiveResourceAuth&quot;)
+
+                .otherwise()
+                    .throwException(new IllegalArgumentException(&quot;Unknown resource classification&quot;))
+            .end();
+
+        // Confidential resource authorization
+        from(&quot;direct:confidentialResourceAuth&quot;)
+            .process(exchange -&gt; {
+                String userId = exchange.getIn().getHeader(&quot;authenticated-user&quot;, String.class);
+
+                // Check if user has confidential data access clearance
+                if (!securityClearanceService.hasConfidentialAccess(userId)) {
+                    throw new UnauthorizedException(&quot;Insufficient security clearance for confidential resource&quot;);
+                }
+
+                // Require MFA for confidential access
+                if (!exchange.getIn().getHeader(&quot;mfa-verified&quot;, Boolean.class, false)) {
+                    throw new UnauthorizedException(&quot;Multi-factor authentication required for confidential resource&quot;);
+                }
+
+                // Check location restrictions
+                String clientIP = exchange.getIn().getHeader(&quot;X-Forwarded-For&quot;, String.class);
+                if (!locationService.isSecureLocation(clientIP)) {
+                    throw new UnauthorizedException(&quot;Confidential resource access not allowed from current location&quot;);
+                }
+            })
+            .to(&quot;direct:logHighSecurityAccess&quot;)
+            .to(&quot;direct:processConfidentialRequest&quot;);
+
+        // Standard resource authorization
+        from(&quot;direct:standardResourceAuth&quot;)
+            .process(exchange -&gt; {
+                String userId = exchange.getIn().getHeader(&quot;authenticated-user&quot;, String.class);
+                String resourceId = exchange.getIn().getHeader(&quot;resource-id&quot;, String.class);
+                String action = exchange.getIn().getHeader(&quot;action&quot;, String.class);
+
+                AuthorizationResult result = standardAuthorizationService.authorize(userId, resourceId, action);
+
+                if (!result.isAllowed()) {
+                    throw new UnauthorizedException(&quot;Access denied: &quot; + result.getMessage());
+                }
+            })
+            .to(&quot;direct:processStandardRequest&quot;);
+
+        // Sensitive resource authorization
+        from(&quot;direct:sensitiveResourceAuth&quot;)
+            .process(exchange -&gt; {
+                // Apply both RBAC and additional business rules
+                performStandardAuthorization(exchange);
+
+                // Additional business rule checks
+                String userId = exchange.getIn().getHeader(&quot;authenticated-user&quot;, String.class);
+                String resourceId = exchange.getIn().getHeader(&quot;resource-id&quot;, String.class);
+
+                // Check business hours restriction for sensitive data
+                if (!isBusinessHours() &amp;&amp; !hasEmergencyAccess(userId)) {
+                    throw new UnauthorizedException(&quot;Sensitive resource access restricted outside business hours&quot;);
+                }
+
+                // Check data access justification
+                String justification = exchange.getIn().getHeader(&quot;access-justification&quot;, String.class);
+                if (justification == null || justification.trim().isEmpty()) {
+                    throw new UnauthorizedException(&quot;Access justification required for sensitive resource&quot;);
+                }
+            })
+            .to(&quot;direct:logSensitiveAccess&quot;)
+            .to(&quot;direct:processSensitiveRequest&quot;);
+    }
+}
+</code></pre>
+<h3 id="4-dynamic-authorization-route">4. <strong>Dynamic Authorization Route</strong></h3>
+<pre><code class="language-java">@Component
+public class DynamicAuthorizationRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        from(&quot;direct:dynamicAuthorization&quot;)
+            .routeId(&quot;dynamic-authorization-route&quot;)
+            .process(exchange -&gt; {
+                // Build comprehensive authorization request
+                AuthorizationRequest request = buildDynamicAuthorizationRequest(exchange);
+
+                // Perform context-aware authorization
+                AuthorizationResult result = contextAwareAuthorizationService.authorizeWithContext(request);
+
+                if (result.isDenied()) {
+                    throw new UnauthorizedException(&quot;Access denied: &quot; + result.getMessage());
+                }
+
+                if (result.isConditional()) {
+                    // Handle conditional authorization (e.g., require additional auth)
+                    handleConditionalAuthorization(exchange, result);
+                }
+
+                // Set dynamic authorization results
+                exchange.getIn().setHeader(&quot;authorization-result&quot;, result);
+                exchange.getIn().setHeader(&quot;risk-level&quot;, result.getRiskLevel());
+            })
+            .choice()
+                .when(header(&quot;risk-level&quot;).isEqualTo(&quot;HIGH&quot;))
+                    .to(&quot;direct:handleHighRiskAccess&quot;)
+                .when(header(&quot;risk-level&quot;).isEqualTo(&quot;MEDIUM&quot;))
+                    .to(&quot;direct:handleMediumRiskAccess&quot;)
+                .otherwise()
+                    .to(&quot;direct:handleStandardAccess&quot;)
+            .end();
+
+        from(&quot;direct:handleHighRiskAccess&quot;)
+            .process(exchange -&gt; {
+                // Enhanced logging for high-risk access
+                String userId = exchange.getIn().getHeader(&quot;authenticated-user&quot;, String.class);
+                String resourceId = exchange.getIn().getHeader(&quot;resource-id&quot;, String.class);
+
+                securityMonitor.logHighRiskAccess(userId, resourceId);
+
+                // Notify security team
+                alertService.sendSecurityAlert(&quot;High-risk access detected&quot;, 
+                    Map.of(&quot;user&quot;, userId, &quot;resource&quot;, resourceId));
+            })
+            .to(&quot;direct:processWithEnhancedMonitoring&quot;);
+
+        from(&quot;direct:handleMediumRiskAccess&quot;)
+            .process(exchange -&gt; {
+                // Additional verification for medium-risk access
+                String userId = exchange.getIn().getHeader(&quot;authenticated-user&quot;, String.class);
+
+                // Check if additional verification is required
+                AuthorizationResult result = exchange.getIn().getHeader(&quot;authorization-result&quot;, AuthorizationResult.class);
+
+                if (result.requiresAdditionalAuth()) {
+                    Map&lt;String, Object&gt; requirements = result.getAdditionalRequirements();
+
+                    if (Boolean.TRUE.equals(requirements.get(&quot;requireMFA&quot;))) {
+                        // Verify MFA was completed
+                        if (!exchange.getIn().getHeader(&quot;mfa-verified&quot;, Boolean.class, false)) {
+                            throw new UnauthorizedException(&quot;Additional authentication required&quot;);
+                        }
+                    }
+                }
+            })
+            .to(&quot;direct:processWithStandardMonitoring&quot;);
+    }
+
+    private AuthorizationRequest buildDynamicAuthorizationRequest(Exchange exchange) {
+        return AuthorizationRequest.builder()
+            .subjectId(exchange.getIn().getHeader(&quot;authenticated-user&quot;, String.class))
+            .resourceId(exchange.getIn().getHeader(&quot;resource-id&quot;, String.class))
+            .action(exchange.getIn().getHeader(&quot;action&quot;, String.class))
+            .clientIP(exchange.getIn().getHeader(&quot;X-Forwarded-For&quot;, String.class))
+            .userAgent(exchange.getIn().getHeader(&quot;User-Agent&quot;, String.class))
+            .sessionId(exchange.getIn().getHeader(&quot;session-id&quot;, String.class))
+            .attributes(extractAllAttributes(exchange))
+            .build();
+    }
+}
+</code></pre>
+<h2 id="best-practices">Best Practices</h2>
+<h3 id="1-authorization-architecture">1. <strong>Authorization Architecture</strong></h3>
+<ul>
+<li>Implement fine-grained permissions with clear resource hierarchies and action definitions</li>
+<li>Use externalized policy configuration to enable runtime authorization rule changes</li>
+<li>Design for scalability with caching and efficient policy evaluation algorithms</li>
+<li>Implement proper separation of authentication and authorization concerns</li>
+<li>Use consistent authorization patterns across all system components</li>
+</ul>
+<h3 id="2-policy-management">2. <strong>Policy Management</strong></h3>
+<ul>
+<li>Maintain clear, auditable policies with version control and change management</li>
+<li>Use policy templates and inheritance to reduce configuration complexity</li>
+<li>Implement policy testing and validation before deployment</li>
+<li>Provide clear documentation for authorization rules and their business justification</li>
+<li>Use declarative policy languages (XACML, OPA Rego) for complex authorization logic</li>
+</ul>
+<h3 id="3-performance-optimization">3. <strong>Performance Optimization</strong></h3>
+<ul>
+<li>Cache authorization decisions for frequently accessed resources with appropriate TTL</li>
+<li>Use efficient data structures and algorithms for policy evaluation</li>
+<li>Implement policy evaluation timeouts to prevent blocking operations</li>
+<li>Pre-compute permissions for static scenarios to reduce runtime overhead</li>
+<li>Monitor authorization performance and optimize slow policy evaluations</li>
+</ul>
+<h3 id="4-security-considerations">4. <strong>Security Considerations</strong></h3>
+<ul>
+<li>Apply principle of least privilege by default with explicit permission grants</li>
+<li>Implement fail-secure behavior when authorization services are unavailable</li>
+<li>Use secure audit logging for all authorization decisions and policy changes</li>
+<li>Protect authorization policies and configurations from unauthorized access</li>
+<li>Implement proper input validation for all authorization parameters</li>
+</ul>
+<h3 id="5-monitoring-and-compliance">5. <strong>Monitoring and Compliance</strong></h3>
+<ul>
+<li>Log all authorization decisions with sufficient context for audit and investigation</li>
+<li>Monitor authorization patterns and alert on suspicious access attempts</li>
+<li>Implement regular access reviews and permission cleanup processes</li>
+<li>Provide comprehensive reporting for compliance and security assessments</li>
+<li>Track authorization policy effectiveness and adjust based on security incidents</li>
+</ul>
+<h3 id="6-integration-and-usability">6. <strong>Integration and Usability</strong></h3>
+<ul>
+<li>Provide clear error messages that help users understand access requirements</li>
+<li>Implement self-service capabilities for common permission requests</li>
+<li>Design APIs that make it easy for developers to implement proper authorization</li>
+<li>Provide tools and dashboards for administrators to manage permissions effectively</li>
+<li>Ensure authorization checks are integrated seamlessly into business workflows</li>
+</ul>
+<p>The Authorization pattern is essential for maintaining security, compliance, and proper access control in enterprise integration architectures, ensuring that authenticated entities can only perform actions and access resources appropriate to their role, context, and business requirements.</p>
+
+      <a href="../index.html" class="back-to-top">← Back to All Patterns</a>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <p>©2026 <a href="https://dataintegrationmastery.com/">Data Integration Mastery™</a> — All Rights Reserved</p>
+  </footer>
+</body>
+</html>

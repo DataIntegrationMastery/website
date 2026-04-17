@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Choreography — Integration Architecture Patterns | Data Integration Mastery™</title>
+  <meta name="description" content="The Choreography pattern is a decentralized coordination mechanism in enterprise integration architectures where services collaborate to achieve business goa...">
+  <meta name="keywords" content="choreography, integration pattern, orchestration patterns, integration architecture, EAI patterns, data integration">
+  <link rel="canonical" href="https://dataintegrationmastery.com/patterns/orchestration-patterns/choreography.html">
+
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://dataintegrationmastery.com/patterns/orchestration-patterns/choreography.html">
+  <meta property="og:title" content="Choreography — Integration Architecture Patterns">
+  <meta property="og:description" content="The Choreography pattern is a decentralized coordination mechanism in enterprise integration architectures where services collaborate to achieve business goa...">
+  <meta property="og:image" content="https://dataintegrationmastery.com/assets/images/logo.png">
+  <meta property="og:site_name" content="Data Integration Mastery">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Choreography — Integration Architecture Patterns">
+  <meta name="twitter:description" content="The Choreography pattern is a decentralized coordination mechanism in enterprise integration architectures where services collaborate to achieve business goa...">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/docs.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Choreography",
+    "description": "The Choreography pattern is a decentralized coordination mechanism in enterprise integration architectures where services collaborate to achieve business goa...",
+    "url": "https://dataintegrationmastery.com/patterns/orchestration-patterns/choreography.html",
+    "author": {
+      "@type": "Person",
+      "name": "Ari Vilkman",
+      "jobTitle": "Integration Architect"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Data Integration Mastery",
+      "url": "https://dataintegrationmastery.com"
+    },
+    "isPartOf": {
+      "@type": "CollectionPage",
+      "name": "Integration Architecture Patterns",
+      "url": "https://dataintegrationmastery.com/patterns/"
+    },
+    "about": {
+      "@type": "Thing",
+      "name": "Choreography"
+    },
+    "inLanguage": "en",
+    "isAccessibleForFree": true
+  }
+  </script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="https://dataintegrationmastery.com/" class="header-brand">
+        <img src="../../assets/images/dim-icon.png" alt="DIM" width="36" height="36">
+        <span class="header-title">Data Integration Mastery™</span>
+      </a>
+      <nav class="header-nav" aria-label="Main navigation">
+        <a href="https://dataintegrationmastery.com/">Home</a>
+        <a href="../index.html">All Patterns</a>
+        <a href="https://dataintegrationmastery.com/#free-course">Free Course</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="docs-layout">
+    <aside class="docs-sidebar" aria-label="Pattern categories">
+      <div class="sidebar-title">Pattern Categories</div>
+<div class="sidebar-section">
+  <a href="../index.html#resilience" class="sidebar-section-title">🛡️ Resilience Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../resilience-patterns/circuit-breaker.html">Circuit Breaker</a></li>
+    <li><a href="../resilience-patterns/retry-mechanism.html">Retry Mechanism</a></li>
+    <li><a href="../resilience-patterns/timeout.html">Timeout</a></li>
+    <li><a href="../resilience-patterns/dead-letter-queue.html">Dead Letter Queue</a></li>
+    <li><a href="../resilience-patterns/bulkhead.html">Bulkhead</a></li>
+    <li><a href="../resilience-patterns/fallback-graceful-degradation.html">Fallback / Graceful Degradation</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#messaging" class="sidebar-section-title">📨 Messaging Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../messaging-patterns/request-reply.html">Request-Reply</a></li>
+    <li><a href="../messaging-patterns/publish-subscribe.html">Publish-Subscribe</a></li>
+    <li><a href="../messaging-patterns/message-queue.html">Message Queue</a></li>
+    <li><a href="../messaging-patterns/event-streaming.html">Event Streaming</a></li>
+    <li><a href="../messaging-patterns/correlation-id.html">Correlation ID</a></li>
+    <li><a href="../messaging-patterns/message-routing.html">Message Routing</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#data-transformation" class="sidebar-section-title">🔄 Data Transformation Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../data-transformation-patterns/message-translator.html">Message Translator</a></li>
+    <li><a href="../data-transformation-patterns/content-filter.html">Content Filter</a></li>
+    <li><a href="../data-transformation-patterns/message-router.html">Message Router</a></li>
+    <li><a href="../data-transformation-patterns/aggregator.html">Aggregator</a></li>
+    <li><a href="../data-transformation-patterns/splitter.html">Splitter</a></li>
+    <li><a href="../data-transformation-patterns/data-mapper.html">Data Mapper</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#routing" class="sidebar-section-title">🔀 Routing Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../routing-patterns/content-based-router.html">Content-Based Router</a></li>
+    <li><a href="../routing-patterns/recipient-list.html">Recipient List</a></li>
+    <li><a href="../routing-patterns/load-balancer.html">Load Balancer</a></li>
+    <li><a href="../routing-patterns/message-filter.html">Message Filter</a></li>
+    <li><a href="../routing-patterns/dynamic-router.html">Dynamic Router</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#security" class="sidebar-section-title">🔐 Security Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../security-patterns/authentication.html">Authentication</a></li>
+    <li><a href="../security-patterns/authorization.html">Authorization</a></li>
+    <li><a href="../security-patterns/encryption.html">Encryption</a></li>
+    <li><a href="../security-patterns/token-management.html">Token Management</a></li>
+    <li><a href="../security-patterns/api-security.html">API Security</a></li>
+    <li><a href="../security-patterns/secret-management.html">Secret Management</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#orchestration" class="sidebar-section-title">🎭 Orchestration Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="saga-pattern.html">Saga Pattern</a></li>
+    <li><a href="process-manager.html">Process Manager</a></li>
+    <li><a href="workflow-engine.html">Workflow Engine</a></li>
+    <li><a href="choreography.html" class="active">Choreography</a></li>
+    <li><a href="compensation-transactions.html">Compensation Transactions</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#observability" class="sidebar-section-title">📊 Monitoring & Observability Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../monitoring-observability-patterns/distributed-tracing.html">Distributed Tracing</a></li>
+    <li><a href="../monitoring-observability-patterns/metrics-collection.html">Metrics Collection</a></li>
+    <li><a href="../monitoring-observability-patterns/health-checks.html">Health Checks</a></li>
+    <li><a href="../monitoring-observability-patterns/logging-strategies.html">Logging Strategies</a></li>
+    <li><a href="../monitoring-observability-patterns/performance-monitoring.html">Performance Monitoring</a></li>
+    <li><a href="../monitoring-observability-patterns/error-tracking.html">Error Tracking</a></li>
+  </ul>
+</div>
+
+    </aside>
+
+    <main id="main-content" class="docs-content">
+      <div class="breadcrumb">
+        <a href="https://dataintegrationmastery.com/">Home</a>
+        <span class="sep">›</span>
+        <a href="../index.html">Patterns</a>
+        <span class="sep">›</span>
+        <a href="../index.html#orchestration">Orchestration Patterns</a>
+        <span class="sep">›</span>
+        <strong>Choreography</strong>
+      </div>
+
+      <h1>Choreography</h1>
+
+      <h2 id="overview">Overview</h2>
+<p>The Choreography pattern is a decentralized coordination mechanism in enterprise integration architectures where services collaborate to achieve business goals through direct peer-to-peer interactions without the need for a central coordinator or orchestrator. Like a well-rehearsed dance troupe where each dancer knows their role and responds to the movements of their partners without a director, the Choreography pattern enables services to participate in complex business processes by reacting to events and messages from other services according to predefined protocols and agreements. This pattern is essential for building loosely coupled, scalable, and resilient distributed systems where services can autonomously participate in business workflows while maintaining independence and avoiding single points of failure.</p>
+<h3 id="theoretical-foundation">Theoretical Foundation</h3>
+<p>The Choreography pattern is grounded in <strong>distributed systems theory</strong>, <strong>event-driven architecture principles</strong>, and <strong>autonomous agent coordination</strong>. It incorporates concepts from <strong>reactive systems</strong>, <strong>event sourcing</strong>, <strong>publish-subscribe messaging</strong>, and <strong>distributed consensus protocols</strong> to provide a framework for building self-organizing, resilient business process execution without centralized control. The pattern addresses the challenges of maintaining consistency, handling failures, and ensuring reliable process completion in loosely coupled environments where no single component has complete knowledge or control of the entire business process.</p>
+<h3 id="core-principles">Core Principles</h3>
+<h4 id="1-decentralized-coordination">1. <strong>Decentralized Coordination</strong></h4>
+<p>Enabling services to coordinate without centralized control:
+- <strong>Autonomous participation</strong> - each service decides independently how to participate in workflows
+- <strong>Event-driven collaboration</strong> - services communicate through asynchronous event publishing and consumption
+- <strong>Distributed decision making</strong> - business logic distributed across participating services
+- <strong>Self-organizing behavior</strong> - emergent workflow behavior through local service interactions</p>
+<h4 id="2-event-based-communication">2. <strong>Event-Based Communication</strong></h4>
+<p>Coordinating through publish-subscribe event mechanisms:
+- <strong>Event publishing</strong> - services publish domain events when significant state changes occur
+- <strong>Event subscription</strong> - services subscribe to relevant events from other services
+- <strong>Event correlation</strong> - tracking related events across the distributed workflow
+- <strong>Event ordering</strong> - handling event sequences and maintaining causal relationships</p>
+<h4 id="3-protocol-based-interaction">3. <strong>Protocol-Based Interaction</strong></h4>
+<p>Defining interaction contracts and agreements:
+- <strong>Interaction protocols</strong> - well-defined rules for service communication and collaboration
+- <strong>Message schemas</strong> - standardized event and message formats across services
+- <strong>Behavioral contracts</strong> - agreements on expected service behaviors and responses
+- <strong>Compensating actions</strong> - predefined recovery mechanisms for handling failures</p>
+<h4 id="4-loose-coupling-and-autonomy">4. <strong>Loose Coupling and Autonomy</strong></h4>
+<p>Maintaining service independence and flexibility:
+- <strong>Service autonomy</strong> - each service maintains its own data and business logic
+- <strong>Technology independence</strong> - services can use different technologies and platforms
+- <strong>Deployment independence</strong> - services can be deployed and updated independently
+- <strong>Failure isolation</strong> - failures in one service don't directly impact others</p>
+<h3 id="why-choreography-is-essential-in-integration-architecture">Why Choreography is Essential in Integration Architecture</h3>
+<h4 id="1-microservices-orchestration">1. <strong>Microservices Orchestration</strong></h4>
+<p>In microservices architectures, the Choreography pattern provides:
+- <strong>Distributed workflow coordination</strong> - enabling complex business processes across multiple services
+- <strong>Service independence</strong> - avoiding tight coupling between services through centralized orchestrators
+- <strong>Scalability enablement</strong> - supporting horizontal scaling without centralized bottlenecks
+- <strong>Resilience enhancement</strong> - eliminating single points of failure in business process execution</p>
+<h4 id="2-event-driven-system-design">2. <strong>Event-Driven System Design</strong></h4>
+<p>For reactive and event-driven architectures:
+- <strong>Reactive system behavior</strong> - enabling systems to respond dynamically to changing conditions
+- <strong>Event stream processing</strong> - coordinating workflows through continuous event streams
+- <strong>Real-time collaboration</strong> - enabling real-time coordination between distributed services
+- <strong>Stream-based integration</strong> - integrating systems through event streaming platforms</p>
+<h4 id="3-cross-system-integration">3. <strong>Cross-System Integration</strong></h4>
+<p>Enabling coordination across organizational and system boundaries:
+- <strong>Inter-organization workflows</strong> - coordinating processes across multiple organizations
+- <strong>Legacy system integration</strong> - enabling legacy systems to participate through event adapters
+- <strong>Cloud and hybrid integration</strong> - coordinating processes across different cloud platforms
+- <strong>Partner ecosystem integration</strong> - enabling flexible integration with business partners</p>
+<h4 id="4-business-process-flexibility">4. <strong>Business Process Flexibility</strong></h4>
+<p>Supporting dynamic and flexible business processes:
+- <strong>Process evolution</strong> - enabling processes to evolve through changing service behaviors
+- <strong>Dynamic participation</strong> - services can join or leave workflows dynamically
+- <strong>Conditional workflows</strong> - processes can adapt based on runtime conditions and events
+- <strong>Multi-variant processes</strong> - supporting different process variations simultaneously</p>
+<h3 id="benefits-in-integration-contexts">Benefits in Integration Contexts</h3>
+<h4 id="1-technical-advantages">1. <strong>Technical Advantages</strong></h4>
+<ul>
+<li><strong>No single point of failure</strong> - eliminating centralized orchestrators that can become bottlenecks</li>
+<li><strong>High scalability</strong> - supporting massive scale through distributed event processing</li>
+<li><strong>Loose coupling</strong> - minimizing dependencies between services and systems</li>
+<li><strong>Technology diversity</strong> - enabling heterogeneous technology stacks across services</li>
+</ul>
+<h4 id="2-business-value">2. <strong>Business Value</strong></h4>
+<ul>
+<li><strong>Business agility</strong> - rapid adaptation to changing business requirements through service evolution</li>
+<li><strong>Process flexibility</strong> - supporting dynamic and evolving business processes</li>
+<li><strong>Operational efficiency</strong> - reducing operational overhead through autonomous service behavior</li>
+<li><strong>Innovation enablement</strong> - facilitating rapid experimentation and new service development</li>
+</ul>
+<h4 id="3-integration-enablement">3. <strong>Integration Enablement</strong></h4>
+<ul>
+<li><strong>Event-driven integration</strong> - enabling real-time integration through event streaming</li>
+<li><strong>Asynchronous processing</strong> - supporting high-throughput asynchronous workflows</li>
+<li><strong>Protocol mediation</strong> - handling communication between services using different protocols</li>
+<li><strong>Data consistency</strong> - achieving eventual consistency through event-driven synchronization</li>
+</ul>
+<h4 id="4-operational-excellence">4. <strong>Operational Excellence</strong></h4>
+<ul>
+<li><strong>Fault tolerance</strong> - continuing operation despite individual service failures</li>
+<li><strong>Self-healing capabilities</strong> - automatic recovery through compensating actions and retries</li>
+<li><strong>Monitoring and observability</strong> - comprehensive visibility through distributed event tracking</li>
+<li><strong>Performance optimization</strong> - optimizing performance through parallel and asynchronous processing</li>
+</ul>
+<h3 id="integration-architecture-applications">Integration Architecture Applications</h3>
+<h4 id="1-e-commerce-order-processing">1. <strong>E-commerce Order Processing</strong></h4>
+<p>Choreographed order fulfillment across multiple services:</p>
+<pre><code class="language-java">// Order Service - Publishes order events
+@Component
+public class OrderService {
+
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
+
+    @Autowired
+    private OrderRepository orderRepository;
+
+    public Order placeOrder(CreateOrderRequest request) {
+        Order order = new Order();
+        order.setCustomerId(request.getCustomerId());
+        order.setItems(request.getItems());
+        order.setShippingAddress(request.getShippingAddress());
+        order.setStatus(OrderStatus.PLACED);
+        order.setTotalAmount(calculateTotalAmount(request.getItems()));
+
+        order = orderRepository.save(order);
+
+        // Publish order placed event
+        OrderPlacedEvent event = new OrderPlacedEvent();
+        event.setOrderId(order.getId());
+        event.setCustomerId(order.getCustomerId());
+        event.setItems(order.getItems());
+        event.setTotalAmount(order.getTotalAmount());
+        event.setTimestamp(Instant.now());
+
+        eventPublisher.publishEvent(event);
+
+        log.info(&quot;Order placed: {}&quot;, order.getId());
+        return order;
+    }
+
+    @EventListener
+    public void handleInventoryReserved(InventoryReservedEvent event) {
+        Order order = orderRepository.findById(event.getOrderId())
+            .orElseThrow(() -&gt; new OrderNotFoundException(event.getOrderId()));
+
+        order.setStatus(OrderStatus.INVENTORY_RESERVED);
+        orderRepository.save(order);
+
+        log.info(&quot;Inventory reserved for order: {}&quot;, event.getOrderId());
+    }
+
+    @EventListener
+    public void handlePaymentProcessed(PaymentProcessedEvent event) {
+        Order order = orderRepository.findById(event.getOrderId())
+            .orElseThrow(() -&gt; new OrderNotFoundException(event.getOrderId()));
+
+        if (event.getStatus() == PaymentStatus.SUCCESSFUL) {
+            order.setStatus(OrderStatus.PAYMENT_CONFIRMED);
+            order.setPaymentId(event.getPaymentId());
+        } else {
+            order.setStatus(OrderStatus.PAYMENT_FAILED);
+
+            // Publish compensation event
+            OrderPaymentFailedEvent compensationEvent = new OrderPaymentFailedEvent();
+            compensationEvent.setOrderId(event.getOrderId());
+            compensationEvent.setReason(event.getFailureReason());
+            compensationEvent.setTimestamp(Instant.now());
+
+            eventPublisher.publishEvent(compensationEvent);
+        }
+
+        orderRepository.save(order);
+        log.info(&quot;Payment processed for order: {} with status: {}&quot;, 
+                event.getOrderId(), event.getStatus());
+    }
+
+    @EventListener
+    public void handleShippingInitiated(ShippingInitiatedEvent event) {
+        Order order = orderRepository.findById(event.getOrderId())
+            .orElseThrow(() -&gt; new OrderNotFoundException(event.getOrderId()));
+
+        order.setStatus(OrderStatus.SHIPPED);
+        order.setTrackingNumber(event.getTrackingNumber());
+        order.setEstimatedDelivery(event.getEstimatedDelivery());
+
+        orderRepository.save(order);
+
+        log.info(&quot;Shipping initiated for order: {} with tracking: {}&quot;, 
+                event.getOrderId(), event.getTrackingNumber());
+    }
+
+    @EventListener
+    public void handleInventoryReservationFailed(InventoryReservationFailedEvent event) {
+        Order order = orderRepository.findById(event.getOrderId())
+            .orElseThrow(() -&gt; new OrderNotFoundException(event.getOrderId()));
+
+        order.setStatus(OrderStatus.CANCELLED);
+        order.setCancellationReason(&quot;Inventory not available: &quot; + event.getReason());
+
+        orderRepository.save(order);
+
+        log.info(&quot;Order cancelled due to inventory failure: {}&quot;, event.getOrderId());
+    }
+}
+
+// Inventory Service - Reacts to order events and manages inventory
+@Component
+public class InventoryService {
+
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
+
+    @Autowired
+    private InventoryRepository inventoryRepository;
+
+    @EventListener
+    @Async
+    public void handleOrderPlaced(OrderPlacedEvent event) {
+        try {
+            // Check inventory availability for all items
+            boolean allItemsAvailable = event.getItems().stream()
+                .allMatch(item -&gt; checkInventoryAvailability(item.getProductId(), item.getQuantity()));
+
+            if (allItemsAvailable) {
+                // Reserve inventory for all items
+                Map&lt;String, String&gt; reservations = new HashMap&lt;&gt;();
+
+                for (OrderItem item : event.getItems()) {
+                    String reservationId = reserveInventory(item.getProductId(), item.getQuantity());
+                    reservations.put(item.getProductId(), reservationId);
+                }
+
+                // Publish inventory reserved event
+                InventoryReservedEvent reservedEvent = new InventoryReservedEvent();
+                reservedEvent.setOrderId(event.getOrderId());
+                reservedEvent.setReservations(reservations);
+                reservedEvent.setTimestamp(Instant.now());
+
+                eventPublisher.publishEvent(reservedEvent);
+
+                log.info(&quot;Inventory reserved for order: {}&quot;, event.getOrderId());
+
+            } else {
+                // Publish inventory reservation failed event
+                InventoryReservationFailedEvent failedEvent = new InventoryReservationFailedEvent();
+                failedEvent.setOrderId(event.getOrderId());
+                failedEvent.setReason(&quot;Insufficient inventory for requested items&quot;);
+                failedEvent.setTimestamp(Instant.now());
+
+                eventPublisher.publishEvent(failedEvent);
+
+                log.warn(&quot;Insufficient inventory for order: {}&quot;, event.getOrderId());
+            }
+
+        } catch (Exception e) {
+            log.error(&quot;Error processing inventory for order: {}&quot;, event.getOrderId(), e);
+
+            InventoryReservationFailedEvent failedEvent = new InventoryReservationFailedEvent();
+            failedEvent.setOrderId(event.getOrderId());
+            failedEvent.setReason(&quot;Inventory system error: &quot; + e.getMessage());
+            failedEvent.setTimestamp(Instant.now());
+
+            eventPublisher.publishEvent(failedEvent);
+        }
+    }
+
+    @EventListener
+    public void handleOrderPaymentFailed(OrderPaymentFailedEvent event) {
+        try {
+            // Release inventory reservations
+            releaseInventoryForOrder(event.getOrderId());
+
+            log.info(&quot;Inventory released for failed order: {}&quot;, event.getOrderId());
+
+        } catch (Exception e) {
+            log.error(&quot;Error releasing inventory for order: {}&quot;, event.getOrderId(), e);
+        }
+    }
+
+    @EventListener
+    public void handleShippingInitiated(ShippingInitiatedEvent event) {
+        try {
+            // Convert reservations to actual inventory deductions
+            confirmInventoryReservations(event.getOrderId());
+
+            log.info(&quot;Inventory confirmed for shipped order: {}&quot;, event.getOrderId());
+
+        } catch (Exception e) {
+            log.error(&quot;Error confirming inventory for order: {}&quot;, event.getOrderId(), e);
+        }
+    }
+
+    private boolean checkInventoryAvailability(String productId, int quantity) {
+        InventoryItem item = inventoryRepository.findByProductId(productId);
+        return item != null &amp;&amp; item.getAvailableQuantity() &gt;= quantity;
+    }
+
+    private String reserveInventory(String productId, int quantity) {
+        InventoryItem item = inventoryRepository.findByProductId(productId);
+        if (item.getAvailableQuantity() &gt;= quantity) {
+            item.setAvailableQuantity(item.getAvailableQuantity() - quantity);
+            item.setReservedQuantity(item.getReservedQuantity() + quantity);
+            inventoryRepository.save(item);
+
+            String reservationId = UUID.randomUUID().toString();
+
+            InventoryReservation reservation = new InventoryReservation();
+            reservation.setReservationId(reservationId);
+            reservation.setProductId(productId);
+            reservation.setQuantity(quantity);
+            reservation.setCreatedAt(Instant.now());
+
+            inventoryReservationRepository.save(reservation);
+
+            return reservationId;
+        }
+
+        throw new InsufficientInventoryException(productId);
+    }
+}
+
+// Payment Service - Processes payments based on order events
+@Component
+public class PaymentService {
+
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
+
+    @Autowired
+    private PaymentProcessor paymentProcessor;
+
+    @EventListener
+    @Async
+    public void handleInventoryReserved(InventoryReservedEvent event) {
+        try {
+            // Retrieve order details for payment processing
+            PaymentRequest request = buildPaymentRequest(event.getOrderId());
+
+            PaymentResult result = paymentProcessor.processPayment(request);
+
+            PaymentProcessedEvent processedEvent = new PaymentProcessedEvent();
+            processedEvent.setOrderId(event.getOrderId());
+            processedEvent.setPaymentId(result.getPaymentId());
+            processedEvent.setStatus(result.getStatus());
+            processedEvent.setAmount(result.getAmount());
+            processedEvent.setTimestamp(Instant.now());
+
+            if (result.getStatus() == PaymentStatus.FAILED) {
+                processedEvent.setFailureReason(result.getFailureReason());
+            }
+
+            eventPublisher.publishEvent(processedEvent);
+
+            log.info(&quot;Payment processed for order: {} with status: {}&quot;, 
+                    event.getOrderId(), result.getStatus());
+
+        } catch (Exception e) {
+            log.error(&quot;Error processing payment for order: {}&quot;, event.getOrderId(), e);
+
+            PaymentProcessedEvent failedEvent = new PaymentProcessedEvent();
+            failedEvent.setOrderId(event.getOrderId());
+            failedEvent.setStatus(PaymentStatus.FAILED);
+            failedEvent.setFailureReason(&quot;Payment system error: &quot; + e.getMessage());
+            failedEvent.setTimestamp(Instant.now());
+
+            eventPublisher.publishEvent(failedEvent);
+        }
+    }
+
+    private PaymentRequest buildPaymentRequest(String orderId) {
+        // Retrieve order details and build payment request
+        // Implementation depends on order data access strategy
+        return new PaymentRequest();
+    }
+}
+
+// Shipping Service - Handles shipping based on payment confirmation
+@Component
+public class ShippingService {
+
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
+
+    @Autowired
+    private ShippingProvider shippingProvider;
+
+    @EventListener
+    @Async
+    public void handlePaymentProcessed(PaymentProcessedEvent event) {
+        if (event.getStatus() == PaymentStatus.SUCCESSFUL) {
+            try {
+                ShippingRequest request = buildShippingRequest(event.getOrderId());
+
+                ShippingResult result = shippingProvider.createShipment(request);
+
+                ShippingInitiatedEvent initiatedEvent = new ShippingInitiatedEvent();
+                initiatedEvent.setOrderId(event.getOrderId());
+                initiatedEvent.setShipmentId(result.getShipmentId());
+                initiatedEvent.setTrackingNumber(result.getTrackingNumber());
+                initiatedEvent.setCarrier(result.getCarrier());
+                initiatedEvent.setEstimatedDelivery(result.getEstimatedDelivery());
+                initiatedEvent.setTimestamp(Instant.now());
+
+                eventPublisher.publishEvent(initiatedEvent);
+
+                log.info(&quot;Shipping initiated for order: {} with tracking: {}&quot;, 
+                        event.getOrderId(), result.getTrackingNumber());
+
+            } catch (Exception e) {
+                log.error(&quot;Error initiating shipping for order: {}&quot;, event.getOrderId(), e);
+
+                ShippingFailedEvent failedEvent = new ShippingFailedEvent();
+                failedEvent.setOrderId(event.getOrderId());
+                failedEvent.setReason(&quot;Shipping system error: &quot; + e.getMessage());
+                failedEvent.setTimestamp(Instant.now());
+
+                eventPublisher.publishEvent(failedEvent);
+            }
+        }
+    }
+
+    private ShippingRequest buildShippingRequest(String orderId) {
+        // Build shipping request from order data
+        return new ShippingRequest();
+    }
+}
+</code></pre>
+<h4 id="2-financial-services-transaction-processing">2. <strong>Financial Services Transaction Processing</strong></h4>
+<p>Choreographed transaction processing across financial services:</p>
+<pre><code class="language-java">// Account Service - Manages account state and publishes account events
+@Component
+public class AccountService {
+
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
+
+    @Autowired
+    private AccountRepository accountRepository;
+
+    public void initiateTransfer(TransferRequest request) {
+        try {
+            Account fromAccount = accountRepository.findByAccountNumber(request.getFromAccount());
+
+            if (fromAccount.getBalance().compareTo(request.getAmount()) &gt;= 0) {
+                // Create pending transfer
+                PendingTransfer transfer = new PendingTransfer();
+                transfer.setTransferId(UUID.randomUUID().toString());
+                transfer.setFromAccount(request.getFromAccount());
+                transfer.setToAccount(request.getToAccount());
+                transfer.setAmount(request.getAmount());
+                transfer.setStatus(TransferStatus.INITIATED);
+
+                pendingTransferRepository.save(transfer);
+
+                // Publish transfer initiated event
+                TransferInitiatedEvent event = new TransferInitiatedEvent();
+                event.setTransferId(transfer.getTransferId());
+                event.setFromAccount(request.getFromAccount());
+                event.setToAccount(request.getToAccount());
+                event.setAmount(request.getAmount());
+                event.setTimestamp(Instant.now());
+
+                eventPublisher.publishEvent(event);
+
+                log.info(&quot;Transfer initiated: {}&quot;, transfer.getTransferId());
+
+            } else {
+                throw new InsufficientFundsException(request.getFromAccount());
+            }
+
+        } catch (Exception e) {
+            TransferFailedEvent failedEvent = new TransferFailedEvent();
+            failedEvent.setFromAccount(request.getFromAccount());
+            failedEvent.setToAccount(request.getToAccount());
+            failedEvent.setAmount(request.getAmount());
+            failedEvent.setReason(e.getMessage());
+            failedEvent.setTimestamp(Instant.now());
+
+            eventPublisher.publishEvent(failedEvent);
+        }
+    }
+
+    @EventListener
+    public void handleFraudCheckCompleted(FraudCheckCompletedEvent event) {
+        PendingTransfer transfer = pendingTransferRepository.findById(event.getTransferId())
+            .orElseThrow(() -&gt; new TransferNotFoundException(event.getTransferId()));
+
+        if (event.getResult() == FraudCheckResult.APPROVED) {
+            transfer.setStatus(TransferStatus.FRAUD_CHECK_PASSED);
+            pendingTransferRepository.save(transfer);
+
+            // Publish compliance check required event
+            ComplianceCheckRequiredEvent complianceEvent = new ComplianceCheckRequiredEvent();
+            complianceEvent.setTransferId(event.getTransferId());
+            complianceEvent.setFromAccount(transfer.getFromAccount());
+            complianceEvent.setToAccount(transfer.getToAccount());
+            complianceEvent.setAmount(transfer.getAmount());
+            complianceEvent.setTimestamp(Instant.now());
+
+            eventPublisher.publishEvent(complianceEvent);
+
+        } else {
+            transfer.setStatus(TransferStatus.REJECTED);
+            transfer.setRejectionReason(&quot;Fraud check failed: &quot; + event.getReason());
+            pendingTransferRepository.save(transfer);
+
+            TransferRejectedEvent rejectedEvent = new TransferRejectedEvent();
+            rejectedEvent.setTransferId(event.getTransferId());
+            rejectedEvent.setReason(event.getReason());
+            rejectedEvent.setTimestamp(Instant.now());
+
+            eventPublisher.publishEvent(rejectedEvent);
+        }
+    }
+
+    @EventListener
+    public void handleComplianceCheckCompleted(ComplianceCheckCompletedEvent event) {
+        PendingTransfer transfer = pendingTransferRepository.findById(event.getTransferId())
+            .orElseThrow(() -&gt; new TransferNotFoundException(event.getTransferId()));
+
+        if (event.getResult() == ComplianceCheckResult.APPROVED) {
+            // Execute the actual transfer
+            executeTransfer(transfer);
+
+        } else {
+            transfer.setStatus(TransferStatus.REJECTED);
+            transfer.setRejectionReason(&quot;Compliance check failed: &quot; + event.getReason());
+            pendingTransferRepository.save(transfer);
+
+            TransferRejectedEvent rejectedEvent = new TransferRejectedEvent();
+            rejectedEvent.setTransferId(event.getTransferId());
+            rejectedEvent.setReason(event.getReason());
+            rejectedEvent.setTimestamp(Instant.now());
+
+            eventPublisher.publishEvent(rejectedEvent);
+        }
+    }
+
+    private void executeTransfer(PendingTransfer transfer) {
+        try {
+            Account fromAccount = accountRepository.findByAccountNumber(transfer.getFromAccount());
+            Account toAccount = accountRepository.findByAccountNumber(transfer.getToAccount());
+
+            // Perform the transfer
+            fromAccount.setBalance(fromAccount.getBalance().subtract(transfer.getAmount()));
+            toAccount.setBalance(toAccount.getBalance().add(transfer.getAmount()));
+
+            accountRepository.save(fromAccount);
+            accountRepository.save(toAccount);
+
+            transfer.setStatus(TransferStatus.COMPLETED);
+            pendingTransferRepository.save(transfer);
+
+            // Publish transfer completed event
+            TransferCompletedEvent completedEvent = new TransferCompletedEvent();
+            completedEvent.setTransferId(transfer.getTransferId());
+            completedEvent.setFromAccount(transfer.getFromAccount());
+            completedEvent.setToAccount(transfer.getToAccount());
+            completedEvent.setAmount(transfer.getAmount());
+            completedEvent.setTimestamp(Instant.now());
+
+            eventPublisher.publishEvent(completedEvent);
+
+            log.info(&quot;Transfer completed: {}&quot;, transfer.getTransferId());
+
+        } catch (Exception e) {
+            log.error(&quot;Error executing transfer: {}&quot;, transfer.getTransferId(), e);
+
+            transfer.setStatus(TransferStatus.FAILED);
+            transfer.setRejectionReason(&quot;Transfer execution failed: &quot; + e.getMessage());
+            pendingTransferRepository.save(transfer);
+
+            TransferFailedEvent failedEvent = new TransferFailedEvent();
+            failedEvent.setTransferId(transfer.getTransferId());
+            failedEvent.setReason(e.getMessage());
+            failedEvent.setTimestamp(Instant.now());
+
+            eventPublisher.publishEvent(failedEvent);
+        }
+    }
+}
+
+// Fraud Detection Service - Analyzes transactions for fraud
+@Component
+public class FraudDetectionService {
+
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
+
+    @Autowired
+    private FraudDetectionEngine fraudEngine;
+
+    @EventListener
+    @Async
+    public void handleTransferInitiated(TransferInitiatedEvent event) {
+        try {
+            FraudAnalysisRequest request = new FraudAnalysisRequest();
+            request.setTransferId(event.getTransferId());
+            request.setFromAccount(event.getFromAccount());
+            request.setToAccount(event.getToAccount());
+            request.setAmount(event.getAmount());
+            request.setTimestamp(event.getTimestamp());
+
+            FraudAnalysisResult result = fraudEngine.analyzeTransaction(request);
+
+            FraudCheckCompletedEvent completedEvent = new FraudCheckCompletedEvent();
+            completedEvent.setTransferId(event.getTransferId());
+            completedEvent.setResult(result.getResult());
+            completedEvent.setRiskScore(result.getRiskScore());
+            completedEvent.setReason(result.getReason());
+            completedEvent.setTimestamp(Instant.now());
+
+            eventPublisher.publishEvent(completedEvent);
+
+            log.info(&quot;Fraud check completed for transfer: {} with result: {}&quot;, 
+                    event.getTransferId(), result.getResult());
+
+        } catch (Exception e) {
+            log.error(&quot;Error in fraud detection for transfer: {}&quot;, event.getTransferId(), e);
+
+            FraudCheckCompletedEvent failedEvent = new FraudCheckCompletedEvent();
+            failedEvent.setTransferId(event.getTransferId());
+            failedEvent.setResult(FraudCheckResult.ERROR);
+            failedEvent.setReason(&quot;Fraud detection system error: &quot; + e.getMessage());
+            failedEvent.setTimestamp(Instant.now());
+
+            eventPublisher.publishEvent(failedEvent);
+        }
+    }
+}
+
+// Compliance Service - Performs regulatory compliance checks
+@Component
+public class ComplianceService {
+
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
+
+    @Autowired
+    private ComplianceEngine complianceEngine;
+
+    @EventListener
+    @Async
+    public void handleComplianceCheckRequired(ComplianceCheckRequiredEvent event) {
+        try {
+            ComplianceCheckRequest request = new ComplianceCheckRequest();
+            request.setTransferId(event.getTransferId());
+            request.setFromAccount(event.getFromAccount());
+            request.setToAccount(event.getToAccount());
+            request.setAmount(event.getAmount());
+
+            ComplianceCheckResult result = complianceEngine.performComplianceCheck(request);
+
+            ComplianceCheckCompletedEvent completedEvent = new ComplianceCheckCompletedEvent();
+            completedEvent.setTransferId(event.getTransferId());
+            completedEvent.setResult(result.getResult());
+            completedEvent.setReason(result.getReason());
+            completedEvent.setRequiredActions(result.getRequiredActions());
+            completedEvent.setTimestamp(Instant.now());
+
+            eventPublisher.publishEvent(completedEvent);
+
+            log.info(&quot;Compliance check completed for transfer: {} with result: {}&quot;, 
+                    event.getTransferId(), result.getResult());
+
+        } catch (Exception e) {
+            log.error(&quot;Error in compliance check for transfer: {}&quot;, event.getTransferId(), e);
+
+            ComplianceCheckCompletedEvent failedEvent = new ComplianceCheckCompletedEvent();
+            failedEvent.setTransferId(event.getTransferId());
+            failedEvent.setResult(ComplianceCheckResult.ERROR);
+            failedEvent.setReason(&quot;Compliance system error: &quot; + e.getMessage());
+            failedEvent.setTimestamp(Instant.now());
+
+            eventPublisher.publishEvent(failedEvent);
+        }
+    }
+}
+</code></pre>
+<h4 id="3-apache-camel-choreography-implementation">3. <strong>Apache Camel Choreography Implementation</strong></h4>
+<p>Event-driven choreography using Apache Camel:</p>
+<pre><code class="language-java">@Component
+public class CamelChoreographyRoute extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+
+        // Order processing choreography
+        from(&quot;kafka:order-events?groupId=order-choreography&quot;)
+            .routeId(&quot;order-choreography&quot;)
+            .unmarshal().json(JsonLibrary.Jackson, OrderEvent.class)
+            .choice()
+                .when(simple(&quot;${body.eventType} == 'ORDER_PLACED'&quot;))
+                    .multicast().parallelProcessing()
+                        .to(&quot;direct:processInventoryCheck&quot;)
+                        .to(&quot;direct:validatePaymentMethod&quot;)
+                    .end()
+                .when(simple(&quot;${body.eventType} == 'INVENTORY_RESERVED'&quot;))
+                    .to(&quot;direct:processPayment&quot;)
+                .when(simple(&quot;${body.eventType} == 'PAYMENT_CONFIRMED'&quot;))
+                    .to(&quot;direct:initiateShipping&quot;)
+                .when(simple(&quot;${body.eventType} == 'INVENTORY_FAILED'&quot;))
+                    .to(&quot;direct:handleOrderFailure&quot;)
+                .when(simple(&quot;${body.eventType} == 'PAYMENT_FAILED'&quot;))
+                    .to(&quot;direct:releaseInventory&quot;)
+                .otherwise()
+                    .log(&quot;Unknown order event: ${body.eventType}&quot;)
+            .end();
+
+        from(&quot;direct:processInventoryCheck&quot;)
+            .routeId(&quot;process-inventory-check&quot;)
+            .process(exchange -&gt; {
+                OrderEvent orderEvent = exchange.getIn().getBody(OrderEvent.class);
+
+                InventoryCheckRequest request = new InventoryCheckRequest();
+                request.setOrderId(orderEvent.getOrderId());
+                request.setItems(orderEvent.getItems());
+
+                exchange.getIn().setBody(request);
+            })
+            .to(&quot;kafka:inventory-check-requests&quot;)
+            .log(&quot;Inventory check requested for order: ${body.orderId}&quot;);
+
+        from(&quot;direct:validatePaymentMethod&quot;)
+            .routeId(&quot;validate-payment-method&quot;)
+            .process(exchange -&gt; {
+                OrderEvent orderEvent = exchange.getIn().getBody(OrderEvent.class);
+
+                PaymentValidationRequest request = new PaymentValidationRequest();
+                request.setOrderId(orderEvent.getOrderId());
+                request.setPaymentMethod(orderEvent.getPaymentMethod());
+                request.setCustomerId(orderEvent.getCustomerId());
+
+                exchange.getIn().setBody(request);
+            })
+            .to(&quot;kafka:payment-validation-requests&quot;)
+            .log(&quot;Payment validation requested for order: ${body.orderId}&quot;);
+
+        from(&quot;direct:processPayment&quot;)
+            .routeId(&quot;process-payment&quot;)
+            .process(exchange -&gt; {
+                OrderEvent orderEvent = exchange.getIn().getBody(OrderEvent.class);
+
+                PaymentProcessingRequest request = new PaymentProcessingRequest();
+                request.setOrderId(orderEvent.getOrderId());
+                request.setAmount(orderEvent.getTotalAmount());
+                request.setPaymentMethod(orderEvent.getPaymentMethod());
+
+                exchange.getIn().setBody(request);
+            })
+            .to(&quot;kafka:payment-processing-requests&quot;)
+            .log(&quot;Payment processing requested for order: ${body.orderId}&quot;);
+
+        from(&quot;direct:initiateShipping&quot;)
+            .routeId(&quot;initiate-shipping&quot;)
+            .process(exchange -&gt; {
+                OrderEvent orderEvent = exchange.getIn().getBody(OrderEvent.class);
+
+                ShippingRequest request = new ShippingRequest();
+                request.setOrderId(orderEvent.getOrderId());
+                request.setShippingAddress(orderEvent.getShippingAddress());
+                request.setItems(orderEvent.getItems());
+
+                exchange.getIn().setBody(request);
+            })
+            .to(&quot;kafka:shipping-requests&quot;)
+            .log(&quot;Shipping requested for order: ${body.orderId}&quot;);
+
+        from(&quot;direct:releaseInventory&quot;)
+            .routeId(&quot;release-inventory&quot;)
+            .process(exchange -&gt; {
+                OrderEvent orderEvent = exchange.getIn().getBody(OrderEvent.class);
+
+                InventoryReleaseRequest request = new InventoryReleaseRequest();
+                request.setOrderId(orderEvent.getOrderId());
+                request.setReason(&quot;Payment failed&quot;);
+
+                exchange.getIn().setBody(request);
+            })
+            .to(&quot;kafka:inventory-release-requests&quot;)
+            .log(&quot;Inventory release requested for order: ${body.orderId}&quot;);
+
+        from(&quot;direct:handleOrderFailure&quot;)
+            .routeId(&quot;handle-order-failure&quot;)
+            .process(exchange -&gt; {
+                OrderEvent orderEvent = exchange.getIn().getBody(OrderEvent.class);
+
+                OrderFailureNotification notification = new OrderFailureNotification();
+                notification.setOrderId(orderEvent.getOrderId());
+                notification.setCustomerId(orderEvent.getCustomerId());
+                notification.setReason(orderEvent.getFailureReason());
+
+                exchange.getIn().setBody(notification);
+            })
+            .to(&quot;kafka:customer-notifications&quot;)
+            .log(&quot;Order failure notification sent for order: ${body.orderId}&quot;);
+
+        // Inventory service choreography
+        from(&quot;kafka:inventory-check-requests?groupId=inventory-choreography&quot;)
+            .routeId(&quot;inventory-choreography&quot;)
+            .unmarshal().json(JsonLibrary.Jackson, InventoryCheckRequest.class)
+            .process(exchange -&gt; {
+                InventoryCheckRequest request = exchange.getIn().getBody(InventoryCheckRequest.class);
+
+                // Check inventory availability
+                boolean available = checkInventoryAvailability(request.getItems());
+
+                OrderEvent resultEvent = new OrderEvent();
+                resultEvent.setOrderId(request.getOrderId());
+                resultEvent.setEventType(available ? &quot;INVENTORY_RESERVED&quot; : &quot;INVENTORY_FAILED&quot;);
+                resultEvent.setTimestamp(Instant.now());
+
+                if (!available) {
+                    resultEvent.setFailureReason(&quot;Insufficient inventory&quot;);
+                }
+
+                exchange.getIn().setBody(resultEvent);
+            })
+            .to(&quot;kafka:order-events&quot;)
+            .log(&quot;Inventory check result sent for order: ${body.orderId}&quot;);
+
+        // Payment service choreography
+        from(&quot;kafka:payment-processing-requests?groupId=payment-choreography&quot;)
+            .routeId(&quot;payment-choreography&quot;)
+            .unmarshal().json(JsonLibrary.Jackson, PaymentProcessingRequest.class)
+            .process(exchange -&gt; {
+                PaymentProcessingRequest request = exchange.getIn().getBody(PaymentProcessingRequest.class);
+
+                // Process payment
+                boolean success = processPayment(request);
+
+                OrderEvent resultEvent = new OrderEvent();
+                resultEvent.setOrderId(request.getOrderId());
+                resultEvent.setEventType(success ? &quot;PAYMENT_CONFIRMED&quot; : &quot;PAYMENT_FAILED&quot;);
+                resultEvent.setTimestamp(Instant.now());
+
+                if (!success) {
+                    resultEvent.setFailureReason(&quot;Payment processing failed&quot;);
+                }
+
+                exchange.getIn().setBody(resultEvent);
+            })
+            .to(&quot;kafka:order-events&quot;)
+            .log(&quot;Payment processing result sent for order: ${body.orderId}&quot;);
+
+        // Shipping service choreography
+        from(&quot;kafka:shipping-requests?groupId=shipping-choreography&quot;)
+            .routeId(&quot;shipping-choreography&quot;)
+            .unmarshal().json(JsonLibrary.Jackson, ShippingRequest.class)
+            .process(exchange -&gt; {
+                ShippingRequest request = exchange.getIn().getBody(ShippingRequest.class);
+
+                // Initiate shipping
+                String trackingNumber = initiateShipping(request);
+
+                OrderEvent resultEvent = new OrderEvent();
+                resultEvent.setOrderId(request.getOrderId());
+                resultEvent.setEventType(&quot;SHIPPING_INITIATED&quot;);
+                resultEvent.setTrackingNumber(trackingNumber);
+                resultEvent.setTimestamp(Instant.now());
+
+                exchange.getIn().setBody(resultEvent);
+            })
+            .to(&quot;kafka:order-events&quot;)
+            .log(&quot;Shipping initiation result sent for order: ${body.orderId}&quot;);
+
+        // Event correlation and monitoring
+        from(&quot;kafka:order-events?groupId=event-correlation&quot;)
+            .routeId(&quot;event-correlation&quot;)
+            .unmarshal().json(JsonLibrary.Jackson, OrderEvent.class)
+            .process(exchange -&gt; {
+                OrderEvent event = exchange.getIn().getBody(OrderEvent.class);
+
+                // Track event correlation and process state
+                ProcessCorrelation correlation = new ProcessCorrelation();
+                correlation.setOrderId(event.getOrderId());
+                correlation.setEventType(event.getEventType());
+                correlation.setTimestamp(event.getTimestamp());
+
+                // Store correlation data for monitoring and debugging
+                correlationRepository.save(correlation);
+
+                exchange.getIn().setBody(correlation);
+            })
+            .choice()
+                .when(simple(&quot;${body.eventType} == 'ORDER_PLACED'&quot;))
+                    .to(&quot;direct:startProcessMonitoring&quot;)
+                .when(simple(&quot;${body.eventType} in 'SHIPPING_INITIATED,ORDER_FAILED,ORDER_CANCELLED'&quot;))
+                    .to(&quot;direct:endProcessMonitoring&quot;)
+            .end();
+
+        from(&quot;direct:startProcessMonitoring&quot;)
+            .routeId(&quot;start-process-monitoring&quot;)
+            .process(exchange -&gt; {
+                ProcessCorrelation correlation = exchange.getIn().getBody(ProcessCorrelation.class);
+
+                ProcessMonitor monitor = new ProcessMonitor();
+                monitor.setOrderId(correlation.getOrderId());
+                monitor.setStartTime(correlation.getTimestamp());
+                monitor.setStatus(ProcessStatus.IN_PROGRESS);
+
+                processMonitorRepository.save(monitor);
+            })
+            .log(&quot;Process monitoring started for order: ${body.orderId}&quot;);
+
+        from(&quot;direct:endProcessMonitoring&quot;)
+            .routeId(&quot;end-process-monitoring&quot;)
+            .process(exchange -&gt; {
+                ProcessCorrelation correlation = exchange.getIn().getBody(ProcessCorrelation.class);
+
+                ProcessMonitor monitor = processMonitorRepository.findByOrderId(correlation.getOrderId());
+                if (monitor != null) {
+                    monitor.setEndTime(correlation.getTimestamp());
+                    monitor.setStatus(ProcessStatus.COMPLETED);
+
+                    Duration duration = Duration.between(monitor.getStartTime(), monitor.getEndTime());
+                    monitor.setProcessingDuration(duration);
+
+                    processMonitorRepository.save(monitor);
+                }
+            })
+            .log(&quot;Process monitoring completed for order: ${body.orderId}&quot;);
+    }
+}
+</code></pre>
+<h2 id="best-practices">Best Practices</h2>
+<h3 id="1-event-design-and-schema-management">1. <strong>Event Design and Schema Management</strong></h3>
+<ul>
+<li>Design events with clear semantic meaning and stable schemas</li>
+<li>Use event versioning strategies to handle schema evolution</li>
+<li>Include correlation identifiers in all related events</li>
+<li>Design events to be immutable and idempotent</li>
+<li>Use meaningful event names that describe business outcomes</li>
+</ul>
+<h3 id="2-service-autonomy-and-boundaries">2. <strong>Service Autonomy and Boundaries</strong></h3>
+<ul>
+<li>Ensure each service owns its data and business logic</li>
+<li>Avoid shared databases between services in the choreography</li>
+<li>Design services to be independently deployable and scalable</li>
+<li>Implement proper service boundaries based on business domains</li>
+<li>Minimize dependencies between services</li>
+</ul>
+<h3 id="3-error-handling-and-compensation">3. <strong>Error Handling and Compensation</strong></h3>
+<ul>
+<li>Design comprehensive error handling for each service</li>
+<li>Implement compensating actions for reversible operations</li>
+<li>Use dead letter queues for unprocessable events</li>
+<li>Design timeout handling for all asynchronous operations</li>
+<li>Plan for partial failure scenarios and recovery</li>
+</ul>
+<h3 id="4-event-ordering-and-consistency">4. <strong>Event Ordering and Consistency</strong></h3>
+<ul>
+<li>Design for eventual consistency across services</li>
+<li>Use event ordering strategies when sequence matters</li>
+<li>Implement event deduplication to handle duplicate events</li>
+<li>Use event sourcing for complete event history</li>
+<li>Design services to handle out-of-order events gracefully</li>
+</ul>
+<h3 id="5-monitoring-and-observability">5. <strong>Monitoring and Observability</strong></h3>
+<ul>
+<li>Implement comprehensive event tracking and correlation</li>
+<li>Use distributed tracing to follow events across services</li>
+<li>Create dashboards for choreography health monitoring</li>
+<li>Implement alerting for failed choreographies and timeouts</li>
+<li>Track business metrics and process completion rates</li>
+</ul>
+<h3 id="6-testing-and-validation">6. <strong>Testing and Validation</strong></h3>
+<ul>
+<li>Create comprehensive end-to-end testing for choreographed processes</li>
+<li>Use contract testing to validate service interactions</li>
+<li>Implement chaos engineering to test failure scenarios</li>
+<li>Test event ordering and timing scenarios</li>
+<li>Validate compensating action effectiveness</li>
+</ul>
+<p>The Choreography pattern is essential for building resilient, scalable, and loosely coupled distributed systems where services can autonomously participate in complex business processes without centralized coordination, enabling high performance and fault tolerance in enterprise integration architectures.</p>
+
+      <a href="../index.html" class="back-to-top">← Back to All Patterns</a>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <p>©2026 <a href="https://dataintegrationmastery.com/">Data Integration Mastery™</a> — All Rights Reserved</p>
+  </footer>
+</body>
+</html>

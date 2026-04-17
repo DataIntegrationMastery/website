@@ -1,0 +1,1695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Event Streaming Pattern — Integration Architecture Patterns | Data Integration Mastery™</title>
+  <meta name="description" content="The Event Streaming pattern enables continuous, real-time processing of unbounded data streams through persistent, append-only logs of events. It provides a ...">
+  <meta name="keywords" content="event streaming pattern, integration pattern, messaging patterns, integration architecture, EAI patterns, data integration">
+  <link rel="canonical" href="https://dataintegrationmastery.com/patterns/messaging-patterns/event-streaming.html">
+
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://dataintegrationmastery.com/patterns/messaging-patterns/event-streaming.html">
+  <meta property="og:title" content="Event Streaming Pattern — Integration Architecture Patterns">
+  <meta property="og:description" content="The Event Streaming pattern enables continuous, real-time processing of unbounded data streams through persistent, append-only logs of events. It provides a ...">
+  <meta property="og:image" content="https://dataintegrationmastery.com/assets/images/logo.png">
+  <meta property="og:site_name" content="Data Integration Mastery">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Event Streaming Pattern — Integration Architecture Patterns">
+  <meta name="twitter:description" content="The Event Streaming pattern enables continuous, real-time processing of unbounded data streams through persistent, append-only logs of events. It provides a ...">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/docs.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Event Streaming Pattern",
+    "description": "The Event Streaming pattern enables continuous, real-time processing of unbounded data streams through persistent, append-only logs of events. It provides a ...",
+    "url": "https://dataintegrationmastery.com/patterns/messaging-patterns/event-streaming.html",
+    "author": {
+      "@type": "Person",
+      "name": "Ari Vilkman",
+      "jobTitle": "Integration Architect"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Data Integration Mastery",
+      "url": "https://dataintegrationmastery.com"
+    },
+    "isPartOf": {
+      "@type": "CollectionPage",
+      "name": "Integration Architecture Patterns",
+      "url": "https://dataintegrationmastery.com/patterns/"
+    },
+    "about": {
+      "@type": "Thing",
+      "name": "Event Streaming Pattern"
+    },
+    "inLanguage": "en",
+    "isAccessibleForFree": true
+  }
+  </script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="https://dataintegrationmastery.com/" class="header-brand">
+        <img src="../../assets/images/dim-icon.png" alt="DIM" width="36" height="36">
+        <span class="header-title">Data Integration Mastery™</span>
+      </a>
+      <nav class="header-nav" aria-label="Main navigation">
+        <a href="https://dataintegrationmastery.com/">Home</a>
+        <a href="../index.html">All Patterns</a>
+        <a href="https://dataintegrationmastery.com/#free-course">Free Course</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="docs-layout">
+    <aside class="docs-sidebar" aria-label="Pattern categories">
+      <div class="sidebar-title">Pattern Categories</div>
+<div class="sidebar-section">
+  <a href="../index.html#resilience" class="sidebar-section-title">🛡️ Resilience Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../resilience-patterns/circuit-breaker.html">Circuit Breaker</a></li>
+    <li><a href="../resilience-patterns/retry-mechanism.html">Retry Mechanism</a></li>
+    <li><a href="../resilience-patterns/timeout.html">Timeout</a></li>
+    <li><a href="../resilience-patterns/dead-letter-queue.html">Dead Letter Queue</a></li>
+    <li><a href="../resilience-patterns/bulkhead.html">Bulkhead</a></li>
+    <li><a href="../resilience-patterns/fallback-graceful-degradation.html">Fallback / Graceful Degradation</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#messaging" class="sidebar-section-title">📨 Messaging Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="request-reply.html">Request-Reply</a></li>
+    <li><a href="publish-subscribe.html">Publish-Subscribe</a></li>
+    <li><a href="message-queue.html">Message Queue</a></li>
+    <li><a href="event-streaming.html" class="active">Event Streaming</a></li>
+    <li><a href="correlation-id.html">Correlation ID</a></li>
+    <li><a href="message-routing.html">Message Routing</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#data-transformation" class="sidebar-section-title">🔄 Data Transformation Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../data-transformation-patterns/message-translator.html">Message Translator</a></li>
+    <li><a href="../data-transformation-patterns/content-filter.html">Content Filter</a></li>
+    <li><a href="../data-transformation-patterns/message-router.html">Message Router</a></li>
+    <li><a href="../data-transformation-patterns/aggregator.html">Aggregator</a></li>
+    <li><a href="../data-transformation-patterns/splitter.html">Splitter</a></li>
+    <li><a href="../data-transformation-patterns/data-mapper.html">Data Mapper</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#routing" class="sidebar-section-title">🔀 Routing Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../routing-patterns/content-based-router.html">Content-Based Router</a></li>
+    <li><a href="../routing-patterns/recipient-list.html">Recipient List</a></li>
+    <li><a href="../routing-patterns/load-balancer.html">Load Balancer</a></li>
+    <li><a href="../routing-patterns/message-filter.html">Message Filter</a></li>
+    <li><a href="../routing-patterns/dynamic-router.html">Dynamic Router</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#security" class="sidebar-section-title">🔐 Security Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../security-patterns/authentication.html">Authentication</a></li>
+    <li><a href="../security-patterns/authorization.html">Authorization</a></li>
+    <li><a href="../security-patterns/encryption.html">Encryption</a></li>
+    <li><a href="../security-patterns/token-management.html">Token Management</a></li>
+    <li><a href="../security-patterns/api-security.html">API Security</a></li>
+    <li><a href="../security-patterns/secret-management.html">Secret Management</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#orchestration" class="sidebar-section-title">🎭 Orchestration Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../orchestration-patterns/saga-pattern.html">Saga Pattern</a></li>
+    <li><a href="../orchestration-patterns/process-manager.html">Process Manager</a></li>
+    <li><a href="../orchestration-patterns/workflow-engine.html">Workflow Engine</a></li>
+    <li><a href="../orchestration-patterns/choreography.html">Choreography</a></li>
+    <li><a href="../orchestration-patterns/compensation-transactions.html">Compensation Transactions</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#observability" class="sidebar-section-title">📊 Monitoring & Observability Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../monitoring-observability-patterns/distributed-tracing.html">Distributed Tracing</a></li>
+    <li><a href="../monitoring-observability-patterns/metrics-collection.html">Metrics Collection</a></li>
+    <li><a href="../monitoring-observability-patterns/health-checks.html">Health Checks</a></li>
+    <li><a href="../monitoring-observability-patterns/logging-strategies.html">Logging Strategies</a></li>
+    <li><a href="../monitoring-observability-patterns/performance-monitoring.html">Performance Monitoring</a></li>
+    <li><a href="../monitoring-observability-patterns/error-tracking.html">Error Tracking</a></li>
+  </ul>
+</div>
+
+    </aside>
+
+    <main id="main-content" class="docs-content">
+      <div class="breadcrumb">
+        <a href="https://dataintegrationmastery.com/">Home</a>
+        <span class="sep">›</span>
+        <a href="../index.html">Patterns</a>
+        <span class="sep">›</span>
+        <a href="../index.html#messaging">Messaging Patterns</a>
+        <span class="sep">›</span>
+        <strong>Event Streaming Pattern</strong>
+      </div>
+
+      <h1>Event Streaming Pattern</h1>
+
+      <h2 id="overview">Overview</h2>
+<p>The Event Streaming pattern enables <strong>continuous, real-time processing</strong> of unbounded data streams through persistent, append-only logs of events. It provides a foundational architecture for building reactive, event-driven systems that can process massive volumes of data with low latency while maintaining strong consistency and durability guarantees. Event streaming transforms traditional batch processing paradigms into continuous, real-time data flows.</p>
+<h3 id="theoretical-foundation">Theoretical Foundation</h3>
+<p>Event Streaming is rooted in <strong>distributed systems theory</strong>, <strong>stream processing principles</strong>, and <strong>event sourcing concepts</strong>. It implements the <strong>"log-structured data" paradigm</strong> where events are stored in immutable, ordered sequences that can be replayed and processed by multiple consumers. The pattern embodies <strong>"stream processing semantics"</strong> where data flows continuously through processing pipelines rather than being processed in discrete batches.</p>
+<h3 id="core-principles">Core Principles</h3>
+<h4 id="1-immutable-event-logs">1. <strong>Immutable Event Logs</strong></h4>
+<p>Events are stored in append-only logs that preserve the complete history of state changes, enabling temporal queries, debugging, and audit capabilities while ensuring data integrity.</p>
+<h4 id="2-stream-table-duality">2. <strong>Stream-Table Duality</strong></h4>
+<p>Every stream can be viewed as a changelog of a table, and every table can be viewed as a snapshot of a stream, enabling flexible data modeling and processing patterns.</p>
+<h4 id="3-temporal-processing">3. <strong>Temporal Processing</strong></h4>
+<p>Events carry temporal information enabling time-based operations like windowing, late data handling, and temporal joins across multiple streams.</p>
+<h4 id="4-scalable-partitioning">4. <strong>Scalable Partitioning</strong></h4>
+<p>Event streams are horizontally partitioned to enable parallel processing while maintaining ordering guarantees within partitions.</p>
+<h3 id="why-event-streaming-is-essential-in-integration-architecture">Why Event Streaming is Essential in Integration Architecture</h3>
+<h4 id="1-real-time-business-intelligence">1. <strong>Real-Time Business Intelligence</strong></h4>
+<p>Modern businesses require immediate insights and reactions:
+- <strong>Real-time analytics</strong> for operational decision making
+- <strong>Live dashboards</strong> showing current business state
+- <strong>Immediate alerting</strong> for critical business events
+- <strong>Fraud detection</strong> requiring millisecond response times</p>
+<h4 id="2-microservices-data-integration">2. <strong>Microservices Data Integration</strong></h4>
+<p>Event streaming enables effective microservices architectures:
+- <strong>Service state synchronization</strong> across distributed systems
+- <strong>Event-driven communication</strong> between loosely coupled services
+- <strong>Data consistency</strong> through event sourcing patterns
+- <strong>Service independence</strong> while maintaining data coherence</p>
+<h4 id="3-iot-and-edge-computing">3. <strong>IoT and Edge Computing</strong></h4>
+<p>Supporting massive-scale sensor and device integration:
+- <strong>High-throughput ingestion</strong> from millions of IoT devices
+- <strong>Real-time stream processing</strong> at the edge
+- <strong>Time series data management</strong> for sensor readings
+- <strong>Anomaly detection</strong> in continuous data streams</p>
+<h4 id="4-modern-data-architecture">4. <strong>Modern Data Architecture</strong></h4>
+<p>Event streaming forms the backbone of modern data platforms:
+- <strong>Data lake integration</strong> through streaming ingestion
+- <strong>Real-time ETL</strong> replacing batch processing workflows
+- <strong>Change data capture (CDC)</strong> from operational databases
+- <strong>Multi-cloud data replication</strong> with low latency</p>
+<h3 id="benefits-in-integration-contexts">Benefits in Integration Contexts</h3>
+<h4 id="1-temporal-flexibility">1. <strong>Temporal Flexibility</strong></h4>
+<ul>
+<li><strong>Historical replay</strong> enabling reprocessing of past events for new use cases</li>
+<li><strong>Point-in-time recovery</strong> for system state reconstruction</li>
+<li><strong>A/B testing</strong> through parallel stream processing with different algorithms</li>
+<li><strong>System migration</strong> by replaying events through new processing logic</li>
+</ul>
+<h4 id="2-scalability-and-performance">2. <strong>Scalability and Performance</strong></h4>
+<ul>
+<li><strong>Linear scalability</strong> through stream partitioning and parallel processing</li>
+<li><strong>Low latency processing</strong> with sub-millisecond event delivery</li>
+<li><strong>High throughput</strong> supporting millions of events per second</li>
+<li><strong>Elastic scaling</strong> adapting to varying data volumes automatically</li>
+</ul>
+<h4 id="3-integration-simplification">3. <strong>Integration Simplification</strong></h4>
+<ul>
+<li><strong>Unified data pipeline</strong> replacing multiple point-to-point integrations</li>
+<li><strong>Schema evolution</strong> supporting gradual system updates</li>
+<li><strong>Multi-consumer patterns</strong> enabling diverse downstream processing</li>
+<li><strong>Replay capabilities</strong> for integration testing and debugging</li>
+</ul>
+<h4 id="4-operational-excellence">4. <strong>Operational Excellence</strong></h4>
+<ul>
+<li><strong>Monitoring and observability</strong> through stream metrics and processing topology visibility</li>
+<li><strong>Fault tolerance</strong> with automatic recovery and exactly-once processing guarantees</li>
+<li><strong>Data governance</strong> through schema registries and lineage tracking</li>
+<li><strong>Capacity planning</strong> based on stream throughput and processing lag metrics</li>
+</ul>
+<h3 id="integration-architecture-applications">Integration Architecture Applications</h3>
+<h4 id="1-real-time-data-pipelines">1. <strong>Real-Time Data Pipelines</strong></h4>
+<p>Event streaming powers modern data engineering:
+- <strong>Change data capture</strong> from operational databases to analytical systems
+- <strong>Real-time ETL</strong> transforming data as it flows through the system
+- <strong>Data mesh architectures</strong> enabling domain-owned data products
+- <strong>Stream-to-batch integration</strong> for hybrid processing scenarios</p>
+<h4 id="2-event-driven-microservices">2. <strong>Event-Driven Microservices</strong></h4>
+<p>Enables sophisticated microservices choreography:
+- <strong>Saga pattern implementation</strong> for distributed transaction management
+- <strong>CQRS (Command Query Responsibility Segregation)</strong> with event sourcing
+- <strong>Service mesh integration</strong> with event-driven communication
+- <strong>Polyglot persistence</strong> synchronized through event streams</p>
+<h4 id="3-real-time-analytics-and-ml">3. <strong>Real-Time Analytics and ML</strong></h4>
+<p>Supports advanced analytics and machine learning:
+- <strong>Streaming analytics</strong> for real-time business metrics
+- <strong>Online machine learning</strong> with continuous model updates
+- <strong>Feature engineering</strong> on live data streams
+- <strong>Real-time recommendations</strong> based on user behavior streams</p>
+<h4 id="4-enterprise-application-integration">4. <strong>Enterprise Application Integration</strong></h4>
+<p>Modernizes enterprise integration patterns:
+- <strong>Legacy system integration</strong> through event streaming adapters
+- <strong>Multi-cloud data synchronization</strong> with low latency
+- <strong>B2B integration</strong> with partner systems through standardized event formats
+- <strong>Supply chain visibility</strong> through end-to-end event tracking</p>
+<h2 id="how-event-streaming-pattern-works">How Event Streaming Pattern Works</h2>
+<p>Event streaming operates through distributed, fault-tolerant logs that enable continuous data processing:</p>
+<h3 id="stream-architecture-overview">Stream Architecture Overview</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────────┐
+│                     Event Streaming Platform                       │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│  Producers                 Event Logs                Consumers      │
+│  ┌──────────┐              ┌─────────────┐          ┌─────────────┐ │
+│  │ App A    │─────────────▶│ Topic A     │─────────▶│ Analytics   │ │
+│  │          │              │ [P0][P1][P2]│          │ Service     │ │
+│  └──────────┘              └─────────────┘          └─────────────┘ │
+│                                   │                        │        │
+│  ┌──────────┐              ┌─────────────┐          ┌─────────────┐ │
+│  │ App B    │─────────────▶│ Topic B     │─────────▶│ ML Pipeline │ │
+│  │          │              │ [P0][P1]    │          │             │ │
+│  └──────────┘              └─────────────┘          └─────────────┘ │
+│                                   │                        │        │
+│  ┌──────────┐              ┌─────────────┐          ┌─────────────┐ │
+│  │ IoT Hub  │─────────────▶│ Topic C     │─────────▶│ Alerting    │ │
+│  │          │              │ [P0][P1][P2]│          │ System      │ │
+│  └──────────┘              └─────────────┘          └─────────────┘ │
+└─────────────────────────────────────────────────────────────────────┘
+</code></pre>
+<h3 id="event-stream-lifecycle">Event Stream Lifecycle</h3>
+<pre><code>┌───────────────────────────────────────────────────────────────┐
+│                    Event Stream Lifecycle                    │
+├───────────────────────────────────────────────────────────────┤
+│                                                               │
+│ 1. [Event Production] ──▶ 2. [Stream Partitioning] ──▶       │
+│                                      │                       │
+│                                      ▼                       │
+│ 6. [Consumer Commit] ◀── 5. [Event Processing] ◀──           │
+│                                      │                       │
+│                                      ▼                       │
+│                           3. [Persistent Storage] ──▶        │
+│                                      │                       │
+│                                      ▼                       │
+│                           4. [Consumer Subscription]         │
+│                                                               │
+│ Stream Features:                                              │
+│ • Append-only logs                                            │
+│ • Configurable retention (time/size)                         │
+│ • Multiple consumer groups                                    │
+│ • Replay capability                                           │
+│ • Fault tolerance through replication                        │
+└───────────────────────────────────────────────────────────────┘
+</code></pre>
+<h3 id="stream-processing-topologies">Stream Processing Topologies</h3>
+<h4 id="1-linear-processing-pipeline">1. <strong>Linear Processing Pipeline</strong></h4>
+<pre><code>Event Source ──▶ [Transform] ──▶ [Filter] ──▶ [Enrich] ──▶ Sink
+</code></pre>
+<h4 id="2-fan-out-processing">2. <strong>Fan-out Processing</strong></h4>
+<pre><code>                    ┌──▶ [Analytics Pipeline]
+Event Source ──▶ [Split] ──▶ [ML Pipeline]
+                    └──▶ [Alerting Pipeline]
+</code></pre>
+<h4 id="3-stream-joins">3. <strong>Stream Joins</strong></h4>
+<pre><code>Stream A ──┐
+           ├──▶ [Join] ──▶ Enriched Stream
+Stream B ──┘
+</code></pre>
+<h4 id="4-aggregation-windows">4. <strong>Aggregation Windows</strong></h4>
+<pre><code>Event Stream ──▶ [Windowing] ──▶ [Aggregate] ──▶ Result Stream
+              (5-min windows)   (sum, count, avg)
+</code></pre>
+<h2 id="key-components">Key Components</h2>
+<h3 id="1-stream-producer">1. Stream Producer</h3>
+<p>Publishes events to streaming platforms:</p>
+<pre><code class="language-java">@Component
+public class EventStreamProducer {
+    private final StreamingPlatform streamingPlatform;
+    private final EventSerializer eventSerializer;
+    private final StreamMetrics streamMetrics;
+    private final SchemaRegistry schemaRegistry;
+
+    public StreamResult publishEvent(String streamName, Object event) {
+        return publishEvent(streamName, event, StreamOptions.defaultOptions());
+    }
+
+    public StreamResult publishEvent(String streamName, Object event, StreamOptions options) {
+        try {
+            // Validate event schema
+            validateEventSchema(event, streamName);
+
+            // Serialize event
+            byte[] serializedEvent = eventSerializer.serialize(event);
+
+            // Create stream record
+            StreamRecord record = StreamRecord.builder()
+                .streamName(streamName)
+                .eventId(generateEventId())
+                .timestamp(Instant.now())
+                .partitionKey(options.getPartitionKey())
+                .payload(serializedEvent)
+                .headers(buildHeaders(event, options))
+                .build();
+
+            // Publish to stream
+            StreamResult result = streamingPlatform.publish(record);
+
+            // Record metrics
+            streamMetrics.recordEventPublished(streamName, serializedEvent.length);
+
+            log.debug(&quot;Published event to stream {}: partition={}, offset={}&quot;, 
+                     streamName, result.getPartition(), result.getOffset());
+
+            return result;
+
+        } catch (Exception e) {
+            streamMetrics.recordPublishError(streamName);
+            log.error(&quot;Failed to publish event to stream {}: {}&quot;, streamName, e.getMessage(), e);
+            throw new StreamPublishException(&quot;Failed to publish event&quot;, e);
+        }
+    }
+
+    public CompletableFuture&lt;StreamResult&gt; publishEventAsync(String streamName, 
+                                                           Object event, 
+                                                           StreamOptions options) {
+        return CompletableFuture.supplyAsync(() -&gt; publishEvent(streamName, event, options));
+    }
+
+    public StreamResult publishEventBatch(String streamName, 
+                                        List&lt;Object&gt; events, 
+                                        StreamOptions options) {
+        try {
+            List&lt;StreamRecord&gt; records = events.stream()
+                .map(event -&gt; {
+                    try {
+                        validateEventSchema(event, streamName);
+                        byte[] serializedEvent = eventSerializer.serialize(event);
+
+                        return StreamRecord.builder()
+                            .streamName(streamName)
+                            .eventId(generateEventId())
+                            .timestamp(Instant.now())
+                            .partitionKey(options.getPartitionKey())
+                            .payload(serializedEvent)
+                            .headers(buildHeaders(event, options))
+                            .build();
+                    } catch (Exception e) {
+                        throw new StreamPublishException(&quot;Failed to prepare event for batch&quot;, e);
+                    }
+                })
+                .collect(Collectors.toList());
+
+            StreamResult result = streamingPlatform.publishBatch(records);
+            streamMetrics.recordBatchPublished(streamName, events.size());
+
+            return result;
+
+        } catch (Exception e) {
+            streamMetrics.recordBatchError(streamName);
+            throw new StreamPublishException(&quot;Failed to publish event batch&quot;, e);
+        }
+    }
+
+    private void validateEventSchema(Object event, String streamName) {
+        try {
+            Schema schema = schemaRegistry.getLatestSchema(streamName);
+            if (schema != null &amp;&amp; !schema.isCompatible(event)) {
+                throw new SchemaValidationException(
+                    &quot;Event does not conform to schema for stream: &quot; + streamName);
+            }
+        } catch (SchemaNotFoundException e) {
+            log.warn(&quot;No schema found for stream {}, skipping validation&quot;, streamName);
+        }
+    }
+
+    private Map&lt;String, String&gt; buildHeaders(Object event, StreamOptions options) {
+        Map&lt;String, String&gt; headers = new HashMap&lt;&gt;();
+        headers.put(&quot;eventType&quot;, event.getClass().getSimpleName());
+        headers.put(&quot;producerId&quot;, options.getProducerId());
+        headers.put(&quot;schemaVersion&quot;, getEventSchemaVersion(event));
+
+        if (options.getCorrelationId() != null) {
+            headers.put(&quot;correlationId&quot;, options.getCorrelationId());
+        }
+
+        if (options.getCausationId() != null) {
+            headers.put(&quot;causationId&quot;, options.getCausationId());
+        }
+
+        return headers;
+    }
+
+    private String generateEventId() {
+        return UUID.randomUUID().toString();
+    }
+
+    private String getEventSchemaVersion(Object event) {
+        SchemaVersion annotation = event.getClass().getAnnotation(SchemaVersion.class);
+        return annotation != null ? annotation.value() : &quot;1.0&quot;;
+    }
+}
+</code></pre>
+<h3 id="2-stream-consumer">2. Stream Consumer</h3>
+<p>Consumes and processes events from streams:</p>
+<pre><code class="language-java">@Component
+public abstract class EventStreamConsumer {
+    private final StreamingPlatform streamingPlatform;
+    private final EventDeserializer eventDeserializer;
+    private final StreamMetrics streamMetrics;
+
+    private volatile boolean running = false;
+    private StreamSubscription subscription;
+    private final ExecutorService processingExecutor;
+
+    public void start() {
+        this.running = true;
+
+        StreamSubscription.Builder subscriptionBuilder = StreamSubscription.builder()
+            .consumerId(getConsumerId())
+            .consumerGroup(getConsumerGroup())
+            .streamNames(getStreamNames())
+            .processingGuarantee(getProcessingGuarantee())
+            .offsetResetStrategy(getOffsetResetStrategy())
+            .maxPollRecords(getMaxPollRecords())
+            .sessionTimeout(getSessionTimeout());
+
+        this.subscription = streamingPlatform.subscribe(subscriptionBuilder.build());
+
+        // Start processing threads
+        int concurrency = getProcessingConcurrency();
+        for (int i = 0; i &lt; concurrency; i++) {
+            processingExecutor.submit(this::processEvents);
+        }
+
+        log.info(&quot;Started stream consumer {} for streams: {}&quot;, 
+                 getConsumerId(), getStreamNames());
+    }
+
+    public void stop() {
+        running = false;
+
+        if (subscription != null) {
+            subscription.close();
+        }
+
+        processingExecutor.shutdown();
+        try {
+            if (!processingExecutor.awaitTermination(30, TimeUnit.SECONDS)) {
+                processingExecutor.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            processingExecutor.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
+
+        log.info(&quot;Stopped stream consumer {}&quot;, getConsumerId());
+    }
+
+    private void processEvents() {
+        while (running) {
+            try {
+                List&lt;StreamRecord&gt; records = subscription.poll(getPollTimeout());
+
+                if (records.isEmpty()) {
+                    continue;
+                }
+
+                // Process records in batch or individually based on configuration
+                if (supportsBatchProcessing()) {
+                    processBatch(records);
+                } else {
+                    for (StreamRecord record : records) {
+                        processRecord(record);
+                    }
+                }
+
+                // Commit offsets based on processing guarantee
+                if (getProcessingGuarantee() == ProcessingGuarantee.AT_LEAST_ONCE) {
+                    subscription.commitSync();
+                }
+
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                break;
+            } catch (Exception e) {
+                log.error(&quot;Error in stream processing loop: {}&quot;, e.getMessage(), e);
+                handleProcessingError(e);
+            }
+        }
+    }
+
+    private void processRecord(StreamRecord record) {
+        String streamName = record.getStreamName();
+        long startTime = System.nanoTime();
+
+        try {
+            // Deserialize event
+            Object event = eventDeserializer.deserialize(
+                record.getPayload(), getEventType(record));
+
+            // Create processing context
+            StreamProcessingContext context = StreamProcessingContext.builder()
+                .streamName(streamName)
+                .partition(record.getPartition())
+                .offset(record.getOffset())
+                .timestamp(record.getTimestamp())
+                .eventId(record.getEventId())
+                .headers(record.getHeaders())
+                .event(event)
+                .build();
+
+            // Process event
+            ProcessingResult result = handleEvent(context);
+
+            if (result.isSuccess()) {
+                streamMetrics.recordEventProcessed(streamName);
+            } else {
+                handleProcessingFailure(record, result.getError());
+            }
+
+        } catch (Exception e) {
+            log.error(&quot;Error processing event from stream {}: {}&quot;, streamName, e.getMessage(), e);
+            handleProcessingFailure(record, e);
+        } finally {
+            long duration = System.nanoTime() - startTime;
+            streamMetrics.recordProcessingLatency(streamName, Duration.ofNanos(duration));
+        }
+    }
+
+    private void processBatch(List&lt;StreamRecord&gt; records) {
+        try {
+            List&lt;StreamProcessingContext&gt; contexts = records.stream()
+                .map(record -&gt; {
+                    try {
+                        Object event = eventDeserializer.deserialize(
+                            record.getPayload(), getEventType(record));
+
+                        return StreamProcessingContext.builder()
+                            .streamName(record.getStreamName())
+                            .partition(record.getPartition())
+                            .offset(record.getOffset())
+                            .timestamp(record.getTimestamp())
+                            .eventId(record.getEventId())
+                            .headers(record.getHeaders())
+                            .event(event)
+                            .build();
+                    } catch (Exception e) {
+                        throw new StreamProcessingException(&quot;Failed to prepare context for batch&quot;, e);
+                    }
+                })
+                .collect(Collectors.toList());
+
+            ProcessingResult result = handleEventBatch(contexts);
+
+            if (result.isSuccess()) {
+                streamMetrics.recordBatchProcessed(records.get(0).getStreamName(), records.size());
+            } else {
+                // Handle batch failure - may need individual record processing
+                handleBatchProcessingFailure(records, result.getError());
+            }
+
+        } catch (Exception e) {
+            log.error(&quot;Error processing event batch: {}&quot;, e.getMessage(), e);
+            handleBatchProcessingFailure(records, e);
+        }
+    }
+
+    protected abstract ProcessingResult handleEvent(StreamProcessingContext context);
+    protected abstract String getConsumerId();
+    protected abstract String getConsumerGroup();
+    protected abstract List&lt;String&gt; getStreamNames();
+    protected abstract ProcessingGuarantee getProcessingGuarantee();
+    protected abstract OffsetResetStrategy getOffsetResetStrategy();
+    protected abstract int getMaxPollRecords();
+    protected abstract Duration getPollTimeout();
+    protected abstract Duration getSessionTimeout();
+    protected abstract int getProcessingConcurrency();
+    protected abstract Class&lt;?&gt; getEventType(StreamRecord record);
+
+    // Optional overrides
+    protected boolean supportsBatchProcessing() { return false; }
+    protected ProcessingResult handleEventBatch(List&lt;StreamProcessingContext&gt; contexts) {
+        throw new UnsupportedOperationException(&quot;Batch processing not supported&quot;);
+    }
+
+    protected void handleProcessingError(Exception error) {
+        // Default: sleep before retry
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+
+    protected void handleProcessingFailure(StreamRecord record, Exception error) {
+        streamMetrics.recordProcessingError(record.getStreamName());
+        // Default: log error (can be overridden for DLQ, etc.)
+        log.error(&quot;Failed to process event {} from stream {}: {}&quot;, 
+                 record.getEventId(), record.getStreamName(), error.getMessage());
+    }
+
+    protected void handleBatchProcessingFailure(List&lt;StreamRecord&gt; records, Exception error) {
+        // Default: process records individually
+        for (StreamRecord record : records) {
+            try {
+                processRecord(record);
+            } catch (Exception e) {
+                handleProcessingFailure(record, e);
+            }
+        }
+    }
+}
+
+// Example concrete consumer implementation
+@Component
+public class ContactEventStreamConsumer extends EventStreamConsumer {
+    private final ContactEventHandler contactEventHandler;
+
+    @Override
+    protected ProcessingResult handleEvent(StreamProcessingContext context) {
+        ContactEvent contactEvent = (ContactEvent) context.getEvent();
+
+        try {
+            contactEventHandler.handleContactEvent(contactEvent, context);
+            return ProcessingResult.success();
+        } catch (ContactValidationException e) {
+            return ProcessingResult.failure(&quot;Validation error: &quot; + e.getMessage());
+        } catch (ContactBusinessException e) {
+            return ProcessingResult.failure(&quot;Business logic error: &quot; + e.getMessage());
+        }
+    }
+
+    @Override
+    protected String getConsumerId() {
+        return &quot;contact-event-consumer&quot;;
+    }
+
+    @Override
+    protected String getConsumerGroup() {
+        return &quot;contact-processing-group&quot;;
+    }
+
+    @Override
+    protected List&lt;String&gt; getStreamNames() {
+        return Arrays.asList(&quot;contact.events&quot;, &quot;contact.lifecycle&quot;);
+    }
+
+    @Override
+    protected ProcessingGuarantee getProcessingGuarantee() {
+        return ProcessingGuarantee.AT_LEAST_ONCE;
+    }
+
+    @Override
+    protected OffsetResetStrategy getOffsetResetStrategy() {
+        return OffsetResetStrategy.EARLIEST;
+    }
+
+    @Override
+    protected int getMaxPollRecords() {
+        return 100;
+    }
+
+    @Override
+    protected Duration getPollTimeout() {
+        return Duration.ofSeconds(5);
+    }
+
+    @Override
+    protected Duration getSessionTimeout() {
+        return Duration.ofSeconds(30);
+    }
+
+    @Override
+    protected int getProcessingConcurrency() {
+        return 3;
+    }
+
+    @Override
+    protected Class&lt;?&gt; getEventType(StreamRecord record) {
+        String eventType = record.getHeaders().get(&quot;eventType&quot;);
+        return eventType != null ? getEventClassByType(eventType) : ContactEvent.class;
+    }
+
+    private Class&lt;?&gt; getEventClassByType(String eventType) {
+        switch (eventType) {
+            case &quot;ContactCreated&quot;: return ContactCreatedEvent.class;
+            case &quot;ContactUpdated&quot;: return ContactUpdatedEvent.class;
+            case &quot;ContactDeleted&quot;: return ContactDeletedEvent.class;
+            default: return ContactEvent.class;
+        }
+    }
+}
+</code></pre>
+<h3 id="3-stream-processor">3. Stream Processor</h3>
+<p>Handles stream transformations and analytics:</p>
+<pre><code class="language-java">@Component
+public class StreamProcessor {
+    private final StreamingPlatform streamingPlatform;
+    private final StreamTopologyBuilder topologyBuilder;
+
+    public StreamTopology buildContactProcessingTopology() {
+        StreamTopologyBuilder builder = new StreamTopologyBuilder();
+
+        // Source stream
+        StreamNode&lt;ContactEvent&gt; contactEvents = builder
+            .source(&quot;contact-events-source&quot;, &quot;contact.events&quot;, ContactEvent.class);
+
+        // Filter valid events
+        StreamNode&lt;ContactEvent&gt; validEvents = contactEvents
+            .filter(&quot;filter-valid&quot;, event -&gt; isValidContactEvent(event));
+
+        // Transform and enrich
+        StreamNode&lt;EnrichedContactEvent&gt; enrichedEvents = validEvents
+            .map(&quot;enrich-contact&quot;, event -&gt; enrichContactEvent(event));
+
+        // Branch processing
+        Map&lt;String, StreamNode&lt;EnrichedContactEvent&gt;&gt; branches = enrichedEvents
+            .branch(&quot;branch-by-type&quot;,
+                    Predicate.named(&quot;created&quot;, e -&gt; e.getEventType() == EventType.CREATED),
+                    Predicate.named(&quot;updated&quot;, e -&gt; e.getEventType() == EventType.UPDATED),
+                    Predicate.named(&quot;deleted&quot;, e -&gt; e.getEventType() == EventType.DELETED));
+
+        // Process created contacts
+        branches.get(&quot;created&quot;)
+            .process(&quot;process-created&quot;, new ContactCreatedProcessor())
+            .to(&quot;contact.processed.created&quot;);
+
+        // Process updated contacts with windowing
+        branches.get(&quot;updated&quot;)
+            .groupBy(&quot;group-by-contact&quot;, contact -&gt; contact.getContactId())
+            .windowedBy(TimeWindows.of(Duration.ofMinutes(5)))
+            .aggregate(&quot;aggregate-updates&quot;, 
+                      () -&gt; new ContactUpdateAggregate(),
+                      (key, value, aggregate) -&gt; aggregate.add(value),
+                      Materialized.as(&quot;contact-updates-store&quot;))
+            .toStream()
+            .map(&quot;flatten-aggregates&quot;, (windowedKey, aggregate) -&gt; 
+                 aggregate.toContactUpdateSummary(windowedKey.key()))
+            .to(&quot;contact.update.summaries&quot;);
+
+        // Process deleted contacts
+        branches.get(&quot;deleted&quot;)
+            .process(&quot;process-deleted&quot;, new ContactDeletedProcessor())
+            .to(&quot;contact.processed.deleted&quot;);
+
+        return builder.build();
+    }
+
+    public void startProcessing(StreamTopology topology) {
+        StreamProcessor processor = streamingPlatform.createProcessor(topology);
+        processor.start();
+
+        // Add shutdown hook
+        Runtime.getRuntime().addShutdownHook(new Thread(() -&gt; {
+            log.info(&quot;Shutting down stream processor...&quot;);
+            processor.stop();
+        }));
+    }
+
+    private boolean isValidContactEvent(ContactEvent event) {
+        return event != null &amp;&amp; 
+               event.getContactId() != null &amp;&amp; 
+               event.getEventType() != null &amp;&amp;
+               event.getTimestamp() != null;
+    }
+
+    private EnrichedContactEvent enrichContactEvent(ContactEvent event) {
+        // Enrich with additional data (lookup services, etc.)
+        ContactProfile profile = lookupContactProfile(event.getContactId());
+        ContactMetadata metadata = generateContactMetadata(event);
+
+        return EnrichedContactEvent.builder()
+            .baseEvent(event)
+            .contactProfile(profile)
+            .metadata(metadata)
+            .enrichedAt(Instant.now())
+            .build();
+    }
+
+    // Custom processors
+    public static class ContactCreatedProcessor implements StreamNodeProcessor&lt;EnrichedContactEvent, ContactCreatedResult&gt; {
+
+        @Override
+        public ContactCreatedResult process(ProcessorContext context, EnrichedContactEvent event) {
+            try {
+                // Business logic for contact creation
+                ContactCreatedResult result = processContactCreation(event);
+
+                // Update state store
+                context.getStateStore(&quot;contact-state&quot;).put(event.getContactId(), event);
+
+                // Schedule future processing if needed
+                context.schedule(Duration.ofHours(24), 
+                               () -&gt; scheduleContactFollowUp(event.getContactId()));
+
+                return result;
+
+            } catch (Exception e) {
+                log.error(&quot;Error processing contact creation: {}&quot;, e.getMessage(), e);
+                throw new StreamProcessingException(&quot;Contact creation failed&quot;, e);
+            }
+        }
+
+        private ContactCreatedResult processContactCreation(EnrichedContactEvent event) {
+            // Implementation details...
+            return ContactCreatedResult.success(event.getContactId());
+        }
+
+        private void scheduleContactFollowUp(String contactId) {
+            // Implementation details...
+        }
+    }
+}
+</code></pre>
+<h3 id="4-schema-registry">4. Schema Registry</h3>
+<p>Manages event schemas and evolution:</p>
+<pre><code class="language-java">@Component
+public class SchemaRegistry {
+    private final SchemaStorage schemaStorage;
+    private final Map&lt;String, Schema&gt; schemaCache = new ConcurrentHashMap&lt;&gt;();
+    private final SchemaCompatibilityChecker compatibilityChecker;
+
+    public Schema registerSchema(String subject, SchemaDefinition definition) {
+        validateSchemaDefinition(definition);
+
+        // Check compatibility with existing schemas
+        List&lt;Schema&gt; existingSchemas = getSchemaHistory(subject);
+        if (!existingSchemas.isEmpty()) {
+            Schema latestSchema = existingSchemas.get(existingSchemas.size() - 1);
+            if (!compatibilityChecker.isCompatible(latestSchema, definition)) {
+                throw new SchemaCompatibilityException(
+                    &quot;Schema is not compatible with existing version&quot;);
+            }
+        }
+
+        // Generate schema version
+        int version = existingSchemas.size() + 1;
+
+        Schema schema = Schema.builder()
+            .subject(subject)
+            .version(version)
+            .definition(definition)
+            .registeredAt(Instant.now())
+            .build();
+
+        // Store schema
+        schemaStorage.store(schema);
+
+        // Update cache
+        schemaCache.put(getCacheKey(subject, version), schema);
+        schemaCache.put(getCacheKey(subject, &quot;latest&quot;), schema);
+
+        log.info(&quot;Registered schema for subject {} version {}&quot;, subject, version);
+        return schema;
+    }
+
+    public Optional&lt;Schema&gt; getSchema(String subject, int version) {
+        String cacheKey = getCacheKey(subject, version);
+        Schema cached = schemaCache.get(cacheKey);
+
+        if (cached != null) {
+            return Optional.of(cached);
+        }
+
+        Optional&lt;Schema&gt; schema = schemaStorage.getSchema(subject, version);
+        schema.ifPresent(s -&gt; schemaCache.put(cacheKey, s));
+
+        return schema;
+    }
+
+    public Optional&lt;Schema&gt; getLatestSchema(String subject) {
+        String cacheKey = getCacheKey(subject, &quot;latest&quot;);
+        Schema cached = schemaCache.get(cacheKey);
+
+        if (cached != null) {
+            return Optional.of(cached);
+        }
+
+        Optional&lt;Schema&gt; schema = schemaStorage.getLatestSchema(subject);
+        schema.ifPresent(s -&gt; schemaCache.put(cacheKey, s));
+
+        return schema;
+    }
+
+    public List&lt;Schema&gt; getSchemaHistory(String subject) {
+        return schemaStorage.getSchemaHistory(subject);
+    }
+
+    public boolean isCompatible(String subject, SchemaDefinition newDefinition) {
+        Optional&lt;Schema&gt; latestSchema = getLatestSchema(subject);
+        if (!latestSchema.isPresent()) {
+            return true; // No existing schema, always compatible
+        }
+
+        return compatibilityChecker.isCompatible(latestSchema.get(), newDefinition);
+    }
+
+    public SchemaEvolutionPlan planEvolution(String subject, SchemaDefinition targetDefinition) {
+        List&lt;Schema&gt; history = getSchemaHistory(subject);
+
+        return SchemaEvolutionPlan.builder()
+            .subject(subject)
+            .currentVersion(history.isEmpty() ? 0 : history.get(history.size() - 1).getVersion())
+            .targetDefinition(targetDefinition)
+            .evolutionSteps(calculateEvolutionSteps(history, targetDefinition))
+            .breakingChanges(identifyBreakingChanges(history, targetDefinition))
+            .migrationRequired(requiresMigration(history, targetDefinition))
+            .build();
+    }
+
+    private void validateSchemaDefinition(SchemaDefinition definition) {
+        if (definition == null || definition.getSchema() == null) {
+            throw new IllegalArgumentException(&quot;Schema definition cannot be null&quot;);
+        }
+
+        try {
+            // Validate schema syntax (JSON Schema, Avro, etc.)
+            definition.validate();
+        } catch (Exception e) {
+            throw new SchemaValidationException(&quot;Invalid schema definition&quot;, e);
+        }
+    }
+
+    private String getCacheKey(String subject, Object version) {
+        return subject + &quot;:&quot; + version.toString();
+    }
+
+    private List&lt;EvolutionStep&gt; calculateEvolutionSteps(List&lt;Schema&gt; history, 
+                                                       SchemaDefinition target) {
+        // Implementation for calculating evolution steps
+        return Collections.emptyList();
+    }
+
+    private List&lt;BreakingChange&gt; identifyBreakingChanges(List&lt;Schema&gt; history, 
+                                                        SchemaDefinition target) {
+        // Implementation for identifying breaking changes
+        return Collections.emptyList();
+    }
+
+    private boolean requiresMigration(List&lt;Schema&gt; history, SchemaDefinition target) {
+        // Implementation for determining if migration is required
+        return false;
+    }
+}
+</code></pre>
+<h2 id="configuration-parameters">Configuration Parameters</h2>
+<h3 id="essential-settings">Essential Settings</h3>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Typical Values</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Partition Count</strong></td>
+<td>Number of partitions per stream</td>
+<td>3-100</td>
+</tr>
+<tr>
+<td><strong>Retention Period</strong></td>
+<td>How long to keep events</td>
+<td>7d-365d</td>
+</tr>
+<tr>
+<td><strong>Batch Size</strong></td>
+<td>Events per producer batch</td>
+<td>100-10000</td>
+</tr>
+<tr>
+<td><strong>Consumer Lag Threshold</strong></td>
+<td>Maximum acceptable consumer lag</td>
+<td>1000-100000</td>
+</tr>
+<tr>
+<td><strong>Processing Guarantee</strong></td>
+<td>Delivery semantics</td>
+<td>at-least-once/exactly-once</td>
+</tr>
+<tr>
+<td><strong>Compression Type</strong></td>
+<td>Event compression algorithm</td>
+<td>gzip/lz4/snappy</td>
+</tr>
+</tbody>
+</table>
+<h3 id="example-configuration">Example Configuration</h3>
+<pre><code class="language-properties"># Stream Platform Configuration
+stream.platform=kafka
+stream.bootstrap-servers=localhost:9092
+stream.schema-registry-url=http://localhost:8081
+
+# Producer Configuration
+stream.producer.batch-size=16384
+stream.producer.linger-ms=10
+stream.producer.compression-type=lz4
+stream.producer.acks=all
+stream.producer.retries=3
+stream.producer.max-in-flight-requests=1
+
+# Consumer Configuration
+stream.consumer.fetch-min-bytes=1024
+stream.consumer.fetch-max-wait-ms=500
+stream.consumer.max-poll-records=500
+stream.consumer.session-timeout-ms=30000
+stream.consumer.heartbeat-interval-ms=3000
+stream.consumer.auto-offset-reset=earliest
+
+# Stream Processing Configuration
+stream.processing.guarantee=exactly-once
+stream.processing.commit-interval=10s
+stream.processing.cache-max-bytes=10MB
+stream.processing.num-stream-threads=4
+
+# Schema Registry Configuration
+stream.schema.compatibility-level=BACKWARD
+stream.schema.cache-size=1000
+stream.schema.cache-expiry=1h
+</code></pre>
+<h2 id="implementation-examples">Implementation Examples</h2>
+<h3 id="1-apache-kafka-streams-implementation">1. Apache Kafka Streams Implementation</h3>
+<pre><code class="language-java">@Configuration
+@EnableKafka
+public class KafkaStreamsConfiguration {
+
+    @Bean
+    public KafkaStreamsConfiguration kafkaStreamsConfig() {
+        Properties props = new Properties();
+        props.put(StreamsConfig.APPLICATION_ID_CONFIG, &quot;contact-streams-app&quot;);
+        props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, &quot;localhost:9092&quot;);
+        props.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass());
+        props.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, JsonSerde.class);
+        props.put(StreamsConfig.PROCESSING_GUARANTEE_CONFIG, StreamsConfig.EXACTLY_ONCE_V2);
+        props.put(StreamsConfig.COMMIT_INTERVAL_MS_CONFIG, 10000);
+        props.put(StreamsConfig.CACHE_MAX_BYTES_BUFFERING_CONFIG, 10 * 1024 * 1024);
+        return new KafkaStreamsConfiguration(props);
+    }
+
+    @Bean
+    public KafkaStreams contactEventStream(KafkaStreamsConfiguration config) {
+        StreamsBuilder builder = new StreamsBuilder();
+
+        // Contact events stream
+        KStream&lt;String, ContactEvent&gt; contactEvents = builder
+            .stream(&quot;contact.events&quot;, 
+                   Consumed.with(Serdes.String(), new ContactEventSerde()));
+
+        // Filter and transform
+        KStream&lt;String, EnrichedContactEvent&gt; enrichedEvents = contactEvents
+            .filter((key, event) -&gt; event != null &amp;&amp; event.getContactId() != null)
+            .mapValues(this::enrichContactEvent);
+
+        // Branch by event type
+        Map&lt;String, KStream&lt;String, EnrichedContactEvent&gt;&gt; branches = enrichedEvents
+            .split(Named.as(&quot;contact-&quot;))
+            .branch((key, event) -&gt; event.getEventType() == EventType.CREATED,
+                   Branched.as(&quot;created&quot;))
+            .branch((key, event) -&gt; event.getEventType() == EventType.UPDATED,
+                   Branched.as(&quot;updated&quot;))
+            .defaultBranch(Branched.as(&quot;other&quot;));
+
+        // Process created contacts
+        branches.get(&quot;contact-created&quot;)
+            .process(() -&gt; new ContactCreatedProcessor(),
+                    Named.as(&quot;process-created&quot;));
+
+        // Aggregate updated contacts
+        branches.get(&quot;contact-updated&quot;)
+            .groupBy((key, event) -&gt; event.getContactId(),
+                    Grouped.with(Serdes.String(), new EnrichedContactEventSerde()))
+            .windowedBy(TimeWindows.of(Duration.ofMinutes(5)))
+            .aggregate(
+                ContactUpdateSummary::new,
+                (key, event, aggregate) -&gt; aggregate.addUpdate(event),
+                Named.as(&quot;aggregate-updates&quot;),
+                Materialized.&lt;String, ContactUpdateSummary, WindowStore&lt;Bytes, byte[]&gt;&gt;as(&quot;updates-store&quot;)
+                    .withKeySerde(Serdes.String())
+                    .withValueSerde(new ContactUpdateSummarySerde()))
+            .toStream()
+            .map((windowedKey, summary) -&gt; 
+                 KeyValue.pair(windowedKey.key(), summary.complete()))
+            .to(&quot;contact.update.summaries&quot;,
+               Produced.with(Serdes.String(), new ContactUpdateSummarySerde()));
+
+        Topology topology = builder.build();
+        KafkaStreams streams = new KafkaStreams(topology, config.asProperties());
+
+        streams.start();
+
+        Runtime.getRuntime().addShutdownHook(new Thread(streams::close));
+
+        return streams;
+    }
+
+    private EnrichedContactEvent enrichContactEvent(ContactEvent event) {
+        // Enrichment logic
+        return EnrichedContactEvent.builder()
+            .baseEvent(event)
+            .enrichedAt(Instant.now())
+            .build();
+    }
+}
+
+@Component
+public class KafkaContactEventProducer {
+    private final KafkaTemplate&lt;String, ContactEvent&gt; kafkaTemplate;
+
+    @EventListener
+    @Async
+    public void handleContactEvent(ContactEvent event) {
+        String partitionKey = event.getContactId();
+
+        kafkaTemplate.send(&quot;contact.events&quot;, partitionKey, event)
+            .whenComplete((result, ex) -&gt; {
+                if (ex != null) {
+                    log.error(&quot;Failed to publish contact event: {}&quot;, ex.getMessage(), ex);
+                } else {
+                    log.debug(&quot;Published contact event: partition={}, offset={}&quot;, 
+                             result.getRecordMetadata().partition(),
+                             result.getRecordMetadata().offset());
+                }
+            });
+    }
+}
+</code></pre>
+<h3 id="2-amazon-kinesis-implementation">2. Amazon Kinesis Implementation</h3>
+<pre><code class="language-java">@Configuration
+public class KinesisConfiguration {
+
+    @Bean
+    public AmazonKinesis kinesisClient() {
+        return AmazonKinesisClientBuilder.standard()
+            .withRegion(Regions.EU_WEST_1)
+            .build();
+    }
+
+    @Bean
+    public KinesisProducerConfiguration kinesisProducerConfig() {
+        KinesisProducerConfiguration config = new KinesisProducerConfiguration();
+        config.setRegion(&quot;eu-west-1&quot;);
+        config.setMaxConnections(24);
+        config.setRequestTimeout(60000);
+        config.setRecordMaxBufferedTime(15000);
+        config.setAggregationEnabled(true);
+        config.setCompressionFormat(&quot;gzip&quot;);
+        return config;
+    }
+
+    @Bean
+    public KinesisProducer kinesisProducer(KinesisProducerConfiguration config) {
+        return new KinesisProducer(config);
+    }
+}
+
+@Service
+public class KinesisContactEventProducer {
+    private final KinesisProducer kinesisProducer;
+    private final ObjectMapper objectMapper;
+
+    @Value(&quot;${aws.kinesis.contact-stream}&quot;)
+    private String streamName;
+
+    public CompletableFuture&lt;UserRecordResult&gt; publishContactEvent(ContactEvent event) {
+        try {
+            String partitionKey = event.getContactId();
+            String eventJson = objectMapper.writeValueAsString(event);
+            ByteBuffer data = ByteBuffer.wrap(eventJson.getBytes(StandardCharsets.UTF_8));
+
+            UserRecord record = UserRecord.builder()
+                .streamName(streamName)
+                .partitionKey(partitionKey)
+                .data(data)
+                .explicitHashKey(null) // Let Kinesis handle hash key
+                .build();
+
+            CompletableFuture&lt;UserRecordResult&gt; future = kinesisProducer.addUserRecord(record);
+
+            future.whenComplete((result, ex) -&gt; {
+                if (ex != null) {
+                    log.error(&quot;Failed to publish to Kinesis: {}&quot;, ex.getMessage(), ex);
+                } else {
+                    log.debug(&quot;Published to Kinesis: shard={}, sequence={}&quot;, 
+                             result.getShardId(), result.getSequenceNumber());
+                }
+            });
+
+            return future;
+
+        } catch (Exception e) {
+            log.error(&quot;Error preparing Kinesis record: {}&quot;, e.getMessage(), e);
+            CompletableFuture&lt;UserRecordResult&gt; failedFuture = new CompletableFuture&lt;&gt;();
+            failedFuture.completeExceptionally(e);
+            return failedFuture;
+        }
+    }
+}
+
+@Component
+public class KinesisContactEventConsumer {
+    private final AmazonKinesis kinesisClient;
+    private final ObjectMapper objectMapper;
+    private final ContactEventHandler eventHandler;
+
+    @Value(&quot;${aws.kinesis.contact-stream}&quot;)
+    private String streamName;
+
+    @PostConstruct
+    public void startConsumer() {
+        ExecutorService executor = Executors.newFixedThreadPool(2);
+
+        // Start multiple workers for different shards
+        for (int i = 0; i &lt; 2; i++) {
+            executor.submit(this::consumeEvents);
+        }
+    }
+
+    private void consumeEvents() {
+        String shardIterator = getShardIterator();
+
+        while (true) {
+            try {
+                GetRecordsRequest request = GetRecordsRequest.builder()
+                    .shardIterator(shardIterator)
+                    .limit(100)
+                    .build();
+
+                GetRecordsResult result = kinesisClient.getRecords(request);
+
+                for (Record record : result.getRecords()) {
+                    processRecord(record);
+                }
+
+                shardIterator = result.getNextShardIterator();
+
+                if (result.getRecords().isEmpty()) {
+                    Thread.sleep(1000); // Wait before polling again
+                }
+
+            } catch (Exception e) {
+                log.error(&quot;Error consuming from Kinesis: {}&quot;, e.getMessage(), e);
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    break;
+                }
+            }
+        }
+    }
+
+    private void processRecord(Record record) {
+        try {
+            String eventJson = StandardCharsets.UTF_8.decode(record.getData()).toString();
+            ContactEvent event = objectMapper.readValue(eventJson, ContactEvent.class);
+
+            eventHandler.handleContactEvent(event);
+
+            log.debug(&quot;Processed Kinesis record: sequence={}&quot;, record.getSequenceNumber());
+
+        } catch (Exception e) {
+            log.error(&quot;Error processing Kinesis record: {}&quot;, e.getMessage(), e);
+        }
+    }
+
+    private String getShardIterator() {
+        // Implementation to get shard iterator
+        return null;
+    }
+}
+</code></pre>
+<h3 id="3-apache-pulsar-implementation">3. Apache Pulsar Implementation</h3>
+<pre><code class="language-java">@Configuration
+public class PulsarConfiguration {
+
+    @Bean
+    public PulsarClient pulsarClient() {
+        try {
+            return PulsarClient.builder()
+                .serviceUrl(&quot;pulsar://localhost:6650&quot;)
+                .build();
+        } catch (PulsarClientException e) {
+            throw new RuntimeException(&quot;Failed to create Pulsar client&quot;, e);
+        }
+    }
+
+    @Bean
+    public Producer&lt;ContactEvent&gt; contactEventProducer(PulsarClient client) {
+        try {
+            return client.newProducer(Schema.JSON(ContactEvent.class))
+                .topic(&quot;contact-events&quot;)
+                .batchingMaxMessages(100)
+                .batchingMaxPublishDelay(10, TimeUnit.MILLISECONDS)
+                .compressionType(CompressionType.LZ4)
+                .create();
+        } catch (PulsarClientException e) {
+            throw new RuntimeException(&quot;Failed to create Pulsar producer&quot;, e);
+        }
+    }
+
+    @Bean
+    public Consumer&lt;ContactEvent&gt; contactEventConsumer(PulsarClient client) {
+        try {
+            return client.newConsumer(Schema.JSON(ContactEvent.class))
+                .topic(&quot;contact-events&quot;)
+                .subscriptionName(&quot;contact-processing&quot;)
+                .subscriptionType(SubscriptionType.Shared)
+                .receiverQueueSize(1000)
+                .subscribe();
+        } catch (PulsarClientException e) {
+            throw new RuntimeException(&quot;Failed to create Pulsar consumer&quot;, e);
+        }
+    }
+}
+
+@Service
+public class PulsarContactEventProducer {
+    private final Producer&lt;ContactEvent&gt; producer;
+
+    public CompletableFuture&lt;MessageId&gt; publishContactEvent(ContactEvent event) {
+        return producer.newMessage()
+            .key(event.getContactId())
+            .property(&quot;eventType&quot;, event.getEventType().name())
+            .eventTime(event.getTimestamp().toEpochMilli())
+            .value(event)
+            .sendAsync()
+            .whenComplete((messageId, ex) -&gt; {
+                if (ex != null) {
+                    log.error(&quot;Failed to publish to Pulsar: {}&quot;, ex.getMessage(), ex);
+                } else {
+                    log.debug(&quot;Published to Pulsar: messageId={}&quot;, messageId);
+                }
+            });
+    }
+}
+
+@Component
+public class PulsarContactEventConsumer {
+    private final Consumer&lt;ContactEvent&gt; consumer;
+    private final ContactEventHandler eventHandler;
+
+    @PostConstruct
+    public void startConsumer() {
+        CompletableFuture.runAsync(this::consumeEvents);
+    }
+
+    private void consumeEvents() {
+        while (true) {
+            try {
+                Messages&lt;ContactEvent&gt; messages = consumer.batchReceive();
+
+                for (Message&lt;ContactEvent&gt; message : messages) {
+                    processMessage(message);
+                }
+
+                consumer.acknowledge(messages);
+
+            } catch (Exception e) {
+                log.error(&quot;Error consuming from Pulsar: {}&quot;, e.getMessage(), e);
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    break;
+                }
+            }
+        }
+    }
+
+    private void processMessage(Message&lt;ContactEvent&gt; message) {
+        try {
+            ContactEvent event = message.getValue();
+            eventHandler.handleContactEvent(event);
+
+            log.debug(&quot;Processed Pulsar message: messageId={}&quot;, message.getMessageId());
+
+        } catch (Exception e) {
+            log.error(&quot;Error processing Pulsar message: {}&quot;, e.getMessage(), e);
+        }
+    }
+}
+</code></pre>
+<h2 id="best-practices">Best Practices</h2>
+<h3 id="1-event-design-and-schema-management">1. Event Design and Schema Management</h3>
+<pre><code class="language-java">public class EventDesignBestPractices {
+
+    // Use CloudEvents specification for standard event structure
+    public class CloudEventWrapper&lt;T&gt; {
+        private String specversion = &quot;1.0&quot;;
+        private String type;
+        private String source;
+        private String id;
+        private Instant time;
+        private String datacontenttype = &quot;application/json&quot;;
+        private T data;
+        private String subject;
+        private Map&lt;String, String&gt; extensionAttributes;
+
+        public static &lt;T&gt; CloudEventWrapper&lt;T&gt; create(T data, String source, String type) {
+            return CloudEventWrapper.&lt;T&gt;builder()
+                .id(UUID.randomUUID().toString())
+                .source(source)
+                .type(type)
+                .time(Instant.now())
+                .data(data)
+                .build();
+        }
+    }
+
+    // Design events for schema evolution
+    @SchemaEvolution(compatibility = BACKWARD)
+    public class ContactEventV2 {
+        @Required
+        private String eventId;
+
+        @Required 
+        private String contactId;
+
+        @Required
+        private EventType eventType;
+
+        @Required
+        private Instant timestamp;
+
+        // New fields with defaults for backward compatibility
+        @Since(&quot;2.0&quot;)
+        @Default(&quot;unknown&quot;)
+        private String source = &quot;unknown&quot;;
+
+        @Since(&quot;2.0&quot;) 
+        private Map&lt;String, String&gt; metadata = new HashMap&lt;&gt;();
+
+        // Deprecated fields marked for future removal
+        @Deprecated(since = &quot;2.0&quot;, forRemoval = &quot;3.0&quot;)
+        private String legacyField;
+    }
+
+    // Use semantic versioning for schemas
+    public class SchemaVersioning {
+
+        public Schema evolveSchema(Schema currentSchema, SchemaChange change) {
+            SchemaVersion currentVersion = currentSchema.getVersion();
+            SchemaVersion newVersion;
+
+            if (change.isBreaking()) {
+                newVersion = currentVersion.nextMajor(); // 1.0 -&gt; 2.0
+            } else if (change.isFeatureAddition()) {
+                newVersion = currentVersion.nextMinor(); // 1.0 -&gt; 1.1
+            } else {
+                newVersion = currentVersion.nextPatch(); // 1.0.0 -&gt; 1.0.1
+            }
+
+            return currentSchema.evolve(newVersion, change);
+        }
+    }
+}
+</code></pre>
+<h3 id="2-stream-partitioning-and-ordering">2. Stream Partitioning and Ordering</h3>
+<pre><code class="language-java">@Component
+public class StreamPartitioningStrategy {
+
+    // Partition by entity ID for ordered processing
+    public String getPartitionKey(ContactEvent event) {
+        return event.getContactId(); // All events for same contact go to same partition
+    }
+
+    // Custom partitioner for specific business logic
+    public class ContactEventPartitioner implements StreamPartitioner&lt;String, ContactEvent&gt; {
+
+        @Override
+        public Integer partition(String topic, String key, ContactEvent value, int numPartitions) {
+            // Partition by contact region for geographic distribution
+            String region = extractRegion(value.getContactId());
+            return Math.abs(region.hashCode()) % numPartitions;
+        }
+
+        private String extractRegion(String contactId) {
+            // Extract region from contact ID format: REGION-XXXXXXXXXX
+            return contactId.split(&quot;-&quot;)[0];
+        }
+    }
+
+    // Handle out-of-order events with event timestamps
+    @Component
+    public class OutOfOrderEventHandler {
+        private final Map&lt;String, Long&gt; lastProcessedTimestamp = new ConcurrentHashMap&lt;&gt;();
+
+        public boolean isOutOfOrder(ContactEvent event) {
+            String contactId = event.getContactId();
+            long eventTimestamp = event.getTimestamp().toEpochMilli();
+
+            Long lastTimestamp = lastProcessedTimestamp.get(contactId);
+            if (lastTimestamp == null || eventTimestamp &gt; lastTimestamp) {
+                lastProcessedTimestamp.put(contactId, eventTimestamp);
+                return false;
+            }
+
+            return true;
+        }
+
+        public void handleOutOfOrderEvent(ContactEvent event) {
+            // Buffer out-of-order events for later processing
+            outOfOrderBuffer.add(event);
+
+            // Trigger reprocessing if buffer size threshold reached
+            if (outOfOrderBuffer.size() &gt; 100) {
+                reprocessBufferedEvents();
+            }
+        }
+    }
+}
+</code></pre>
+<h3 id="3-stream-processing-patterns">3. Stream Processing Patterns</h3>
+<pre><code class="language-java">@Component
+public class StreamProcessingPatterns {
+
+    // Windowed aggregations for time-based analytics
+    public void configureWindowedAggregation(StreamsBuilder builder) {
+        builder.stream(&quot;contact.events&quot;, 
+                      Consumed.with(Serdes.String(), new ContactEventSerde()))
+            .groupBy((key, event) -&gt; event.getEventType(),
+                    Grouped.with(Serdes.String(), new ContactEventSerde()))
+            .windowedBy(TimeWindows.of(Duration.ofMinutes(5)).grace(Duration.ofSeconds(30)))
+            .count(Named.as(&quot;event-counts&quot;))
+            .toStream()
+            .map((windowedKey, count) -&gt; KeyValue.pair(
+                windowedKey.key() + &quot;@&quot; + windowedKey.window().start(),
+                new EventCountSummary(windowedKey.key(), count, windowedKey.window())
+            ))
+            .to(&quot;contact.event.counts&quot;);
+    }
+
+    // Stream joins for event correlation
+    public void configureStreamJoins(StreamsBuilder builder) {
+        KStream&lt;String, ContactEvent&gt; contactEvents = 
+            builder.stream(&quot;contact.events&quot;);
+        KStream&lt;String, UserEvent&gt; userEvents = 
+            builder.stream(&quot;user.events&quot;);
+
+        // Join streams within a time window
+        contactEvents.join(
+            userEvents,
+            (contact, user) -&gt; new CorrelatedEvent(contact, user),
+            JoinWindows.of(Duration.ofMinutes(5)),
+            StreamJoined.with(
+                Serdes.String(),
+                new ContactEventSerde(),
+                new UserEventSerde()
+            )
+        ).to(&quot;correlated.events&quot;);
+    }
+
+    // Error handling and dead letter topics
+    public void configureErrorHandling(StreamsBuilder builder) {
+        builder.stream(&quot;contact.events&quot;)
+            .process(() -&gt; new ContactEventProcessor(),
+                    Named.as(&quot;process-contacts&quot;))
+            .to((recordContext, key, value, topicNameExtractor) -&gt; {
+                if (value instanceof ProcessingError) {
+                    return &quot;contact.events.errors&quot;;
+                } else {
+                    return &quot;contact.events.processed&quot;;
+                }
+            });
+    }
+}
+</code></pre>
+<h2 id="common-pitfalls">Common Pitfalls</h2>
+<h3 id="1-hot-partitions">1. <strong>Hot Partitions</strong></h3>
+<p><strong>Problem</strong>: Uneven distribution of events leading to processing bottlenecks<br />
+<strong>Solution</strong>: Use effective partitioning strategies and monitor partition metrics</p>
+<h3 id="2-schema-compatibility-issues">2. <strong>Schema Compatibility Issues</strong></h3>
+<p><strong>Problem</strong>: Breaking schema changes causing consumer failures<br />
+<strong>Solution</strong>: Implement schema registry with compatibility checking</p>
+<h3 id="3-consumer-lag-accumulation">3. <strong>Consumer Lag Accumulation</strong></h3>
+<p><strong>Problem</strong>: Consumers falling behind producers causing delays<br />
+<strong>Solution</strong>: Monitor lag metrics and implement auto-scaling</p>
+<h3 id="4-memory-leaks-in-state-stores">4. <strong>Memory Leaks in State Stores</strong></h3>
+<p><strong>Problem</strong>: Unbounded state growth in stream processing applications<br />
+<strong>Solution</strong>: Configure retention policies and compact state stores</p>
+<h3 id="5-exactly-once-processing-overhead">5. <strong>Exactly-Once Processing Overhead</strong></h3>
+<p><strong>Problem</strong>: Performance degradation with exactly-once guarantees<br />
+<strong>Solution</strong>: Use at-least-once when appropriate and implement idempotent processing</p>
+<h2 id="integration-in-distributed-systems">Integration in Distributed Systems</h2>
+<h3 id="event-sourcing-implementation">Event Sourcing Implementation</h3>
+<pre><code class="language-java">@Service
+public class EventSourcedContactService {
+
+    public void createContact(CreateContactCommand command) {
+        ContactCreatedEvent event = ContactCreatedEvent.builder()
+            .contactId(command.getContactId())
+            .personalData(command.getPersonalData())
+            .occurredAt(Instant.now())
+            .build();
+
+        eventStreamProducer.publish(&quot;contact.events&quot;, event);
+    }
+}
+</code></pre>
+<h3 id="cqrs-with-event-streaming">CQRS with Event Streaming</h3>
+<pre><code class="language-java">@Service
+public class ContactQueryService {
+
+    @StreamListener(&quot;contact.events&quot;)
+    public void updateContactProjection(ContactEvent event) {
+        ContactProjection projection = contactProjectionRepository
+            .findByContactId(event.getContactId())
+            .orElse(new ContactProjection(event.getContactId()));
+
+        projection.apply(event);
+        contactProjectionRepository.save(projection);
+    }
+}
+</code></pre>
+<h2 id="conclusion">Conclusion</h2>
+<p>Event Streaming is essential for building modern, responsive distributed systems. It provides:</p>
+<ul>
+<li><strong>Real-Time Processing</strong>: Continuous data processing with low latency</li>
+<li><strong>Scalable Architecture</strong>: Linear scalability through partitioning and parallel processing  </li>
+<li><strong>Temporal Flexibility</strong>: Historical replay and point-in-time recovery capabilities</li>
+<li><strong>Integration Simplification</strong>: Unified data pipeline replacing complex point-to-point connections</li>
+</ul>
+<p>When properly implemented with appropriate partitioning, schema management, and monitoring, event streaming enables robust, scalable architectures that can process massive data volumes while maintaining consistency and enabling real-time business intelligence.</p>
+<h2 id="references">References</h2>
+<ul>
+<li><a href="https://www.confluent.io/resources/kafka-the-definitive-guide/">Kafka: The Definitive Guide</a></li>
+<li><a href="https://www.confluent.io/designing-event-driven-systems/">Designing Event-Driven Systems</a></li>
+<li><a href="https://kafka.apache.org/documentation/streams/">Building Streaming Applications with Apache Kafka</a></li>
+<li><a href="https://www.eventstore.com/blog/what-is-event-streaming">Event Streaming Patterns</a></li>
+</ul>
+
+      <a href="../index.html" class="back-to-top">← Back to All Patterns</a>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <p>©2026 <a href="https://dataintegrationmastery.com/">Data Integration Mastery™</a> — All Rights Reserved</p>
+  </footer>
+</body>
+</html>

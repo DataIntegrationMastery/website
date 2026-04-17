@@ -1,0 +1,1636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Message Routing Pattern — Integration Architecture Patterns | Data Integration Mastery™</title>
+  <meta name="description" content="The Message Routing pattern provides intelligent message distribution capabilities that determine the appropriate destination for messages based on content, ...">
+  <meta name="keywords" content="message routing pattern, integration pattern, messaging patterns, integration architecture, EAI patterns, data integration">
+  <link rel="canonical" href="https://dataintegrationmastery.com/patterns/messaging-patterns/message-routing.html">
+
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://dataintegrationmastery.com/patterns/messaging-patterns/message-routing.html">
+  <meta property="og:title" content="Message Routing Pattern — Integration Architecture Patterns">
+  <meta property="og:description" content="The Message Routing pattern provides intelligent message distribution capabilities that determine the appropriate destination for messages based on content, ...">
+  <meta property="og:image" content="https://dataintegrationmastery.com/assets/images/logo.png">
+  <meta property="og:site_name" content="Data Integration Mastery">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Message Routing Pattern — Integration Architecture Patterns">
+  <meta name="twitter:description" content="The Message Routing pattern provides intelligent message distribution capabilities that determine the appropriate destination for messages based on content, ...">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/docs.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Message Routing Pattern",
+    "description": "The Message Routing pattern provides intelligent message distribution capabilities that determine the appropriate destination for messages based on content, ...",
+    "url": "https://dataintegrationmastery.com/patterns/messaging-patterns/message-routing.html",
+    "author": {
+      "@type": "Person",
+      "name": "Ari Vilkman",
+      "jobTitle": "Integration Architect"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Data Integration Mastery",
+      "url": "https://dataintegrationmastery.com"
+    },
+    "isPartOf": {
+      "@type": "CollectionPage",
+      "name": "Integration Architecture Patterns",
+      "url": "https://dataintegrationmastery.com/patterns/"
+    },
+    "about": {
+      "@type": "Thing",
+      "name": "Message Routing Pattern"
+    },
+    "inLanguage": "en",
+    "isAccessibleForFree": true
+  }
+  </script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="https://dataintegrationmastery.com/" class="header-brand">
+        <img src="../../assets/images/dim-icon.png" alt="DIM" width="36" height="36">
+        <span class="header-title">Data Integration Mastery™</span>
+      </a>
+      <nav class="header-nav" aria-label="Main navigation">
+        <a href="https://dataintegrationmastery.com/">Home</a>
+        <a href="../index.html">All Patterns</a>
+        <a href="https://dataintegrationmastery.com/#free-course">Free Course</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="docs-layout">
+    <aside class="docs-sidebar" aria-label="Pattern categories">
+      <div class="sidebar-title">Pattern Categories</div>
+<div class="sidebar-section">
+  <a href="../index.html#resilience" class="sidebar-section-title">🛡️ Resilience Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../resilience-patterns/circuit-breaker.html">Circuit Breaker</a></li>
+    <li><a href="../resilience-patterns/retry-mechanism.html">Retry Mechanism</a></li>
+    <li><a href="../resilience-patterns/timeout.html">Timeout</a></li>
+    <li><a href="../resilience-patterns/dead-letter-queue.html">Dead Letter Queue</a></li>
+    <li><a href="../resilience-patterns/bulkhead.html">Bulkhead</a></li>
+    <li><a href="../resilience-patterns/fallback-graceful-degradation.html">Fallback / Graceful Degradation</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#messaging" class="sidebar-section-title">📨 Messaging Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="request-reply.html">Request-Reply</a></li>
+    <li><a href="publish-subscribe.html">Publish-Subscribe</a></li>
+    <li><a href="message-queue.html">Message Queue</a></li>
+    <li><a href="event-streaming.html">Event Streaming</a></li>
+    <li><a href="correlation-id.html">Correlation ID</a></li>
+    <li><a href="message-routing.html" class="active">Message Routing</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#data-transformation" class="sidebar-section-title">🔄 Data Transformation Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../data-transformation-patterns/message-translator.html">Message Translator</a></li>
+    <li><a href="../data-transformation-patterns/content-filter.html">Content Filter</a></li>
+    <li><a href="../data-transformation-patterns/message-router.html">Message Router</a></li>
+    <li><a href="../data-transformation-patterns/aggregator.html">Aggregator</a></li>
+    <li><a href="../data-transformation-patterns/splitter.html">Splitter</a></li>
+    <li><a href="../data-transformation-patterns/data-mapper.html">Data Mapper</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#routing" class="sidebar-section-title">🔀 Routing Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../routing-patterns/content-based-router.html">Content-Based Router</a></li>
+    <li><a href="../routing-patterns/recipient-list.html">Recipient List</a></li>
+    <li><a href="../routing-patterns/load-balancer.html">Load Balancer</a></li>
+    <li><a href="../routing-patterns/message-filter.html">Message Filter</a></li>
+    <li><a href="../routing-patterns/dynamic-router.html">Dynamic Router</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#security" class="sidebar-section-title">🔐 Security Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../security-patterns/authentication.html">Authentication</a></li>
+    <li><a href="../security-patterns/authorization.html">Authorization</a></li>
+    <li><a href="../security-patterns/encryption.html">Encryption</a></li>
+    <li><a href="../security-patterns/token-management.html">Token Management</a></li>
+    <li><a href="../security-patterns/api-security.html">API Security</a></li>
+    <li><a href="../security-patterns/secret-management.html">Secret Management</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#orchestration" class="sidebar-section-title">🎭 Orchestration Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../orchestration-patterns/saga-pattern.html">Saga Pattern</a></li>
+    <li><a href="../orchestration-patterns/process-manager.html">Process Manager</a></li>
+    <li><a href="../orchestration-patterns/workflow-engine.html">Workflow Engine</a></li>
+    <li><a href="../orchestration-patterns/choreography.html">Choreography</a></li>
+    <li><a href="../orchestration-patterns/compensation-transactions.html">Compensation Transactions</a></li>
+  </ul>
+</div>
+<div class="sidebar-section">
+  <a href="../index.html#observability" class="sidebar-section-title">📊 Monitoring & Observability Patterns</a>
+  <ul class="sidebar-links">
+    <li><a href="../monitoring-observability-patterns/distributed-tracing.html">Distributed Tracing</a></li>
+    <li><a href="../monitoring-observability-patterns/metrics-collection.html">Metrics Collection</a></li>
+    <li><a href="../monitoring-observability-patterns/health-checks.html">Health Checks</a></li>
+    <li><a href="../monitoring-observability-patterns/logging-strategies.html">Logging Strategies</a></li>
+    <li><a href="../monitoring-observability-patterns/performance-monitoring.html">Performance Monitoring</a></li>
+    <li><a href="../monitoring-observability-patterns/error-tracking.html">Error Tracking</a></li>
+  </ul>
+</div>
+
+    </aside>
+
+    <main id="main-content" class="docs-content">
+      <div class="breadcrumb">
+        <a href="https://dataintegrationmastery.com/">Home</a>
+        <span class="sep">›</span>
+        <a href="../index.html">Patterns</a>
+        <span class="sep">›</span>
+        <a href="../index.html#messaging">Messaging Patterns</a>
+        <span class="sep">›</span>
+        <strong>Message Routing Pattern</strong>
+      </div>
+
+      <h1>Message Routing Pattern</h1>
+
+      <h2 id="overview">Overview</h2>
+<p>The Message Routing pattern provides <strong>intelligent message distribution</strong> capabilities that determine the appropriate destination for messages based on content, headers, or routing rules. It implements sophisticated routing logic that enables dynamic message flow control, load balancing, and content-based message distribution across multiple endpoints. This pattern serves as the foundation for building flexible, adaptive messaging architectures that can evolve with changing business requirements.</p>
+<h3 id="theoretical-foundation">Theoretical Foundation</h3>
+<p>Message Routing is grounded in <strong>graph theory</strong> and <strong>network routing principles</strong> applied to messaging systems. It implements <strong>"store-and-forward" semantics</strong> with intelligent path determination based on message characteristics and system state. The pattern embodies <strong>"content-aware routing"</strong> where routing decisions are made based on message content, metadata, and contextual information rather than static configuration.</p>
+<h3 id="core-principles">Core Principles</h3>
+<h4 id="1-dynamic-route-determination">1. <strong>Dynamic Route Determination</strong></h4>
+<p>Routing decisions are made at runtime based on message content, headers, system state, and configured routing rules, enabling adaptive message flow that responds to changing conditions.</p>
+<h4 id="2-content-based-message-distribution">2. <strong>Content-Based Message Distribution</strong></h4>
+<p>Messages are routed based on their content, type, or metadata, enabling fine-grained control over message distribution and processing workflows.</p>
+<h4 id="3-route-optimization-and-load-balancing">3. <strong>Route Optimization and Load Balancing</strong></h4>
+<p>The routing system optimizes message delivery paths and distributes load across available endpoints to maximize throughput and minimize latency.</p>
+<h4 id="4-fault-tolerant-routing">4. <strong>Fault-Tolerant Routing</strong></h4>
+<p>Routing logic includes fallback mechanisms, alternative paths, and error handling to ensure message delivery even when primary routes are unavailable.</p>
+<h3 id="why-message-routing-is-essential-in-integration-architecture">Why Message Routing is Essential in Integration Architecture</h3>
+<h4 id="1-enterprise-integration-requirements">1. <strong>Enterprise Integration Requirements</strong></h4>
+<p>Complex enterprise environments require sophisticated message routing:
+- <strong>Multi-system integration</strong> routing messages between diverse enterprise applications
+- <strong>Legacy system modernization</strong> enabling gradual transition through intelligent routing
+- <strong>B2B communication</strong> routing messages to appropriate trading partners and systems
+- <strong>Compliance and governance</strong> ensuring messages follow required processing paths</p>
+<h4 id="2-microservices-architecture-support">2. <strong>Microservices Architecture Support</strong></h4>
+<p>Microservices architectures depend on effective message routing:
+- <strong>Service discovery integration</strong> routing messages to appropriate service instances
+- <strong>Version management</strong> routing requests to correct service versions
+- <strong>Canary deployments</strong> gradually routing traffic to new service versions
+- <strong>Circuit breaker integration</strong> routing around failed services</p>
+<h4 id="3-scalability-and-performance-optimization">3. <strong>Scalability and Performance Optimization</strong></h4>
+<p>Message routing enables system scalability:
+- <strong>Load distribution</strong> across multiple processing endpoints
+- <strong>Geographic routing</strong> directing messages to closest processing centers
+- <strong>Priority-based routing</strong> ensuring critical messages receive appropriate handling
+- <strong>Capacity-aware routing</strong> directing messages based on endpoint availability</p>
+<h4 id="4-business-process-flexibility">4. <strong>Business Process Flexibility</strong></h4>
+<p>Dynamic routing supports business agility:
+- <strong>A/B testing</strong> routing messages to different processing pipelines for testing
+- <strong>Feature flags</strong> enabling/disabling features through routing configuration
+- <strong>Business rule implementation</strong> routing messages based on business logic
+- <strong>Workflow orchestration</strong> directing messages through complex business processes</p>
+<h3 id="benefits-in-integration-contexts">Benefits in Integration Contexts</h3>
+<h4 id="1-architecture-flexibility">1. <strong>Architecture Flexibility</strong></h4>
+<ul>
+<li><strong>Loose coupling</strong> between message producers and consumers</li>
+<li><strong>Runtime reconfiguration</strong> enabling dynamic routing changes without system restarts</li>
+<li><strong>Technology independence</strong> routing messages between different platforms and protocols</li>
+<li><strong>Gradual system evolution</strong> enabling incremental changes without disrupting existing flows</li>
+</ul>
+<h4 id="2-operational-excellence">2. <strong>Operational Excellence</strong></h4>
+<ul>
+<li><strong>High availability</strong> through redundant routing paths and failover mechanisms</li>
+<li><strong>Performance monitoring</strong> with detailed routing metrics and analytics</li>
+<li><strong>Troubleshooting support</strong> through comprehensive routing logs and tracing</li>
+<li><strong>Capacity management</strong> based on routing patterns and endpoint utilization</li>
+</ul>
+<h4 id="3-development-productivity">3. <strong>Development Productivity</strong></h4>
+<ul>
+<li><strong>Simplified integration</strong> through declarative routing configuration</li>
+<li><strong>Testing flexibility</strong> enabling isolated testing of individual routing paths</li>
+<li><strong>Debugging capabilities</strong> with detailed routing trace information</li>
+<li><strong>Rapid prototyping</strong> through quick routing rule modifications</li>
+</ul>
+<h4 id="4-business-value">4. <strong>Business Value</strong></h4>
+<ul>
+<li><strong>Faster time-to-market</strong> through flexible integration capabilities</li>
+<li><strong>Cost optimization</strong> through efficient resource utilization</li>
+<li><strong>Risk mitigation</strong> through redundant routing and fallback mechanisms</li>
+<li><strong>Compliance assurance</strong> through controlled message routing paths</li>
+</ul>
+<h3 id="integration-architecture-applications">Integration Architecture Applications</h3>
+<h4 id="1-enterprise-service-bus-esb-implementation">1. <strong>Enterprise Service Bus (ESB) Implementation</strong></h4>
+<p>Message routing forms the core of ESB architectures:
+- <strong>Service mediation</strong> routing messages between different service interfaces
+- <strong>Protocol transformation</strong> routing messages through appropriate protocol adapters
+- <strong>Message transformation</strong> routing messages through transformation pipelines
+- <strong>Error handling</strong> routing failed messages to appropriate error handling services</p>
+<h4 id="2-api-gateway-integration">2. <strong>API Gateway Integration</strong></h4>
+<p>API gateways use message routing for request distribution:
+- <strong>Backend service routing</strong> directing API requests to appropriate microservices
+- <strong>Version routing</strong> managing API versioning through intelligent request routing
+- <strong>Authentication routing</strong> directing requests through appropriate authentication services
+- <strong>Rate limiting</strong> routing requests based on quotas and throttling policies</p>
+<h4 id="3-event-driven-architecture-routing">3. <strong>Event-Driven Architecture Routing</strong></h4>
+<p>Event systems require sophisticated routing capabilities:
+- <strong>Event type routing</strong> distributing events to appropriate event handlers
+- <strong>Subscriber routing</strong> routing events to interested subscribers
+- <strong>Event transformation routing</strong> routing events through processing pipelines
+- <strong>Dead letter routing</strong> handling failed event processing</p>
+<h4 id="4-data-pipeline-orchestration">4. <strong>Data Pipeline Orchestration</strong></h4>
+<p>Data processing systems use routing for pipeline management:
+- <strong>Data source routing</strong> directing data from various sources to processing systems
+- <strong>Processing stage routing</strong> orchestrating multi-stage data processing workflows
+- <strong>Quality assurance routing</strong> directing data through validation and cleansing processes
+- <strong>Output routing</strong> distributing processed data to appropriate destination systems</p>
+<h2 id="how-message-routing-pattern-works">How Message Routing Pattern Works</h2>
+<p>Message routing operates through configurable routing engines that evaluate messages against routing rules and direct them to appropriate destinations:</p>
+<h3 id="basic-routing-architecture">Basic Routing Architecture</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────┐
+│                     Message Router                             │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  ┌─────────────┐    ┌──────────────┐    ┌─────────────────────┐ │
+│  │ Message     │──▶ │ Routing      │──▶ │ Destination         │ │
+│  │ Classifier  │    │ Engine       │    │ Selector            │ │
+│  └─────────────┘    └──────────────┘    └─────────────────────┘ │
+│          │                  │                       │           │
+│          ▼                  ▼                       ▼           │
+│  ┌─────────────┐    ┌──────────────┐    ┌─────────────────────┐ │
+│  │ Content     │    │ Rule         │    │ Load Balancer       │ │
+│  │ Analyzer    │    │ Evaluator    │    │                     │ │
+│  └─────────────┘    └──────────────┘    └─────────────────────┘ │
+│                                                                 │
+├─────────────────────────────────────────────────────────────────┤
+│                    Routing Outcomes                             │
+│                                                                 │
+│ Message A ──┬──▶ Service 1                                      │
+│             └──▶ Service 2 (Load Balanced)                     │
+│                                                                 │
+│ Message B ──────▶ Service 3 (Content-based)                    │
+│                                                                 │
+│ Message C ──┬──▶ Service 4 (Primary)                           │
+│             └──▶ Dead Letter Queue (Fallback)                  │
+└─────────────────────────────────────────────────────────────────┘
+</code></pre>
+<h3 id="routing-decision-process">Routing Decision Process</h3>
+<pre><code>┌────────────────────────────────────────────────────────────┐
+│                Routing Decision Flow                       │
+├────────────────────────────────────────────────────────────┤
+│                                                            │
+│ 1. [Message Received] ──▶ 2. [Extract Routing Metadata]   │
+│                                      │                    │
+│                                      ▼                    │
+│ 6. [Route Message] ◀── 5. [Select Route] ◀── 3. [Evaluate Rules] │
+│                                      │                    │
+│                                      ▼                    │
+│                           4. [Apply Filters &amp; Conditions] │
+│                                                            │
+│ Routing Criteria:                                          │
+│ • Message content and headers                              │
+│ • Destination availability                                 │
+│ • Load balancing algorithms                                │
+│ • Business rules and policies                              │
+│ • Error handling requirements                              │
+└────────────────────────────────────────────────────────────┘
+</code></pre>
+<h3 id="routing-strategies">Routing Strategies</h3>
+<h4 id="1-content-based-routing">1. <strong>Content-Based Routing</strong></h4>
+<pre><code>Message Content ──▶ [Content Analyzer] ──▶ Route Decision
+
+if (message.type == &quot;ORDER&quot;) → order.processing.queue
+if (message.priority == &quot;HIGH&quot;) → priority.processing.queue  
+if (message.amount &gt; 1000) → manual.review.queue
+</code></pre>
+<h4 id="2-header-based-routing">2. <strong>Header-Based Routing</strong></h4>
+<pre><code>Message Headers ──▶ [Header Evaluator] ──▶ Route Decision
+
+if (headers.region == &quot;EU&quot;) → eu.processing.service
+if (headers.version == &quot;v2&quot;) → v2.api.endpoint
+if (headers.tenant == &quot;premium&quot;) → premium.service.tier
+</code></pre>
+<h4 id="3-load-balanced-routing">3. <strong>Load-Balanced Routing</strong></h4>
+<pre><code>Available Endpoints ──▶ [Load Balancer] ──▶ Endpoint Selection
+
+Round Robin: endpoint1 → endpoint2 → endpoint3 → endpoint1
+Weighted: endpoint1 (70%) → endpoint2 (30%)
+Least Connections: route to endpoint with fewest active connections
+</code></pre>
+<h4 id="4-conditional-routing">4. <strong>Conditional Routing</strong></h4>
+<pre><code>Business Rules ──▶ [Rule Engine] ──▶ Route Decision
+
+if (customer.tier == &quot;VIP&quot;) → vip.service.endpoint
+if (order.total &gt; threshold) → approval.workflow.service
+if (system.time in business_hours) → live.service else batch.service
+</code></pre>
+<h2 id="key-components">Key Components</h2>
+<h3 id="1-message-router">1. Message Router</h3>
+<p>Core routing engine that evaluates messages and determines destinations:</p>
+<pre><code class="language-java">@Component
+public class MessageRouter {
+    private final List&lt;RoutingRule&gt; routingRules;
+    private final RouteEvaluator routeEvaluator;
+    private final LoadBalancer loadBalancer;
+    private final RouteMetrics routeMetrics;
+    private final FallbackHandler fallbackHandler;
+
+    public RoutingResult route(Message message, RoutingContext context) {
+        try {
+            // Extract routing metadata
+            RoutingMetadata metadata = extractRoutingMetadata(message, context);
+
+            // Evaluate routing rules
+            List&lt;RoutingRule&gt; applicableRules = findApplicableRules(metadata);
+
+            if (applicableRules.isEmpty()) {
+                return handleNoMatchingRules(message, metadata);
+            }
+
+            // Determine best route
+            Route selectedRoute = selectBestRoute(applicableRules, metadata);
+
+            if (selectedRoute == null) {
+                return handleNoValidRoute(message, metadata);
+            }
+
+            // Apply load balancing if multiple endpoints
+            Endpoint targetEndpoint = selectEndpoint(selectedRoute, metadata);
+
+            // Validate endpoint availability
+            if (!isEndpointAvailable(targetEndpoint)) {
+                return handleUnavailableEndpoint(message, selectedRoute, metadata);
+            }
+
+            // Route message
+            RoutingResult result = executeRoute(message, targetEndpoint, selectedRoute);
+
+            // Record metrics
+            routeMetrics.recordSuccessfulRoute(selectedRoute, targetEndpoint, result);
+
+            return result;
+
+        } catch (Exception e) {
+            log.error(&quot;Error routing message: {}&quot;, e.getMessage(), e);
+            routeMetrics.recordRoutingError(message, e);
+            return fallbackHandler.handleRoutingError(message, context, e);
+        }
+    }
+
+    private RoutingMetadata extractRoutingMetadata(Message message, RoutingContext context) {
+        return RoutingMetadata.builder()
+            .messageType(message.getType())
+            .headers(message.getHeaders())
+            .contentLength(message.getPayload().length)
+            .priority(message.getPriority())
+            .timestamp(message.getTimestamp())
+            .correlationId(context.getCorrelationId())
+            .sourceEndpoint(context.getSourceEndpoint())
+            .routingAttributes(extractContentAttributes(message))
+            .build();
+    }
+
+    private List&lt;RoutingRule&gt; findApplicableRules(RoutingMetadata metadata) {
+        return routingRules.stream()
+            .filter(rule -&gt; rule.isApplicable(metadata))
+            .sorted(Comparator.comparing(RoutingRule::getPriority).reversed())
+            .collect(Collectors.toList());
+    }
+
+    private Route selectBestRoute(List&lt;RoutingRule&gt; rules, RoutingMetadata metadata) {
+        for (RoutingRule rule : rules) {
+            List&lt;Route&gt; candidateRoutes = rule.evaluateRoutes(metadata);
+
+            if (!candidateRoutes.isEmpty()) {
+                Route selectedRoute = selectOptimalRoute(candidateRoutes, metadata);
+                if (selectedRoute != null &amp;&amp; isRouteValid(selectedRoute, metadata)) {
+                    return selectedRoute;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private Route selectOptimalRoute(List&lt;Route&gt; candidateRoutes, RoutingMetadata metadata) {
+        // Apply route selection strategy
+        RouteSelectionStrategy strategy = determineSelectionStrategy(metadata);
+
+        switch (strategy) {
+            case PRIORITY_BASED:
+                return candidateRoutes.stream()
+                    .max(Comparator.comparing(Route::getPriority))
+                    .orElse(null);
+            case PERFORMANCE_BASED:
+                return candidateRoutes.stream()
+                    .min(Comparator.comparing(this::getRouteLatency))
+                    .orElse(null);
+            case CAPACITY_BASED:
+                return candidateRoutes.stream()
+                    .min(Comparator.comparing(this::getRouteUtilization))
+                    .orElse(null);
+            default:
+                return candidateRoutes.get(0);
+        }
+    }
+
+    private Endpoint selectEndpoint(Route route, RoutingMetadata metadata) {
+        List&lt;Endpoint&gt; availableEndpoints = getAvailableEndpoints(route);
+
+        if (availableEndpoints.isEmpty()) {
+            throw new NoAvailableEndpointException(&quot;No available endpoints for route: &quot; + route.getName());
+        }
+
+        if (availableEndpoints.size() == 1) {
+            return availableEndpoints.get(0);
+        }
+
+        // Apply load balancing
+        return loadBalancer.selectEndpoint(availableEndpoints, metadata);
+    }
+
+    private RoutingResult executeRoute(Message message, Endpoint endpoint, Route route) {
+        RouteExecutor executor = getRouteExecutor(route.getType());
+
+        return executor.execute(message, endpoint, route);
+    }
+
+    private Map&lt;String, Object&gt; extractContentAttributes(Message message) {
+        // Extract routing attributes from message content
+        try {
+            if (message.getType().equals(&quot;JSON&quot;)) {
+                return jsonAttributeExtractor.extract(message.getPayload());
+            } else if (message.getType().equals(&quot;XML&quot;)) {
+                return xmlAttributeExtractor.extract(message.getPayload());
+            } else {
+                return Collections.emptyMap();
+            }
+        } catch (Exception e) {
+            log.warn(&quot;Failed to extract content attributes: {}&quot;, e.getMessage());
+            return Collections.emptyMap();
+        }
+    }
+}
+</code></pre>
+<h3 id="2-routing-rules-engine">2. Routing Rules Engine</h3>
+<p>Manages and evaluates routing rules:</p>
+<pre><code class="language-java">@Component
+public class RoutingRulesEngine {
+    private final RuleRepository ruleRepository;
+    private final ExpressionEvaluator expressionEvaluator;
+    private final RuleCache ruleCache;
+
+    public List&lt;RoutingRule&gt; evaluateRules(RoutingMetadata metadata) {
+        List&lt;RoutingRule&gt; cachedRules = ruleCache.getRules(metadata.getCacheKey());
+
+        if (cachedRules != null) {
+            return filterApplicableRules(cachedRules, metadata);
+        }
+
+        List&lt;RoutingRule&gt; allRules = ruleRepository.getAllActiveRules();
+        List&lt;RoutingRule&gt; applicableRules = filterApplicableRules(allRules, metadata);
+
+        ruleCache.putRules(metadata.getCacheKey(), applicableRules);
+
+        return applicableRules;
+    }
+
+    private List&lt;RoutingRule&gt; filterApplicableRules(List&lt;RoutingRule&gt; rules, RoutingMetadata metadata) {
+        return rules.stream()
+            .filter(rule -&gt; evaluateRuleCondition(rule, metadata))
+            .sorted(Comparator.comparing(RoutingRule::getPriority).reversed())
+            .collect(Collectors.toList());
+    }
+
+    private boolean evaluateRuleCondition(RoutingRule rule, RoutingMetadata metadata) {
+        try {
+            RuleCondition condition = rule.getCondition();
+            return expressionEvaluator.evaluate(condition, createEvaluationContext(metadata));
+        } catch (Exception e) {
+            log.error(&quot;Error evaluating rule condition for rule {}: {}&quot;, rule.getId(), e.getMessage(), e);
+            return false;
+        }
+    }
+
+    private EvaluationContext createEvaluationContext(RoutingMetadata metadata) {
+        EvaluationContext context = new StandardEvaluationContext();
+
+        // Add metadata fields to context
+        context.setVariable(&quot;messageType&quot;, metadata.getMessageType());
+        context.setVariable(&quot;headers&quot;, metadata.getHeaders());
+        context.setVariable(&quot;contentLength&quot;, metadata.getContentLength());
+        context.setVariable(&quot;priority&quot;, metadata.getPriority());
+        context.setVariable(&quot;timestamp&quot;, metadata.getTimestamp());
+        context.setVariable(&quot;attributes&quot;, metadata.getRoutingAttributes());
+
+        // Add utility functions
+        context.setVariable(&quot;now&quot;, Instant.now());
+        context.setVariable(&quot;today&quot;, LocalDate.now());
+        context.setVariable(&quot;isBusinessHours&quot;, isBusinessHours());
+
+        return context;
+    }
+
+    public RoutingRule createRule(RuleDefinition definition) {
+        validateRuleDefinition(definition);
+
+        RoutingRule rule = RoutingRule.builder()
+            .id(UUID.randomUUID().toString())
+            .name(definition.getName())
+            .description(definition.getDescription())
+            .condition(compileCondition(definition.getConditionExpression()))
+            .routes(definition.getRoutes())
+            .priority(definition.getPriority())
+            .enabled(definition.isEnabled())
+            .createdAt(Instant.now())
+            .build();
+
+        ruleRepository.save(rule);
+        ruleCache.invalidate(); // Clear cache after rule change
+
+        return rule;
+    }
+
+    public void updateRule(String ruleId, RuleDefinition definition) {
+        RoutingRule existingRule = ruleRepository.findById(ruleId)
+            .orElseThrow(() -&gt; new RuleNotFoundException(&quot;Rule not found: &quot; + ruleId));
+
+        validateRuleDefinition(definition);
+
+        RoutingRule updatedRule = existingRule.toBuilder()
+            .name(definition.getName())
+            .description(definition.getDescription())
+            .condition(compileCondition(definition.getConditionExpression()))
+            .routes(definition.getRoutes())
+            .priority(definition.getPriority())
+            .enabled(definition.isEnabled())
+            .updatedAt(Instant.now())
+            .build();
+
+        ruleRepository.save(updatedRule);
+        ruleCache.invalidate();
+
+        log.info(&quot;Updated routing rule: {}&quot;, ruleId);
+    }
+
+    private RuleCondition compileCondition(String expression) {
+        try {
+            return expressionEvaluator.compile(expression);
+        } catch (Exception e) {
+            throw new RuleCompilationException(&quot;Failed to compile rule condition: &quot; + expression, e);
+        }
+    }
+
+    private void validateRuleDefinition(RuleDefinition definition) {
+        if (definition.getName() == null || definition.getName().trim().isEmpty()) {
+            throw new IllegalArgumentException(&quot;Rule name cannot be null or empty&quot;);
+        }
+
+        if (definition.getConditionExpression() == null || definition.getConditionExpression().trim().isEmpty()) {
+            throw new IllegalArgumentException(&quot;Rule condition cannot be null or empty&quot;);
+        }
+
+        if (definition.getRoutes() == null || definition.getRoutes().isEmpty()) {
+            throw new IllegalArgumentException(&quot;Rule must have at least one route&quot;);
+        }
+
+        // Test compile the condition
+        try {
+            compileCondition(definition.getConditionExpression());
+        } catch (Exception e) {
+            throw new IllegalArgumentException(&quot;Invalid rule condition expression&quot;, e);
+        }
+    }
+}
+
+// Example routing rules
+@Component
+public class ContactRoutingRules {
+
+    public void setupContactRoutingRules(RoutingRulesEngine rulesEngine) {
+
+        // Route high-priority contacts to premium processing
+        rulesEngine.createRule(RuleDefinition.builder()
+            .name(&quot;High Priority Contact Routing&quot;)
+            .description(&quot;Route high-priority contacts to premium processing service&quot;)
+            .conditionExpression(&quot;headers['priority'] == 'HIGH' || attributes['customerTier'] == 'VIP'&quot;)
+            .routes(Arrays.asList(
+                Route.builder()
+                    .name(&quot;premium-contact-processing&quot;)
+                    .endpoint(&quot;premium.contact.service&quot;)
+                    .priority(100)
+                    .build()
+            ))
+            .priority(100)
+            .enabled(true)
+            .build());
+
+        // Route EU contacts to EU processing center
+        rulesEngine.createRule(RuleDefinition.builder()
+            .name(&quot;EU Contact Geographic Routing&quot;)
+            .description(&quot;Route EU contacts to EU data center for GDPR compliance&quot;)
+            .conditionExpression(&quot;headers['region'] == 'EU' || attributes['country'] in {'DE', 'FR', 'IT', 'ES'}&quot;)
+            .routes(Arrays.asList(
+                Route.builder()
+                    .name(&quot;eu-contact-processing&quot;)
+                    .endpoint(&quot;eu.contact.service&quot;)
+                    .priority(90)
+                    .build()
+            ))
+            .priority(90)
+            .enabled(true)
+            .build());
+
+        // Route large contact batches to batch processing
+        rulesEngine.createRule(RuleDefinition.builder()
+            .name(&quot;Batch Contact Processing&quot;)
+            .description(&quot;Route large contact batches to dedicated batch processing service&quot;)
+            .conditionExpression(&quot;messageType == 'BATCH' &amp;&amp; contentLength &gt; 1000000&quot;)
+            .routes(Arrays.asList(
+                Route.builder()
+                    .name(&quot;batch-contact-processing&quot;)
+                    .endpoint(&quot;batch.contact.service&quot;)
+                    .priority(80)
+                    .build()
+            ))
+            .priority(80)
+            .enabled(true)
+            .build());
+
+        // Default contact routing
+        rulesEngine.createRule(RuleDefinition.builder()
+            .name(&quot;Default Contact Routing&quot;)
+            .description(&quot;Default routing for all other contacts&quot;)
+            .conditionExpression(&quot;messageType == 'CONTACT'&quot;)
+            .routes(Arrays.asList(
+                Route.builder()
+                    .name(&quot;standard-contact-processing&quot;)
+                    .endpoint(&quot;standard.contact.service&quot;)
+                    .priority(50)
+                    .build()
+            ))
+            .priority(10) // Lowest priority - catch-all
+            .enabled(true)
+            .build());
+    }
+}
+</code></pre>
+<h3 id="3-load-balancer">3. Load Balancer</h3>
+<p>Distributes messages across multiple endpoints:</p>
+<pre><code class="language-java">@Component
+public class LoadBalancer {
+    private final EndpointHealthMonitor healthMonitor;
+    private final LoadBalancingStrategy strategy;
+    private final EndpointMetrics endpointMetrics;
+
+    public Endpoint selectEndpoint(List&lt;Endpoint&gt; endpoints, RoutingMetadata metadata) {
+        List&lt;Endpoint&gt; healthyEndpoints = filterHealthyEndpoints(endpoints);
+
+        if (healthyEndpoints.isEmpty()) {
+            throw new NoHealthyEndpointException(&quot;No healthy endpoints available&quot;);
+        }
+
+        if (healthyEndpoints.size() == 1) {
+            return healthyEndpoints.get(0);
+        }
+
+        return strategy.selectEndpoint(healthyEndpoints, metadata);
+    }
+
+    private List&lt;Endpoint&gt; filterHealthyEndpoints(List&lt;Endpoint&gt; endpoints) {
+        return endpoints.stream()
+            .filter(endpoint -&gt; healthMonitor.isHealthy(endpoint))
+            .collect(Collectors.toList());
+    }
+
+    // Load balancing strategies
+    public interface LoadBalancingStrategy {
+        Endpoint selectEndpoint(List&lt;Endpoint&gt; endpoints, RoutingMetadata metadata);
+    }
+
+    @Component
+    public static class RoundRobinStrategy implements LoadBalancingStrategy {
+        private final AtomicLong counter = new AtomicLong(0);
+
+        @Override
+        public Endpoint selectEndpoint(List&lt;Endpoint&gt; endpoints, RoutingMetadata metadata) {
+            int index = (int) (counter.getAndIncrement() % endpoints.size());
+            return endpoints.get(index);
+        }
+    }
+
+    @Component
+    public static class WeightedRoundRobinStrategy implements LoadBalancingStrategy {
+        private final Map&lt;String, WeightedEndpointSelector&gt; selectors = new ConcurrentHashMap&lt;&gt;();
+
+        @Override
+        public Endpoint selectEndpoint(List&lt;Endpoint&gt; endpoints, RoutingMetadata metadata) {
+            String key = createEndpointGroupKey(endpoints);
+            WeightedEndpointSelector selector = selectors.computeIfAbsent(key, 
+                k -&gt; new WeightedEndpointSelector(endpoints));
+
+            return selector.selectEndpoint();
+        }
+
+        private String createEndpointGroupKey(List&lt;Endpoint&gt; endpoints) {
+            return endpoints.stream()
+                .map(e -&gt; e.getId() + &quot;:&quot; + e.getWeight())
+                .collect(Collectors.joining(&quot;,&quot;));
+        }
+    }
+
+    @Component
+    public static class LeastConnectionsStrategy implements LoadBalancingStrategy {
+        private final EndpointConnectionTracker connectionTracker;
+
+        @Override
+        public Endpoint selectEndpoint(List&lt;Endpoint&gt; endpoints, RoutingMetadata metadata) {
+            return endpoints.stream()
+                .min(Comparator.comparing(endpoint -&gt; 
+                    connectionTracker.getActiveConnections(endpoint)))
+                .orElseThrow(() -&gt; new IllegalStateException(&quot;No endpoints available&quot;));
+        }
+    }
+
+    @Component
+    public static class ResponseTimeStrategy implements LoadBalancingStrategy {
+        private final EndpointResponseTimeTracker responseTimeTracker;
+
+        @Override
+        public Endpoint selectEndpoint(List&lt;Endpoint&gt; endpoints, RoutingMetadata metadata) {
+            return endpoints.stream()
+                .min(Comparator.comparing(endpoint -&gt; 
+                    responseTimeTracker.getAverageResponseTime(endpoint)))
+                .orElseThrow(() -&gt; new IllegalStateException(&quot;No endpoints available&quot;));
+        }
+    }
+
+    @Component
+    public static class HashBasedStrategy implements LoadBalancingStrategy {
+
+        @Override
+        public Endpoint selectEndpoint(List&lt;Endpoint&gt; endpoints, RoutingMetadata metadata) {
+            String hashKey = getHashKey(metadata);
+            int hash = Math.abs(hashKey.hashCode());
+            int index = hash % endpoints.size();
+
+            return endpoints.get(index);
+        }
+
+        private String getHashKey(RoutingMetadata metadata) {
+            // Use correlation ID or other consistent identifier
+            String correlationId = metadata.getCorrelationId();
+            if (correlationId != null) {
+                return correlationId;
+            }
+
+            // Fallback to message type
+            return metadata.getMessageType();
+        }
+    }
+}
+</code></pre>
+<h3 id="4-route-executor">4. Route Executor</h3>
+<p>Executes routing decisions and handles message delivery:</p>
+<pre><code class="language-java">@Component
+public class RouteExecutor {
+    private final Map&lt;RouteType, MessageSender&gt; messageSenders;
+    private final RetryTemplate retryTemplate;
+    private final CircuitBreakerRegistry circuitBreakerRegistry;
+    private final RouteMetrics routeMetrics;
+
+    public RoutingResult executeRoute(Message message, Endpoint endpoint, Route route) {
+        String routeKey = route.getName() + &quot;:&quot; + endpoint.getId();
+        CircuitBreaker circuitBreaker = circuitBreakerRegistry.circuitBreaker(routeKey);
+
+        return circuitBreaker.executeSupplier(() -&gt; {
+            Timer.Sample sample = routeMetrics.startRouteTimer(route, endpoint);
+
+            try {
+                RoutingResult result = doExecuteRoute(message, endpoint, route);
+
+                sample.stop(Timer.builder(&quot;route.execution.duration&quot;)
+                    .tag(&quot;route&quot;, route.getName())
+                    .tag(&quot;endpoint&quot;, endpoint.getId())
+                    .tag(&quot;status&quot;, &quot;success&quot;)
+                    .register(routeMetrics.getMeterRegistry()));
+
+                routeMetrics.recordSuccessfulRoute(route, endpoint);
+                return result;
+
+            } catch (Exception e) {
+                sample.stop(Timer.builder(&quot;route.execution.duration&quot;)
+                    .tag(&quot;route&quot;, route.getName())
+                    .tag(&quot;endpoint&quot;, endpoint.getId())
+                    .tag(&quot;status&quot;, &quot;error&quot;)
+                    .register(routeMetrics.getMeterRegistry()));
+
+                routeMetrics.recordFailedRoute(route, endpoint, e);
+                throw e;
+            }
+        });
+    }
+
+    private RoutingResult doExecuteRoute(Message message, Endpoint endpoint, Route route) {
+        MessageSender sender = messageSenders.get(route.getType());
+        if (sender == null) {
+            throw new UnsupportedRouteTypeException(&quot;Unsupported route type: &quot; + route.getType());
+        }
+
+        return retryTemplate.execute(context -&gt; {
+            log.debug(&quot;Executing route {} to endpoint {} (attempt {})&quot;, 
+                     route.getName(), endpoint.getId(), context.getRetryCount() + 1);
+
+            return sender.send(message, endpoint, route);
+        });
+    }
+
+    // Message senders for different route types
+    public interface MessageSender {
+        RoutingResult send(Message message, Endpoint endpoint, Route route);
+    }
+
+    @Component
+    public static class HttpMessageSender implements MessageSender {
+        private final RestTemplate restTemplate;
+
+        @Override
+        public RoutingResult send(Message message, Endpoint endpoint, Route route) {
+            String url = endpoint.getBaseUrl() + route.getPath();
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.putAll(convertHeaders(message.getHeaders()));
+
+            HttpEntity&lt;byte[]&gt; request = new HttpEntity&lt;&gt;(message.getPayload(), headers);
+
+            ResponseEntity&lt;String&gt; response = restTemplate.exchange(
+                url, HttpMethod.POST, request, String.class);
+
+            return RoutingResult.builder()
+                .success(response.getStatusCode().is2xxSuccessful())
+                .endpoint(endpoint)
+                .route(route)
+                .response(response.getBody())
+                .statusCode(response.getStatusCode().value())
+                .headers(convertResponseHeaders(response.getHeaders()))
+                .executionTime(Duration.ofMillis(System.currentTimeMillis())) // Simplified
+                .build();
+        }
+    }
+
+    @Component  
+    public static class JmsMessageSender implements MessageSender {
+        private final JmsTemplate jmsTemplate;
+
+        @Override
+        public RoutingResult send(Message message, Endpoint endpoint, Route route) {
+            String destination = endpoint.getId(); // JMS destination name
+
+            jmsTemplate.send(destination, session -&gt; {
+                javax.jms.Message jmsMessage = session.createBytesMessage();
+                ((BytesMessage) jmsMessage).writeBytes(message.getPayload());
+
+                // Add headers
+                for (Map.Entry&lt;String, String&gt; header : message.getHeaders().entrySet()) {
+                    jmsMessage.setStringProperty(header.getKey(), header.getValue());
+                }
+
+                return jmsMessage;
+            });
+
+            return RoutingResult.builder()
+                .success(true)
+                .endpoint(endpoint)
+                .route(route)
+                .executionTime(Duration.ofMillis(10)) // Simplified
+                .build();
+        }
+    }
+
+    @Component
+    public static class KafkaMessageSender implements MessageSender {
+        private final KafkaTemplate&lt;String, byte[]&gt; kafkaTemplate;
+
+        @Override
+        public RoutingResult send(Message message, Endpoint endpoint, Route route) {
+            String topic = endpoint.getId(); // Kafka topic name
+            String key = message.getHeaders().get(&quot;messageKey&quot;);
+
+            ProducerRecord&lt;String, byte[]&gt; record = new ProducerRecord&lt;&gt;(
+                topic, key, message.getPayload());
+
+            // Add headers
+            for (Map.Entry&lt;String, String&gt; header : message.getHeaders().entrySet()) {
+                record.headers().add(header.getKey(), header.getValue().getBytes());
+            }
+
+            try {
+                SendResult&lt;String, byte[]&gt; sendResult = kafkaTemplate.send(record).get();
+
+                return RoutingResult.builder()
+                    .success(true)
+                    .endpoint(endpoint)
+                    .route(route)
+                    .response(&quot;partition=&quot; + sendResult.getRecordMetadata().partition() + 
+                             &quot;,offset=&quot; + sendResult.getRecordMetadata().offset())
+                    .executionTime(Duration.ofMillis(5)) // Simplified
+                    .build();
+
+            } catch (Exception e) {
+                throw new RoutingExecutionException(&quot;Failed to send message to Kafka&quot;, e);
+            }
+        }
+    }
+}
+</code></pre>
+<h2 id="configuration-parameters">Configuration Parameters</h2>
+<h3 id="essential-settings">Essential Settings</h3>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Typical Values</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Rule Cache Size</strong></td>
+<td>Maximum cached routing rules</td>
+<td>1000-10000</td>
+</tr>
+<tr>
+<td><strong>Rule Evaluation Timeout</strong></td>
+<td>Max time for rule evaluation</td>
+<td>100ms-1s</td>
+</tr>
+<tr>
+<td><strong>Endpoint Health Check Interval</strong></td>
+<td>Frequency of endpoint health checks</td>
+<td>30s-300s</td>
+</tr>
+<tr>
+<td><strong>Load Balancing Strategy</strong></td>
+<td>Algorithm for endpoint selection</td>
+<td>round-robin/weighted/least-connections</td>
+</tr>
+<tr>
+<td><strong>Circuit Breaker Threshold</strong></td>
+<td>Failure threshold for circuit breaking</td>
+<td>50%-90%</td>
+</tr>
+<tr>
+<td><strong>Retry Attempts</strong></td>
+<td>Maximum routing retry attempts</td>
+<td>3-10</td>
+</tr>
+</tbody>
+</table>
+<h3 id="example-configuration">Example Configuration</h3>
+<pre><code class="language-properties"># Message Routing Configuration
+routing.rules.cache-size=5000
+routing.rules.cache-ttl=5m
+routing.rules.evaluation-timeout=500ms
+routing.rules.reload-interval=1m
+
+# Endpoint Management
+routing.endpoints.health-check-interval=30s
+routing.endpoints.health-check-timeout=5s
+routing.endpoints.failure-threshold=5
+routing.endpoints.recovery-check-interval=60s
+
+# Load Balancing
+routing.load-balancing.strategy=round-robin
+routing.load-balancing.weight-adjustment-interval=5m
+routing.load-balancing.sticky-sessions=false
+
+# Circuit Breaker
+routing.circuit-breaker.failure-rate-threshold=60%
+routing.circuit-breaker.wait-duration-in-open-state=30s
+routing.circuit-breaker.sliding-window-size=10
+routing.circuit-breaker.minimum-number-of-calls=5
+
+# Retry Configuration
+routing.retry.max-attempts=3
+routing.retry.backoff-delay=1s
+routing.retry.backoff-multiplier=2
+routing.retry.max-backoff-delay=30s
+
+# Performance Tuning
+routing.thread-pool.core-size=10
+routing.thread-pool.max-size=50
+routing.thread-pool.queue-capacity=1000
+routing.message-buffer-size=1000
+</code></pre>
+<h2 id="implementation-examples">Implementation Examples</h2>
+<h3 id="1-spring-integration-message-routing">1. Spring Integration Message Routing</h3>
+<pre><code class="language-java">@Configuration
+@EnableIntegration
+public class SpringIntegrationRoutingConfiguration {
+
+    @Bean
+    public IntegrationFlow contactProcessingFlow() {
+        return IntegrationFlows
+            .from(&quot;contactInputChannel&quot;)
+            .&lt;ContactMessage&gt;route(message -&gt; {
+                // Content-based routing
+                if (&quot;VIP&quot;.equals(message.getCustomerTier())) {
+                    return &quot;vipProcessingChannel&quot;;
+                } else if (&quot;BULK&quot;.equals(message.getMessageType())) {
+                    return &quot;bulkProcessingChannel&quot;;
+                } else {
+                    return &quot;standardProcessingChannel&quot;;
+                }
+            })
+            .get();
+    }
+
+    @Bean
+    public IntegrationFlow headerBasedRoutingFlow() {
+        return IntegrationFlows
+            .from(&quot;headerRoutingInputChannel&quot;)
+            .routeToRecipients(r -&gt; r
+                .recipient(&quot;euProcessingChannel&quot;, &quot;headers['region'] == 'EU'&quot;)
+                .recipient(&quot;usProcessingChannel&quot;, &quot;headers['region'] == 'US'&quot;)
+                .recipient(&quot;apacProcessingChannel&quot;, &quot;headers['region'] == 'APAC'&quot;)
+                .defaultOutputChannel(&quot;defaultProcessingChannel&quot;))
+            .get();
+    }
+
+    @Bean
+    public IntegrationFlow loadBalancedRoutingFlow() {
+        return IntegrationFlows
+            .from(&quot;loadBalancedInputChannel&quot;)
+            .route(Message.class, message -&gt; {
+                // Custom load balancing logic
+                int hash = Math.abs(message.getHeaders().get(&quot;correlationId&quot;).hashCode());
+                return &quot;processingChannel&quot; + (hash % 3 + 1); // Route to one of 3 channels
+            })
+            .get();
+    }
+
+    @ServiceActivator(inputChannel = &quot;vipProcessingChannel&quot;)
+    public void handleVipContact(ContactMessage message) {
+        log.info(&quot;Processing VIP contact: {}&quot;, message.getContactId());
+        // VIP processing logic
+    }
+
+    @ServiceActivator(inputChannel = &quot;bulkProcessingChannel&quot;)
+    public void handleBulkContact(ContactMessage message) {
+        log.info(&quot;Processing bulk contact: {}&quot;, message.getContactId());
+        // Bulk processing logic
+    }
+
+    @ServiceActivator(inputChannel = &quot;standardProcessingChannel&quot;)
+    public void handleStandardContact(ContactMessage message) {
+        log.info(&quot;Processing standard contact: {}&quot;, message.getContactId());
+        // Standard processing logic
+    }
+}
+</code></pre>
+<h3 id="2-apache-camel-routing-implementation">2. Apache Camel Routing Implementation</h3>
+<pre><code class="language-java">@Configuration
+public class CamelRoutingConfiguration {
+
+    @Bean
+    public RouteBuilder contactRoutingRoutes() {
+        return new RouteBuilder() {
+            @Override
+            public void configure() throws Exception {
+
+                // Content-based routing with Apache Camel
+                from(&quot;jms:queue:contact.input&quot;)
+                    .routeId(&quot;contactContentBasedRouting&quot;)
+                    .choice()
+                        .when(jsonpath(&quot;$.customerTier == 'VIP'&quot;))
+                            .to(&quot;jms:queue:contact.vip.processing&quot;)
+                        .when(jsonpath(&quot;$.messageType == 'BULK'&quot;))
+                            .to(&quot;jms:queue:contact.bulk.processing&quot;)
+                        .when(header(&quot;priority&quot;).isEqualTo(&quot;HIGH&quot;))
+                            .to(&quot;jms:queue:contact.priority.processing&quot;)
+                        .otherwise()
+                            .to(&quot;jms:queue:contact.standard.processing&quot;)
+                    .end();
+
+                // Header-based routing
+                from(&quot;jms:queue:contact.regional.input&quot;)
+                    .routeId(&quot;contactRegionalRouting&quot;)
+                    .choice()
+                        .when(header(&quot;region&quot;).isEqualTo(&quot;EU&quot;))
+                            .to(&quot;jms:queue:contact.eu.processing&quot;)
+                        .when(header(&quot;region&quot;).isEqualTo(&quot;US&quot;))
+                            .to(&quot;jms:queue:contact.us.processing&quot;)
+                        .when(header(&quot;region&quot;).isEqualTo(&quot;APAC&quot;))
+                            .to(&quot;jms:queue:contact.apac.processing&quot;)
+                        .otherwise()
+                            .to(&quot;jms:queue:contact.default.processing&quot;)
+                    .end();
+
+                // Load balanced routing with circuit breaker
+                from(&quot;jms:queue:contact.loadbalanced.input&quot;)
+                    .routeId(&quot;contactLoadBalancedRouting&quot;)
+                    .loadBalance()
+                    .roundRobin()
+                    .to(&quot;http://contact-service-1/process?bridgeEndpoint=true&quot;)
+                    .to(&quot;http://contact-service-2/process?bridgeEndpoint=true&quot;)
+                    .to(&quot;http://contact-service-3/process?bridgeEndpoint=true&quot;)
+                    .end()
+                    .onException(Exception.class)
+                        .handled(true)
+                        .to(&quot;jms:queue:contact.errors&quot;)
+                    .end();
+
+                // Dynamic routing based on database lookup
+                from(&quot;jms:queue:contact.dynamic.input&quot;)
+                    .routeId(&quot;contactDynamicRouting&quot;)
+                    .enrichWith(&quot;sql:select processing_endpoint from contact_routing where customer_id = :#customerid&quot;)
+                    .recipientList(simple(&quot;${body[processing_endpoint]}&quot;))
+                    .parallelProcessing()
+                    .stopOnException();
+
+                // Routing with content filtering and transformation
+                from(&quot;jms:queue:contact.filtered.input&quot;)
+                    .routeId(&quot;contactFilteredRouting&quot;)
+                    .filter(jsonpath(&quot;$.amount &gt; 1000&quot;))
+                    .transform().jsonpath(&quot;$.contact&quot;)
+                    .choice()
+                        .when(jsonpath(&quot;$.contact.type == 'PREMIUM'&quot;))
+                            .to(&quot;jms:queue:contact.premium.processing&quot;)
+                        .otherwise()
+                            .to(&quot;jms:queue:contact.standard.processing&quot;)
+                    .end();
+            }
+        };
+    }
+
+    @Component
+    public static class ContactRoutingProcessor implements Processor {
+
+        @Override
+        public void process(Exchange exchange) throws Exception {
+            ContactMessage contact = exchange.getIn().getBody(ContactMessage.class);
+
+            // Custom routing logic
+            String routingKey = determineRoutingKey(contact);
+            exchange.getIn().setHeader(&quot;routingKey&quot;, routingKey);
+
+            log.info(&quot;Routing contact {} to {}&quot;, contact.getContactId(), routingKey);
+        }
+
+        private String routingKey(ContactMessage contact) {
+            if (&quot;VIP&quot;.equals(contact.getCustomerTier())) {
+                return &quot;vip.processing&quot;;
+            } else if (contact.getAmount() != null &amp;&amp; contact.getAmount() &gt; 1000) {
+                return &quot;high.value.processing&quot;;
+            } else {
+                return &quot;standard.processing&quot;;
+            }
+        }
+    }
+}
+</code></pre>
+<h3 id="3-custom-message-router-implementation">3. Custom Message Router Implementation</h3>
+<pre><code class="language-java">@Service
+public class CustomMessageRoutingService {
+    private final MessageRouter messageRouter;
+    private final RoutingRulesEngine rulesEngine;
+    private final EndpointRegistry endpointRegistry;
+
+    public void processMessage(ContactMessage contactMessage) {
+        // Convert to internal message format
+        Message message = convertToMessage(contactMessage);
+
+        // Create routing context
+        RoutingContext context = RoutingContext.builder()
+            .correlationId(UUID.randomUUID().toString())
+            .sourceEndpoint(&quot;contact.input.service&quot;)
+            .timestamp(Instant.now())
+            .build();
+
+        try {
+            // Route message
+            RoutingResult result = messageRouter.route(message, context);
+
+            if (result.isSuccess()) {
+                log.info(&quot;Successfully routed message to endpoint: {}&quot;, 
+                         result.getEndpoint().getId());
+            } else {
+                log.error(&quot;Failed to route message: {}&quot;, result.getErrorMessage());
+                handleRoutingFailure(message, result);
+            }
+
+        } catch (Exception e) {
+            log.error(&quot;Error routing message: {}&quot;, e.getMessage(), e);
+            handleRoutingException(message, context, e);
+        }
+    }
+
+    private Message convertToMessage(ContactMessage contactMessage) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            byte[] payload = mapper.writeValueAsBytes(contactMessage);
+
+            Map&lt;String, String&gt; headers = new HashMap&lt;&gt;();
+            headers.put(&quot;messageType&quot;, &quot;CONTACT&quot;);
+            headers.put(&quot;customerTier&quot;, contactMessage.getCustomerTier());
+            headers.put(&quot;region&quot;, contactMessage.getRegion());
+            headers.put(&quot;priority&quot;, contactMessage.getPriority());
+
+            return Message.builder()
+                .id(UUID.randomUUID().toString())
+                .type(&quot;CONTACT&quot;)
+                .payload(payload)
+                .headers(headers)
+                .timestamp(Instant.now())
+                .priority(determinePriority(contactMessage))
+                .build();
+
+        } catch (Exception e) {
+            throw new MessageConversionException(&quot;Failed to convert contact message&quot;, e);
+        }
+    }
+
+    private int determinePriority(ContactMessage contactMessage) {
+        if (&quot;VIP&quot;.equals(contactMessage.getCustomerTier())) {
+            return 100;
+        } else if (&quot;HIGH&quot;.equals(contactMessage.getPriority())) {
+            return 80;
+        } else {
+            return 50;
+        }
+    }
+
+    private void handleRoutingFailure(Message message, RoutingResult result) {
+        // Send to dead letter queue or retry
+        deadLetterService.handleFailedRouting(message, result);
+    }
+
+    private void handleRoutingException(Message message, RoutingContext context, Exception e) {
+        // Log and send to error handling service
+        errorHandlingService.handleRoutingException(message, context, e);
+    }
+}
+
+// Dynamic routing rule management
+@RestController
+@RequestMapping(&quot;/api/routing&quot;)
+public class RoutingRuleController {
+    private final RoutingRulesEngine rulesEngine;
+
+    @PostMapping(&quot;/rules&quot;)
+    public ResponseEntity&lt;RoutingRule&gt; createRule(@RequestBody RuleDefinition definition) {
+        RoutingRule rule = rulesEngine.createRule(definition);
+        return ResponseEntity.ok(rule);
+    }
+
+    @PutMapping(&quot;/rules/{id}&quot;)
+    public ResponseEntity&lt;Void&gt; updateRule(@PathVariable String id, 
+                                         @RequestBody RuleDefinition definition) {
+        rulesEngine.updateRule(id, definition);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping(&quot;/rules/{id}&quot;)
+    public ResponseEntity&lt;Void&gt; deleteRule(@PathVariable String id) {
+        rulesEngine.deleteRule(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping(&quot;/rules&quot;)
+    public ResponseEntity&lt;List&lt;RoutingRule&gt;&gt; getAllRules() {
+        List&lt;RoutingRule&gt; rules = rulesEngine.getAllRules();
+        return ResponseEntity.ok(rules);
+    }
+
+    @PostMapping(&quot;/rules/{id}/test&quot;)
+    public ResponseEntity&lt;RoutingTestResult&gt; testRule(@PathVariable String id,
+                                                    @RequestBody TestMessage testMessage) {
+        RoutingTestResult result = rulesEngine.testRule(id, testMessage);
+        return ResponseEntity.ok(result);
+    }
+}
+</code></pre>
+<h3 id="4-microservices-api-gateway-routing">4. Microservices API Gateway Routing</h3>
+<pre><code class="language-java">@Configuration
+public class ApiGatewayRouting {
+
+    @Bean
+    public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
+        return builder.routes()
+
+            // Content-based routing for contact API
+            .route(&quot;contact-vip&quot;, r -&gt; r
+                .path(&quot;/api/contacts/**&quot;)
+                .and()
+                .header(&quot;Customer-Tier&quot;, &quot;VIP&quot;)
+                .uri(&quot;http://vip-contact-service:8080&quot;))
+
+            // Version-based routing
+            .route(&quot;contact-v2&quot;, r -&gt; r
+                .path(&quot;/api/contacts/**&quot;)
+                .and()
+                .header(&quot;API-Version&quot;, &quot;v2&quot;)
+                .uri(&quot;http://contact-service-v2:8080&quot;))
+
+            // Default contact routing
+            .route(&quot;contact-default&quot;, r -&gt; r
+                .path(&quot;/api/contacts/**&quot;)
+                .uri(&quot;http://contact-service:8080&quot;))
+
+            // Geographic routing
+            .route(&quot;contact-eu&quot;, r -&gt; r
+                .path(&quot;/api/contacts/**&quot;)
+                .and()
+                .header(&quot;Region&quot;, &quot;EU&quot;)
+                .uri(&quot;http://eu-contact-service:8080&quot;))
+
+            // Load balanced routing
+            .route(&quot;contact-loadbalanced&quot;, r -&gt; r
+                .path(&quot;/api/internal/contacts/**&quot;)
+                .uri(&quot;lb://contact-service-cluster&quot;))
+
+            .build();
+    }
+
+    @Component
+    public static class CustomRouteFilter implements GlobalFilter {
+
+        @Override
+        public Mono&lt;Void&gt; filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+            ServerHttpRequest request = exchange.getRequest();
+
+            // Extract routing metadata
+            String customerTier = request.getHeaders().getFirst(&quot;Customer-Tier&quot;);
+            String region = request.getHeaders().getFirst(&quot;Region&quot;);
+            String contentLength = request.getHeaders().getFirst(&quot;Content-Length&quot;);
+
+            // Add routing attributes to request
+            ServerHttpRequest modifiedRequest = request.mutate()
+                .header(&quot;X-Routing-Tier&quot;, customerTier != null ? customerTier : &quot;STANDARD&quot;)
+                .header(&quot;X-Routing-Region&quot;, region != null ? region : &quot;DEFAULT&quot;)
+                .header(&quot;X-Routing-Size&quot;, contentLength != null ? contentLength : &quot;0&quot;)
+                .build();
+
+            return chain.filter(exchange.mutate().request(modifiedRequest).build());
+        }
+    }
+}
+</code></pre>
+<h2 id="best-practices">Best Practices</h2>
+<h3 id="1-routing-rule-design">1. Routing Rule Design</h3>
+<pre><code class="language-java">public class RoutingRuleBestPractices {
+
+    // Use priority-based rule ordering
+    public void setupRulePriorities() {
+        // Highest priority: Security and compliance rules
+        createRule(&quot;GDPR-Routing&quot;, &quot;headers['dataClassification'] == 'PERSONAL'&quot;, 100);
+
+        // High priority: Business-critical routing
+        createRule(&quot;VIP-Customer&quot;, &quot;attributes['customerTier'] == 'VIP'&quot;, 90);
+
+        // Medium priority: Geographic and regional routing
+        createRule(&quot;EU-Routing&quot;, &quot;headers['region'] == 'EU'&quot;, 70);
+
+        // Low priority: Performance optimization routing
+        createRule(&quot;Load-Balancing&quot;, &quot;messageType == 'STANDARD'&quot;, 50);
+
+        // Lowest priority: Default catch-all routing
+        createRule(&quot;Default-Route&quot;, &quot;true&quot;, 10);
+    }
+
+    // Use efficient rule expressions
+    public class EfficientRuleExpressions {
+
+        // Good: Simple, fast evaluation
+        String efficientRule = &quot;headers['priority'] == 'HIGH'&quot;;
+
+        // Avoid: Complex, slow evaluation
+        String inefficientRule = &quot;jsonPath(payload, '$.customer.orders[?(@.amount &gt; 1000)].length') &gt; 5&quot;;
+
+        // Better: Pre-computed attributes
+        String optimizedRule = &quot;attributes['highValueOrderCount'] &gt; 5&quot;;
+    }
+
+    // Implement rule testing and validation
+    public void validateRoutingRules(List&lt;RoutingRule&gt; rules) {
+        for (RoutingRule rule : rules) {
+            // Test rule compilation
+            try {
+                compileRule(rule);
+            } catch (Exception e) {
+                throw new InvalidRuleException(&quot;Rule compilation failed: &quot; + rule.getName(), e);
+            }
+
+            // Test rule with sample data
+            TestMessage[] testCases = createTestCases();
+            for (TestMessage testCase : testCases) {
+                try {
+                    evaluateRule(rule, testCase);
+                } catch (Exception e) {
+                    log.warn(&quot;Rule evaluation failed for test case: {} - {}&quot;, 
+                            rule.getName(), e.getMessage());
+                }
+            }
+        }
+    }
+}
+</code></pre>
+<h3 id="2-performance-optimization">2. Performance Optimization</h3>
+<pre><code class="language-java">@Component
+public class RoutingPerformanceOptimization {
+
+    // Use rule caching for frequently evaluated rules
+    @Cacheable(value = &quot;routingRules&quot;, key = &quot;#metadata.cacheKey&quot;)
+    public List&lt;RoutingRule&gt; getCachedRules(RoutingMetadata metadata) {
+        return evaluateRules(metadata);
+    }
+
+    // Implement parallel rule evaluation for complex scenarios
+    public List&lt;RoutingRule&gt; evaluateRulesInParallel(RoutingMetadata metadata) {
+        List&lt;RoutingRule&gt; allRules = getAllRules();
+
+        return allRules.parallelStream()
+            .filter(rule -&gt; evaluateRuleCondition(rule, metadata))
+            .sorted(Comparator.comparing(RoutingRule::getPriority).reversed())
+            .collect(Collectors.toList());
+    }
+
+    // Use connection pooling for external endpoints
+    @Bean
+    public RestTemplate routingRestTemplate() {
+        HttpComponentsClientHttpRequestFactory factory = 
+            new HttpComponentsClientHttpRequestFactory();
+
+        // Configure connection pooling
+        PoolingHttpClientConnectionManager connectionManager = 
+            new PoolingHttpClientConnectionManager();
+        connectionManager.setMaxTotal(100);
+        connectionManager.setDefaultMaxPerRoute(20);
+
+        CloseableHttpClient httpClient = HttpClients.custom()
+            .setConnectionManager(connectionManager)
+            .build();
+
+        factory.setHttpClient(httpClient);
+
+        RestTemplate restTemplate = new RestTemplate(factory);
+        restTemplate.setErrorHandler(new RoutingResponseErrorHandler());
+
+        return restTemplate;
+    }
+
+    // Optimize message parsing and attribute extraction
+    public Map&lt;String, Object&gt; extractAttributesEfficiently(Message message) {
+        // Use streaming JSON parser for large messages
+        if (message.getPayload().length &gt; 10000) {
+            return streamingJsonExtractor.extract(message.getPayload());
+        } else {
+            return standardJsonExtractor.extract(message.getPayload());
+        }
+    }
+}
+</code></pre>
+<h3 id="3-monitoring-and-observability">3. Monitoring and Observability</h3>
+<pre><code class="language-java">@Component
+public class RoutingMonitoring {
+    private final MeterRegistry meterRegistry;
+    private final DistributedTracing tracing;
+
+    public void recordRoutingMetrics(RoutingResult result) {
+        String routeName = result.getRoute().getName();
+        String endpointId = result.getEndpoint().getId();
+        String status = result.isSuccess() ? &quot;success&quot; : &quot;failure&quot;;
+
+        // Record routing count
+        meterRegistry.counter(&quot;routing.messages&quot;, 
+                            &quot;route&quot;, routeName,
+                            &quot;endpoint&quot;, endpointId,
+                            &quot;status&quot;, status)
+                    .increment();
+
+        // Record routing latency
+        meterRegistry.timer(&quot;routing.duration&quot;,
+                          &quot;route&quot;, routeName,
+                          &quot;endpoint&quot;, endpointId)
+                    .record(result.getExecutionTime());
+
+        // Record endpoint health
+        meterRegistry.gauge(&quot;routing.endpoint.health&quot;,
+                          Tags.of(&quot;endpoint&quot;, endpointId),
+                          result.isSuccess() ? 1.0 : 0.0);
+    }
+
+    public void traceRouting(Message message, RoutingContext context, RoutingResult result) {
+        Span span = tracing.nextSpan()
+            .name(&quot;message.routing&quot;)
+            .tag(&quot;route.name&quot;, result.getRoute().getName())
+            .tag(&quot;endpoint.id&quot;, result.getEndpoint().getId())
+            .tag(&quot;message.type&quot;, message.getType())
+            .tag(&quot;correlation.id&quot;, context.getCorrelationId())
+            .start();
+
+        try (Tracer.SpanInScope ws = tracing.tracer().withSpanInScope(span)) {
+            if (result.isSuccess()) {
+                span.tag(&quot;routing.status&quot;, &quot;success&quot;);
+            } else {
+                span.tag(&quot;routing.status&quot;, &quot;failure&quot;);
+                span.tag(&quot;error.message&quot;, result.getErrorMessage());
+            }
+        } finally {
+            span.end();
+        }
+    }
+
+    @EventListener
+    public void handleRoutingAlert(RoutingEvent event) {
+        if (event.getType() == RoutingEventType.ENDPOINT_DOWN) {
+            alertingService.sendAlert(AlertLevel.CRITICAL,
+                &quot;Endpoint is down: &quot; + event.getEndpointId());
+        }
+
+        if (event.getType() == RoutingEventType.HIGH_ERROR_RATE) {
+            alertingService.sendAlert(AlertLevel.WARNING,
+                &quot;High error rate detected for route: &quot; + event.getRouteName());
+        }
+    }
+}
+</code></pre>
+<h2 id="common-pitfalls">Common Pitfalls</h2>
+<h3 id="1-rule-conflicts-and-ambiguity">1. <strong>Rule Conflicts and Ambiguity</strong></h3>
+<p><strong>Problem</strong>: Multiple rules matching the same message causing unpredictable routing<br />
+<strong>Solution</strong>: Use clear rule priorities and comprehensive testing</p>
+<h3 id="2-performance-degradation-from-complex-rules">2. <strong>Performance Degradation from Complex Rules</strong></h3>
+<p><strong>Problem</strong>: Slow rule evaluation affecting message throughput<br />
+<strong>Solution</strong>: Optimize rule expressions and implement caching</p>
+<h3 id="3-endpoint-health-management">3. <strong>Endpoint Health Management</strong></h3>
+<p><strong>Problem</strong>: Routing to unavailable endpoints causing failures<br />
+<strong>Solution</strong>: Implement comprehensive health checking and circuit breakers</p>
+<h3 id="4-rule-management-complexity">4. <strong>Rule Management Complexity</strong></h3>
+<p><strong>Problem</strong>: Difficult to maintain and debug large numbers of routing rules<br />
+<strong>Solution</strong>: Use rule categorization, testing frameworks, and documentation</p>
+<h3 id="5-security-vulnerabilities-in-dynamic-routing">5. <strong>Security Vulnerabilities in Dynamic Routing</strong></h3>
+<p><strong>Problem</strong>: Routing decisions based on untrusted input enabling attacks<br />
+<strong>Solution</strong>: Validate and sanitize all routing inputs and use allowlisting</p>
+<h2 id="integration-in-distributed-systems">Integration in Distributed Systems</h2>
+<h3 id="event-driven-microservices">Event-Driven Microservices</h3>
+<pre><code class="language-java">@Service
+public class EventRoutingService {
+
+    public void routeEvent(DomainEvent event) {
+        RoutingContext context = createEventContext(event);
+        messageRouter.route(convertEventToMessage(event), context);
+    }
+}
+</code></pre>
+<h3 id="api-gateway-integration">API Gateway Integration</h3>
+<pre><code class="language-java">@Component
+public class GatewayRoutingFilter implements GatewayFilter {
+
+    @Override
+    public Mono&lt;Void&gt; filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+        return determineRoute(exchange.getRequest())
+            .flatMap(route -&gt; routeToEndpoint(exchange, route, chain));
+    }
+}
+</code></pre>
+<h2 id="conclusion">Conclusion</h2>
+<p>The Message Routing pattern is essential for building flexible, scalable distributed systems. It provides:</p>
+<ul>
+<li><strong>Dynamic Message Distribution</strong>: Intelligent routing based on content and context</li>
+<li><strong>System Decoupling</strong>: Loose coupling between message producers and consumers</li>
+<li><strong>Operational Flexibility</strong>: Runtime configuration changes without system restarts</li>
+<li><strong>Performance Optimization</strong>: Load balancing and efficient resource utilization</li>
+</ul>
+<p>When properly implemented with comprehensive rule management, performance optimization, and monitoring, message routing enables adaptive architectures that can evolve with changing business requirements while maintaining high performance and reliability.</p>
+<h2 id="references">References</h2>
+<ul>
+<li><a href="https://www.enterpriseintegrationpatterns.com/patterns/messaging/MessageRouter.html">Enterprise Integration Patterns - Message Router</a></li>
+<li><a href="https://camel.apache.org/manual/latest/routes.html">Apache Camel Routing Documentation</a></li>
+<li><a href="https://docs.spring.io/spring-integration/reference/html/router.html">Spring Integration Router</a></li>
+<li><a href="https://microservices.io/patterns/apigateway.html">Microservices Patterns - API Gateway</a></li>
+</ul>
+
+      <a href="../index.html" class="back-to-top">← Back to All Patterns</a>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <p>©2026 <a href="https://dataintegrationmastery.com/">Data Integration Mastery™</a> — All Rights Reserved</p>
+  </footer>
+</body>
+</html>

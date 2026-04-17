@@ -135,35 +135,26 @@
     });
   }
 
-  // --- YouTube Video Facade (lazy load) ---
+  // --- YouTube Video Facade (opens on YouTube) ---
+  // NOTE: Embedding is disabled for this video (YouTube Error 153).
+  // Clicking opens the video on YouTube in a new tab.
+  // To re-enable in-page embed: go to YouTube Studio → Video → Details → More options → Allow embedding.
   var facade = document.getElementById('video-facade');
   if (facade) {
     function loadVideo() {
       var videoId = facade.getAttribute('data-video-id');
       if (!videoId) return;
-      var iframe = document.createElement('iframe');
-      iframe.setAttribute('src', 'https://www.youtube.com/embed/' + encodeURIComponent(videoId) + '?autoplay=1&rel=0');
-      iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
-      iframe.setAttribute('allowfullscreen', '');
-      iframe.setAttribute('title', 'Data Integration Mastery introduction video');
-      iframe.style.position = 'absolute';
-      iframe.style.top = '0';
-      iframe.style.left = '0';
-      iframe.style.width = '100%';
-      iframe.style.height = '100%';
-      iframe.style.border = '0';
-      facade.innerHTML = '';
-      facade.appendChild(iframe);
-      facade.style.cursor = 'default';
 
       // Track video play in GA4
       if (window.gtag) {
         window.gtag('event', 'video_play', {
           event_category: 'Engagement',
-          event_label: 'Intro video played',
+          event_label: 'Intro video opened on YouTube',
           value: 1
         });
       }
+
+      window.open('https://www.youtube.com/watch?v=' + encodeURIComponent(videoId), '_blank', 'noopener,noreferrer');
     }
 
     facade.addEventListener('click', loadVideo);

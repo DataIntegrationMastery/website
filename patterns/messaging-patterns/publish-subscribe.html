@@ -54,7 +54,6 @@
     "isAccessibleForFree": true
   }
   </script>
-  <script src="../../js/i18n.js"></script>
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -66,23 +65,18 @@
         <span class="header-title">Data Integration Mastery™</span>
       </a>
       <nav class="header-nav" aria-label="Main navigation">
-        <a href="https://dataintegrationmastery.com/" data-i18n="nav_home">Home</a>
-        <a href="../index.html" data-i18n="nav_all_patterns">All Patterns</a>
-        <a href="https://dataintegrationmastery.com/#free-course" data-i18n="nav_free_course">Free Course</a>
-        <div class="lang-switcher" aria-label="Language selector">
-          <button onclick="window.DIM.setLanguage('en')" class="lang-btn" data-lang-btn="en" lang="en" aria-label="English">EN</button>
-          <button onclick="window.DIM.setLanguage('fi')" class="lang-btn" data-lang-btn="fi" lang="fi" aria-label="Suomi">FI</button>
-          <button onclick="window.DIM.setLanguage('de')" class="lang-btn" data-lang-btn="de" lang="de" aria-label="Deutsch">DE</button>
-        </div>
+        <a href="https://dataintegrationmastery.com/">Home</a>
+        <a href="../index.html">All Patterns</a>
+        <a href="https://dataintegrationmastery.com/#free-course">Free Course</a>
       </nav>
     </div>
   </header>
 
   <div class="docs-layout">
     <aside class="docs-sidebar" aria-label="Pattern categories">
-      <div class="sidebar-title" data-i18n="sidebar_title">Pattern Categories</div>
+      <div class="sidebar-title">Pattern Categories</div>
 <div class="sidebar-section">
-  <a href="../index.html#resilience" class="sidebar-section-title" data-i18n="sidebar_resilience">🛡️ Resilience Patterns</a>
+  <a href="../index.html#resilience" class="sidebar-section-title">🛡️ Resilience Patterns</a>
   <ul class="sidebar-links">
     <li><a href="../resilience-patterns/circuit-breaker.html">Circuit Breaker</a></li>
     <li><a href="../resilience-patterns/retry-mechanism.html">Retry Mechanism</a></li>
@@ -93,7 +87,7 @@
   </ul>
 </div>
 <div class="sidebar-section">
-  <a href="../index.html#messaging" class="sidebar-section-title" data-i18n="sidebar_messaging">📨 Messaging Patterns</a>
+  <a href="../index.html#messaging" class="sidebar-section-title">📨 Messaging Patterns</a>
   <ul class="sidebar-links">
     <li><a href="request-reply.html">Request-Reply</a></li>
     <li><a href="publish-subscribe.html" class="active">Publish-Subscribe</a></li>
@@ -104,7 +98,7 @@
   </ul>
 </div>
 <div class="sidebar-section">
-  <a href="../index.html#data-transformation" class="sidebar-section-title" data-i18n="sidebar_transformation">🔄 Data Transformation Patterns</a>
+  <a href="../index.html#data-transformation" class="sidebar-section-title">🔄 Data Transformation Patterns</a>
   <ul class="sidebar-links">
     <li><a href="../data-transformation-patterns/message-translator.html">Message Translator</a></li>
     <li><a href="../data-transformation-patterns/content-filter.html">Content Filter</a></li>
@@ -115,7 +109,7 @@
   </ul>
 </div>
 <div class="sidebar-section">
-  <a href="../index.html#routing" class="sidebar-section-title" data-i18n="sidebar_routing">🔀 Routing Patterns</a>
+  <a href="../index.html#routing" class="sidebar-section-title">🔀 Routing Patterns</a>
   <ul class="sidebar-links">
     <li><a href="../routing-patterns/content-based-router.html">Content-Based Router</a></li>
     <li><a href="../routing-patterns/recipient-list.html">Recipient List</a></li>
@@ -125,7 +119,7 @@
   </ul>
 </div>
 <div class="sidebar-section">
-  <a href="../index.html#security" class="sidebar-section-title" data-i18n="sidebar_security">🔐 Security Patterns</a>
+  <a href="../index.html#security" class="sidebar-section-title">🔐 Security Patterns</a>
   <ul class="sidebar-links">
     <li><a href="../security-patterns/authentication.html">Authentication</a></li>
     <li><a href="../security-patterns/authorization.html">Authorization</a></li>
@@ -136,7 +130,7 @@
   </ul>
 </div>
 <div class="sidebar-section">
-  <a href="../index.html#orchestration" class="sidebar-section-title" data-i18n="sidebar_orchestration">🎭 Orchestration Patterns</a>
+  <a href="../index.html#orchestration" class="sidebar-section-title">🎭 Orchestration Patterns</a>
   <ul class="sidebar-links">
     <li><a href="../orchestration-patterns/saga-pattern.html">Saga Pattern</a></li>
     <li><a href="../orchestration-patterns/process-manager.html">Process Manager</a></li>
@@ -160,9 +154,8 @@
     </aside>
 
     <main id="main-content" class="docs-content">
-<div data-lang="en" class="lang-active">
       <div class="breadcrumb">
-        <a href="https://dataintegrationmastery.com/" data-i18n="nav_home">Home</a>
+        <a href="https://dataintegrationmastery.com/">Home</a>
         <span class="sep">›</span>
         <a href="../index.html">Patterns</a>
         <span class="sep">›</span>
@@ -1266,27 +1259,12 @@ public class MultiTenantEventPublisher {
 <li><a href="https://microservices.io/patterns/data/event-driven-architecture.html">Event-Driven Architecture Patterns</a></li>
 </ul>
 
-      <a href="../index.html" class="back-to-top" data-i18n="back_to_patterns">← Back to All Patterns</a>
-    </div><!-- /data-lang=en -->
-<div data-lang="fi">
-  <h1>Julkaise-tilaa -malli</h1>
-  <h2 id="overview-fi">Yleiskatsaus</h2>
-  <p>Julkaise-tilaa (Pub-Sub) -malli on perustavanlaatuinen viestintäparadigma, joka mahdollistaa yksi-monelle-kommunikaation asynkronisen viestinjakelun kautta. Se luo irrotetun viestintämallin, jossa viestin tuottajat (julkaisijat) lähettävät viestejä aiheisiin tietämättä viestin kuluttajista (tilaajista).</p>
-  <p><em>Koko tekninen dokumentaatio on saatavilla englanniksi. Vaihda kieleksi <strong>EN</strong> nähdäksesi täyden sisällön.</em></p>
-  <a href="../index.html" class="back-to-top">← Takaisin kaikkiin kaavoihin</a>
-</div>
-<div data-lang="de">
-  <h1>Publish-Subscribe-Muster</h1>
-  <h2 id="overview-de">Übersicht</h2>
-  <p>Das Publish-Subscribe-Muster (Pub-Sub) ist ein grundlegendes Nachrichtenparadigma, das eine Eins-zu-viele-Kommunikation durch asynchrone Nachrichtenverteilung ermöglicht. Es etabliert ein entkoppeltes Kommunikationsmodell, bei dem Publisher Nachrichten an Topics senden, ohne Kenntnis von den Subscribern.</p>
-  <p><em>Die vollständige technische Dokumentation ist auf Englisch verfügbar. Wechseln Sie zu <strong>EN</strong>, um den vollständigen Inhalt zu sehen.</em></p>
-  <a href="../index.html" class="back-to-top">← Zurück zu allen Mustern</a>
-</div>
-</main>
+      <a href="../index.html" class="back-to-top">← Back to All Patterns</a>
+    </main>
   </div>
 
   <footer class="site-footer">
-    <p><span data-i18n="footer_rights">©2026 Data Integration Mastery™ — All Rights Reserved</span></p>
+    <p>©2026 <a href="https://dataintegrationmastery.com/">Data Integration Mastery™</a> — All Rights Reserved</p>
   </footer>
 </body>
 </html>

@@ -89,6 +89,15 @@ a:hover {
   top: 1rem;
 }
 
+.translate-hint {
+  background: #f0f4f8;
+  border-bottom: 1px solid #d0dae8;
+  color: #5a6b8a;
+  font-size: 0.8rem;
+  padding: 5px 1rem;
+  text-align: center;
+}
+
 /* --- Main Layout --- */
 .site-main {
   max-width: var(--max-width);

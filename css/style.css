@@ -725,3 +725,53 @@ h1, h2, h3, h4 {
     font-size: 1.5em;
   }
 }
+
+/* --- Language Switcher --- */
+.lang-switcher {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-left: 0.75rem;
+  border-left: 1px solid rgba(255,255,255,0.2);
+  padding-left: 0.75rem;
+}
+.lang-btn {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.3);
+  color: rgba(255,255,255,0.7);
+  padding: 0.2rem 0.45rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: var(--font-body, sans-serif);
+  line-height: 1.4;
+}
+.lang-btn:hover {
+  background: rgba(255,255,255,0.15);
+  color: #fff;
+}
+.lang-btn.active {
+  background: var(--color-heading, #A55A82);
+  border-color: var(--color-heading, #A55A82);
+  color: #fff;
+}
+[data-lang] { display: none; }
+[data-lang].lang-active { display: block; }
+.lang-bar {
+  position: fixed;
+  top: 1rem;
+  right: 1.25rem;
+  z-index: 9000;
+  display: flex;
+  gap: 0.25rem;
+  background: rgba(44,44,58,0.92);
+  padding: 0.35rem 0.6rem;
+  border-radius: 0.4rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+.lang-bar .lang-btn {
+  font-size: 0.8rem;
+  padding: 0.25rem 0.5rem;
+}

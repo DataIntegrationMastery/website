@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Primary Meta Tags -->
+  <title>Integration Architecture Validator — Free Tool | Data Integration Mastery™</title>
+  <meta name="description" content="Answer 7 short questions and get personalised integration architecture recommendations — from API Management and ESB to Event-Driven and iPaaS. Free tool by Data Integration Mastery™.">
+  <meta name="keywords" content="integration architecture validator, integration architecture tool, integration architecture assessment, which integration architecture, ESB vs iPaaS, event-driven vs REST, integration pattern recommendation">
+  <link rel="canonical" href="https://dataintegrationmastery.com/validator/">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://dataintegrationmastery.com/validator/">
+  <meta property="og:title" content="Integration Architecture Validator — Free Tool | Data Integration Mastery™">
+  <meta property="og:description" content="7 questions. Instant personalised recommendation. Discover which integration architecture fits your real-world scenario — API Gateway, ESB, iPaaS, Event-Driven, or Microservices.">
+  <meta property="og:image" content="https://dataintegrationmastery.com/assets/images/logo.png">
+  <meta property="og:site_name" content="Data Integration Mastery">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Integration Architecture Validator — Free Tool">
+  <meta name="twitter:description" content="7 questions. Personalised architecture recommendation. Which integration style fits your scenario?">
+  <meta name="twitter:image" content="https://dataintegrationmastery.com/assets/images/logo.png">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="css/validator.css">
+
+  <!-- Structured Data: WebApplication -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Integration Architecture Validator",
+    "url": "https://dataintegrationmastery.com/validator/",
+    "description": "A free interactive tool that guides IT professionals through 7 scenario-based questions and recommends the best integration architecture approach — from API Management and ESB to Event-Driven and microservices.",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "Web",
+    "isAccessibleForFree": true,
+    "provider": {
+      "@type": "Organization",
+      "name": "Data Integration Mastery",
+      "url": "https://dataintegrationmastery.com"
+    },
+    "author": {
+      "@type": "Person",
+      "name": "Ari Vilkman",
+      "jobTitle": "Integration Architect",
+      "url": "https://www.linkedin.com/in/arivilkman/"
+    }
+  }
+  </script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  <div class="translate-hint" role="note">This site is in English. Use your browser's built-in translate feature to read it in your language.</div>
+
+  <!-- Navigation -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="https://dataintegrationmastery.com/" class="header-brand">
+        <img src="../assets/images/dim-icon.png" alt="DIM" width="36" height="36">
+        <span class="header-title">Data Integration Mastery™</span>
+      </a>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Open navigation" aria-expanded="false">
+        <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path fill="#fff" d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+      </button>
+      <nav class="header-nav" id="header-nav" aria-label="Main navigation">
+        <a href="https://dataintegrationmastery.com/">Home</a>
+        <a href="https://dataintegrationmastery.com/#free-course">Free Course</a>
+        <a href="https://dataintegrationmastery.com/patterns/">Patterns</a>
+        <a href="https://dataintegrationmastery.com/validator/" aria-current="page" class="active">Validator</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main content -->
+  <main id="main-content" class="validator-main">
+
+    <!-- Progress bar (always visible) -->
+    <div class="v-progress-wrap" aria-hidden="true">
+      <p class="v-step-label" id="v-step-label"></p>
+      <div class="v-progress-track" role="progressbar" aria-label="Validator progress" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+        <div class="v-progress-bar" id="v-progress-bar"></div>
+      </div>
+    </div>
+
+    <!-- ===== INTRO SCREEN ===== -->
+    <div id="v-intro" class="v-card" aria-label="Validator introduction" hidden>
+      <div class="v-intro-icon" aria-hidden="true">🧭</div>
+      <h1 class="v-intro-title">Integration Architecture Validator</h1>
+      <p class="v-intro-subtitle">Find the right architecture for your integration scenario</p>
+
+      <div class="v-intro-meta" aria-label="Tool highlights">
+        <div class="v-intro-meta-item">
+          <div class="v-meta-num">7</div>
+          <div class="v-meta-label">Questions</div>
+        </div>
+        <div class="v-intro-meta-item">
+          <div class="v-meta-num">~3</div>
+          <div class="v-meta-label">Minutes</div>
+        </div>
+        <div class="v-intro-meta-item">
+          <div class="v-meta-num">Free</div>
+          <div class="v-meta-label">No signup required</div>
+        </div>
+      </div>
+
+      <div class="v-intro-body">
+        <p>Integration architecture decisions have long-term consequences — and the wrong choice costs teams months of rework and significant budget. Yet most architects make these decisions under time pressure, without a clear framework to structure their thinking.</p>
+        <p>This validator walks you through <strong>seven scenario-based questions</strong> that cover the dimensions that matter most: integration scale, latency, transformation complexity, reliability requirements, and team context. Based on your answers, it recommends the best-fit architecture style — from lightweight API integration to event-driven platforms and enterprise ESBs — and links you directly to the relevant design patterns.</p>
+        <p><strong>Use it for:</strong> architecture reviews, project kickoffs, design justification, or whenever you want a structured second opinion on your integration approach.</p>
+      </div>
+
+      <div class="v-cta-group">
+        <button id="v-start-btn" class="v-btn-primary" type="button">
+          Start the Validator
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
+        </button>
+      </div>
+
+      <p style="text-align:center;font-size:0.85rem;color:#888;">Built by <a href="https://www.linkedin.com/in/arivilkman/" target="_blank" rel="noopener">Ari Vilkman</a> — Integration Architect with 25+ years of real-world projects. Free and open access.</p>
+    </div>
+
+    <!-- ===== QUESTION SCREEN ===== -->
+    <div id="v-question" class="v-card" aria-live="polite" aria-label="Current question" hidden>
+      <p class="v-q-number"></p>
+      <h2 class="v-q-text"></h2>
+      <p class="v-q-hint"></p>
+
+      <div class="v-options" role="group" aria-label="Answer options">
+        <!-- Options injected by JS -->
+      </div>
+
+      <div style="margin-top:1.5rem;">
+        <button class="v-btn-back" id="v-back-btn" type="button">
+          <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+          Back
+        </button>
+      </div>
+    </div>
+
+    <!-- ===== RESULTS SCREEN ===== -->
+    <div id="v-results" class="v-card" aria-label="Your architecture recommendations" hidden>
+      <h2 class="v-results-heading">Your Architecture Recommendations</h2>
+      <p class="v-results-sub">Based on your answers, here are the integration approaches that best fit your scenario — from best match to alternatives worth considering.</p>
+
+      <div class="v-recommendations" aria-live="polite">
+        <!-- Result cards injected by JS -->
+      </div>
+
+      <!-- Lead Magnet: MailerLite form -->
+      <div class="v-mailerlite-section" aria-label="Mailing list signup">
+        <p class="v-ml-heading">📬 Get More: Join the DIM Mailing List</p>
+        <p class="v-ml-body">Get practical integration architecture tips, new pattern guides, and course news delivered straight to your inbox. <strong>No spam. Unsubscribe anytime.</strong></p>
+        <!-- MailerLite Form: Validator lead magnet -->
+        <div class="ml-embedded" data-form="l3EQHd"></div>
+      </div>
+
+      <div class="v-cta-group" style="margin-top:1.5rem;">
+        <button id="v-restart-btn" class="v-btn-primary" type="button">
+          Run the Validator Again
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+        </button>
+        <a href="/patterns/" class="v-btn-primary" style="background:#5A6B8A;">
+          Browse All Patterns
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
+        </a>
+      </div>
+
+      <p style="text-align:center;font-size:0.8rem;color:#888;margin-top:1rem;">©2026 Data Integration Mastery™ — <a href="https://dataintegrationmastery.com/">dataintegrationmastery.com</a></p>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <p>©2026 Data Integration Mastery™ — All Rights Reserved</p>
+  </footer>
+
+  <!-- MailerLite Universal Script -->
+  <script>
+    (function(w,d,e,u,f,l,n){w[f]=w[f]||function(){(w[f].q=w[f].q||[])
+    .push(arguments);},l=d.createElement(e),l.async=1,l.src=u,
+    n=d.getElementsByTagName(e)[0],n.parentNode.insertBefore(l,n);})
+    (window,document,'script','https://assets.mailerlite.com/js/universal.js','ml');
+    ml('account', '1831412');
+  </script>
+
+  <!-- Mobile nav toggle -->
+  <script>
+    (function() {
+      var toggle = document.getElementById('nav-toggle');
+      var nav    = document.getElementById('header-nav');
+      if (toggle && nav) {
+        toggle.addEventListener('click', function() {
+          var open = nav.classList.toggle('open');
+          toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+        });
+      }
+    })();
+  </script>
+
+  <!-- Validator app -->
+  <script src="js/validator.js"></script>
+</body>
+</html>

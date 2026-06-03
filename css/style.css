@@ -592,6 +592,7 @@ h1, h2, h3, h4 {
   color: rgba(255, 255, 255, 0.6);
   font-size: 0.875rem;
 }
+.footer-meta { margin: 6px 0 0; font-size: 0.875rem; }
 
 /* ============================================================
    RESPONSIVE BREAKPOINTS

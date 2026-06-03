@@ -320,6 +320,7 @@ a:hover { color: var(--color-heading); text-decoration: none; }
   text-align: center; padding: 1.5rem;
   color: rgba(255,255,255,0.6); font-size: 0.875rem;
 }
+.footer-meta { margin: 6px 0 0; font-size: 0.875rem; }
 
 /* ============================================================
    RESPONSIVE

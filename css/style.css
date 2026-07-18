@@ -360,7 +360,10 @@ h1, h2, h3, h4 {
 /* --- Testimonial Images --- */
 .testimonial-image {
   display: flex;
+  flex-direction: column;
   justify-content: center;
+  align-items: center;
+  gap: 1rem;
 }
 
 .testimonial-image img {
